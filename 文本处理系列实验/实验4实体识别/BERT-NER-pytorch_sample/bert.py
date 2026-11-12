@@ -78,18 +78,22 @@ class Ner:
         logits_label = torch.argmax(logits,dim=2)
         logits_label = logits_label.detach().cpu().numpy()
         # import ipdb; ipdb.set_trace()
-        logits_confidence = [values[label].item() for values,label in zip(logits[0],logits_label[0])]
-
         logits_label = [logits_label[0][index] for index,i in enumerate(input_mask[0]) if i.item()==1]
         logits_label.pop(0)
         logits_label.pop()
 
         assert len(logits_label) == len(valid_positions)
         labels = []
-        for valid,label in zip(valid_positions,logits_label):
+        confidences = []
+        for token_index, (valid,label) in enumerate(zip(valid_positions,logits_label)):
             if valid:
                 labels.append(self.label_map[label])
+                confidence = logits[0][token_index + 1][label].item()
+                confidences.append(confidence)
         words = word_tokenize(text)
         assert len(labels) == len(words)
-        output = [word:{"tag":label,"confidence":confidence} for word,label,confidence in zip(words,labels,logits_confidence)]
+        output = {
+            word: {"tag": label, "confidence": confidence}
+            for word, label, confidence in zip(words, labels, confidences)
+        }
         return output

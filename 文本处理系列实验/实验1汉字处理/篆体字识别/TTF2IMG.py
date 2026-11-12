@@ -29,7 +29,7 @@ def char_to_img(all_chara, img_dir, uniMap, font, img_size):
 
 
 if __name__ == '__main__':
-    start = time.clock()
+    start = time.perf_counter()
     TTF_DIR = "ALL-Font"  # 存放.tff字体文件夹
     img_dir = "data"  # 生成图片存储路径
     img_size = 30  # 生成图片存储路径
@@ -47,8 +47,8 @@ if __name__ == '__main__':
         print("********" + ttf_path + "*****************")
         # 创建int型unicode编码与字符映射表
         fontmap = TTFont(ttf_path)
-        uniMap = fontmap['cmap'].tables[0].ttFont.getBestCmap()
+        uniMap = fontmap.getBestCmap()
         # 加载并创建指定大小的字体对象
         font = ImageFont.truetype(ttf_path, img_size)
         char_to_img(all_chara, img_dir, uniMap, font, img_size)
-    print('time spent: {}'.format(time.clock()-start))
+    print('time spent: {}'.format(time.perf_counter()-start))
