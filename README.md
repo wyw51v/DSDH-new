@@ -2,9 +2,9 @@
 
 苏州大学历史文化学院课程资源。课程由 12 个方法模块和 1 个综合项目组成，贯穿可复现、案例真实与研究伦理。
 
-**站点入口：**[数据科学与数字人文 · GitHub Pages](https://dsdh-python.github.io/DSDH/)
+**站点入口：**[数据科学与数字人文 · GitHub Pages](https://dsdh-ar.github.io/DSDH/)
 
-**GitHub 仓库：**[DSDH-Python/DSDH](https://github.com/DSDH-Python/DSDH)
+**GitHub 仓库：**[DSDH-Python/DSDH](https://github.com/DSDH-ar/DSDH)
 
 ## 教材与站点
 
