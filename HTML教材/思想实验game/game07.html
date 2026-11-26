@@ -1,0 +1,298 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏 07｜平面国 · 数据科学与数字人文</title>
+<style>
+:root{
+  --blue:#1f4e79; --blue2:#2b6cb0; --blue3:#3b82c4;
+  --soft:#eaf2fa; --soft2:#f5f9fd;
+  --green:#2f855a; --gsoft:#e9f6ef;
+  --ink:#1a202c; --muted:#4a5568; --faint:#718096;
+  --line:#d9e2ec; --line2:#edf1f6;
+  --bg:#f4f7fb; --card:#ffffff;
+  --red:#c53030; --rsoft:#fff5f5; --rline:#feb2b2;
+  --amber:#b7791f; --asoft:#fffaf0;
+  --shadow:0 2px 12px rgba(31,78,121,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  line-height:1.78;font-size:15px}
+a{color:var(--blue2);text-decoration:none}
+a:hover{text-decoration:underline}
+code{background:var(--soft);padding:1px 5px;border-radius:4px;font-family:Consolas,"Courier New",monospace;font-size:.9em;color:var(--blue)}
+
+/* ---------- top bar ---------- */
+.topbar{background:var(--blue);color:#fff;padding:11px 0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.topbar .wrap{max-width:1240px;margin:0 auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{font-size:15.5px;font-weight:700}
+.brand small{display:block;font-size:11px;font-weight:400;opacity:.8;letter-spacing:.3px}
+.topbar nav{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.topbar nav a,.topbar nav button{color:#fff;border:1px solid rgba(255,255,255,.42);background:transparent;
+  padding:5px 11px;border-radius:6px;font-size:12.5px;cursor:pointer;font-family:inherit;line-height:1.4}
+.topbar nav a:hover,.topbar nav button:hover{background:rgba(255,255,255,.16);text-decoration:none}
+.topbar nav .current{background:rgba(255,255,255,.2);border-color:#fff}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(120deg,#1f4e79 0%,#2b6cb0 52%,#2f855a 140%);color:#fff;padding:34px 22px 30px}
+.hero .wrap{max-width:1240px;margin:0 auto}
+.hero .kicker{font-size:11.5px;letter-spacing:2px;opacity:.85;margin:0 0 8px}
+.hero .tag{border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 10px;display:inline-block;font-size:11px;margin-bottom:10px}
+.hero h1{margin:0 0 6px;font-size:29px;line-height:1.3}
+.hero .en{font-size:13px;font-weight:400;opacity:.8;margin-left:8px}
+.hero .game-name{font-size:16px;font-weight:600;opacity:.96;margin:0 0 10px}
+.hero .lead{max-width:930px;margin:0;opacity:.93;font-size:13.8px}
+.stats{display:flex;gap:0;flex-wrap:wrap;margin-top:22px;border-top:1px solid rgba(255,255,255,.28);padding-top:16px}
+.stats .st{padding:0 20px;border-left:2px solid rgba(255,255,255,.4);min-width:120px}
+.stats .st:first-child{padding-left:0;border-left:none}
+.stats .st b{display:block;font-size:17px;line-height:1.3}
+.stats .st span{font-size:11px;opacity:.82}
+
+/* ---------- layout ---------- */
+.doc{max-width:1240px;margin:0 auto;padding:24px 22px 56px;display:grid;grid-template-columns:248px 1fr;gap:26px;align-items:start}
+.side{position:sticky;top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:15px;box-shadow:var(--shadow);max-height:calc(100vh - 28px);overflow:auto}
+.side h4{margin:2px 0 10px;font-size:12.5px;color:var(--blue);letter-spacing:.5px}
+.side a{display:block;padding:5px 8px;border-radius:6px;font-size:12.4px;color:var(--muted);line-height:1.45}
+.side a:hover{background:var(--soft);color:var(--blue);text-decoration:none}
+.side .jp{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.side .jp a{font-size:11.8px}
+.content{min-width:0}
+.content section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px 26px;margin-bottom:18px;box-shadow:var(--shadow)}
+.content section>h2{margin:0 0 14px;font-size:19px;color:var(--blue);padding-bottom:10px;border-bottom:2px solid var(--gsoft)}
+.content section>h2 .no{color:var(--green);font-size:13px;margin-right:8px}
+h3.sub{font-size:14.5px;color:var(--blue);margin:18px 0 8px;padding-left:9px;border-left:3px solid var(--green)}
+h3.sub:first-of-type{margin-top:4px}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:5px 0}
+b,strong{color:var(--blue)}
+.small{font-size:12.8px;color:var(--muted)}
+
+/* ---------- blocks ---------- */
+.quote{background:var(--soft2);border-left:4px solid var(--blue3);border-radius:0 8px 8px 0;padding:12px 16px;margin:10px 0;font-size:13.6px}
+.quote .src{display:block;font-size:11.8px;color:var(--faint);margin-top:6px}
+.think{border:1px solid var(--line);border-radius:10px;padding:13px 16px;background:#fbfdff;margin:12px 0}
+.think .q{font-weight:700;color:var(--green);font-size:14px;margin-bottom:5px}
+.level{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:6px;vertical-align:1px}
+.lv1{background:var(--soft);color:var(--blue)}
+.lv2{background:var(--gsoft);color:var(--green)}
+.lv3{background:var(--asoft);color:var(--amber)}
+.callout{border-left:4px solid var(--blue2);background:var(--soft);border-radius:0 8px 8px 0;padding:11px 15px;margin:12px 0;font-size:13.4px}
+.callout.green{border-left-color:var(--green);background:var(--gsoft)}
+.callout.risk{border-left-color:var(--red);background:var(--rsoft);border:1px solid var(--rline);border-left-width:4px;color:#7b2020}
+.callout.amber{border-left-color:var(--amber);background:var(--asoft)}
+
+/* ---------- setup cards ---------- */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:12px 0}
+.infocard{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--soft2)}
+.infocard h4{margin:0 0 6px;font-size:12.6px;color:var(--blue);letter-spacing:.3px}
+.infocard .big{font-size:19px;font-weight:700;color:var(--green);line-height:1.3}
+.infocard p,.infocard ul{font-size:12.9px;margin:4px 0}
+.infocard ul{padding-left:18px}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;margin:12px 0}
+table.tb{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+table.tb th{background:var(--blue);color:#fff;text-align:left;padding:8px 10px;font-weight:600;font-size:12.5px}
+table.tb td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+table.tb tbody tr:nth-child(even){background:#f8fafc}
+table.tb.compact{font-size:12.5px}
+table.tb.compact th,table.tb.compact td{padding:6px 8px}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill.b{background:var(--soft);color:var(--blue)}
+.pill.g{background:var(--gsoft);color:var(--green)}
+.pill.r{background:var(--rsoft);color:var(--red)}
+
+/* ---------- flow ---------- */
+ol.flow{margin:10px 0;padding:0;list-style:none;counter-reset:flow}
+ol.flow>li{position:relative;padding:12px 14px 12px 52px;margin:10px 0;border:1px solid var(--line);border-radius:9px;background:#fbfdff;counter-increment:flow}
+ol.flow>li:before{content:counter(flow);position:absolute;left:13px;top:12px;width:27px;height:27px;border-radius:8px;
+  background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+ol.flow>li .ft{font-weight:700;color:var(--blue);font-size:14px}
+ol.flow>li .tm{float:right;background:var(--gsoft);color:var(--green);font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px}
+ol.flow>li .say{background:var(--asoft);border-left:3px solid var(--amber);padding:7px 11px;margin-top:8px;font-size:12.8px;color:#6b4f1d;border-radius:0 6px 6px 0}
+ol.flow>li p{font-size:13.2px;margin:5px 0}
+
+/* ---------- printable materials ---------- */
+.pm{border:2px dashed #b9c9da;border-radius:11px;padding:15px 17px;margin:16px 0;background:#fff;page-break-inside:avoid}
+.pm-h{margin:0 0 3px;font-size:14.5px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.pm-h .tagp{background:var(--green);color:#fff;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.pm-note{font-size:12.3px;color:var(--muted);margin:0 0 12px;background:var(--soft2);padding:6px 10px;border-radius:6px}
+.pgrid{display:grid;gap:12px}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+.pcard{border:1.5px solid #94a9be;border-radius:8px;padding:11px 12px;min-height:118px;background:#fcfdff;display:flex;flex-direction:column}
+.pcard .plab{font-size:10.8px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--blue);border-radius:4px;padding:2px 7px;display:inline-block;align-self:flex-start;margin-bottom:7px}
+.pcard.g .plab{background:var(--green)}
+.pcard.r .plab{background:var(--red)}
+.pcard.a .plab{background:var(--amber)}
+.pcard .pbody{font-size:12.6px;line-height:1.62;flex:1}
+.pcard .pbody p{margin:3px 0}
+.pcard .pcut{margin-top:9px;border-top:1px dashed #b9c9da;padding-top:5px;font-size:9.5px;color:var(--faint);text-align:center}
+.wsheet{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fcfdff;font-size:12.8px}
+.wsheet .wh{font-weight:700;color:var(--blue);margin:10px 0 5px;font-size:13px}
+.wsheet .wh:first-child{margin-top:0}
+.pline{border-bottom:1px solid #c3cfdb;height:26px;margin:5px 0}
+.pline.short{width:55%}
+.wsheet table.mm{width:100%;border-collapse:collapse;font-size:12px}
+.wsheet table.mm th,.wsheet table.mm td{border:1px solid #c3cfdb;padding:6px 7px;text-align:left;vertical-align:top}
+.wsheet table.mm th{background:var(--soft);color:var(--blue);font-size:11.5px}
+.wsheet table.mm td.empty{height:34px}
+.scorebox{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
+.scorebox table{width:100%;border-collapse:collapse;font-size:12.5px}
+.scorebox th{background:var(--green);color:#fff;padding:7px 9px;text-align:left}
+.scorebox td{border-bottom:1px solid var(--line);padding:6px 9px}
+.scorebox td.b{background:#fbfdff}
+
+/* ---------- debrief / tips ---------- */
+ol.debrief{margin:10px 0;padding-left:0;list-style:none;counter-reset:db}
+ol.debrief li{position:relative;padding:9px 12px 9px 42px;margin:7px 0;border-left:3px solid var(--gsoft);background:#fbfdff;border-radius:0 8px 8px 0;font-size:13.3px;counter-increment:db}
+ol.debrief li:before{content:counter(db);position:absolute;left:11px;top:9px;color:var(--green);font-weight:800;font-size:13px}
+details{margin:12px 0;border:1px solid var(--line);border-radius:9px;background:var(--soft2);padding:10px 14px}
+details summary{cursor:pointer;color:var(--blue);font-size:13.2px;font-weight:700}
+details[open] summary{margin-bottom:8px}
+details ul,details p{font-size:13px}
+
+/* ---------- bottom nav ---------- */
+.bottom-nav{max-width:1240px;margin:0 auto 40px;padding:0 22px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bottom-nav a{flex:1;min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow);font-size:13px}
+.bottom-nav a:hover{border-color:var(--blue2);text-decoration:none}
+.bottom-nav a small{display:block;color:var(--faint);font-size:11px}
+.bottom-nav a.next{text-align:right}
+.footer{text-align:center;color:var(--faint);font-size:11.8px;padding:0 20px 34px}
+
+/* ---------- responsive ---------- */
+@media(max-width:920px){
+  .doc{grid-template-columns:1fr;padding:18px 14px}
+  .side{position:static;max-height:none}
+  .content section{padding:19px 17px}
+  .hero h1{font-size:24px}
+  .cols-3,.cols-4{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+
+/* ---------- print ---------- */
+@media print{
+  body{background:#fff;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .topbar,.side,.bottom-nav,.footer{display:none!important}
+  .doc{display:block;padding:0;max-width:none}
+  .content section{border:none;box-shadow:none;padding:0 0 14px;margin:0 0 14px;page-break-inside:auto;border-bottom:1px solid #ddd;border-radius:0}
+  .hero{background:#1f4e79!important;padding:14px 0;color:#fff}
+  .hero h1{font-size:20pt}
+  .hero .lead,.stats .st span{font-size:9pt}
+  .pm{page-break-before:auto;page-break-inside:avoid;border:2px dashed #777}
+  .pcard{min-height:105px}
+  details{display:block;border:none;background:none;padding:0}
+  details>summary{display:none}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap"><div class="brand">《数据科学与数字人文》· 思想实验课堂游戏<small>第 07 / 13 场 · 40–45 人班级版</small></div><nav><a href="thought-experiment-games.html">返回总览</a><a href="game06.html">← 上一场</a><a href="game08.html">下一场 →</a><button onclick="window.print()">打印素材</button></nav></div></header>
+<div class="hero"><div class="wrap"><p class="kicker">THOUGHT EXPERIMENT → CLASSROOM GAME · 07 / 13</p><span class="tag">对接 第7章 空间人文与 GIS</span><h1>平面国<span class="en">Flatland · Edwin A. Abbott</span></h1><p class="game-name">课堂游戏：给历史地图补上第三维</p><p class="lead">二维世界的居民无法理解「上下」。学生先只看一张平面分布图下结论，再加入时间维度重画时空图——原本的「中心灾区」竟变成最晚被波及的地方。最后发「权力卡」：这张地图的边界由谁划定？改名撤县如何改变统计？</p><div class="stats"><div class="st"><b>45 分钟</b><span>建议时长</span></div><div class="st"><b>40–45 人</b><span>适用班级</span></div><div class="st"><b>11 组 × 4 人</b><span>分组方式</span></div><div class="st"><b>★★★★☆</b><span>难度</span></div></div></div></div>
+<div class="doc"><aside class="side"><h4>本场目录</h4><a href="#origin">一、思想实验原典与展开</a><a href="#mapping">二、与教材的对接</a><a href="#setup">三、班级组织（40–45 人）</a><a href="#objectives">四、学习目标</a><a href="#materials">五、材料清单与准备</a><a href="#flow">六、游戏流程</a><a href="#assets">七、游戏素材（可打印）</a><a href="#debrief">八、讨论引导（分层）</a><a href="#assessment">九、评价与计分</a><a href="#redline">十、伦理与安全红线</a><a href="#tips">十一、教师提示与变体</a><div class="jp"><a href="game06.html">← 06 六度分隔</a><a href="game08.html">→ 08 缸中之脑</a></div></aside>
+<main class="content">
+<section id="origin"><h2><span class="no">01</span>一、思想实验原典与展开</h2>
+<h3 class="sub">原典与情节</h3>
+<div class="quote">我生活在二维世界。这里的一切——包括我自己——都是平面图形。我们唯一的" + "「上下」是南北，唯一的" + "「左右」是东西。直到有一天，一个来自三维世界的球体穿过我的平面……
+<span class="src">——艾博特《平面国：多维度传奇》，1884（作者署名 A Square）</span></div>
+
+<h3 class="sub">提出者与写作动机</h3>
+<p>埃德温·阿伯特（Edwin A. Abbott，1838—1926），英国牧师、数学教师与莎士比亚学者。《平面国》表面是数学寓言，实则是<b>维多利亚时代的社会讽刺</b>：二维世界的等级由边数决定（等腰三角形是工人、正方形是中产、圆形是教士），女性被画成危险的直线。这个讽刺提醒我们：<b>空间的" + "「自然秩序」往往是社会建构。</b></p>
+
+<h3 class="sub">思想实验的展开</h3>
+<ol>
+<li><b>维度的局限：</b>二维居民看球体穿过平面，只能看到一个圆由小变大再变小——他们无法" + "「看见」球体本身，只能看见它的截面。</li>
+<li><b>归纳的陷阱：</b>他们根据有限经验建立" + "「世界只有二维」的信念，这个信念在经验内完全自洽。</li>
+<li><b>更高维：</b>当球体讲述三维，正方形 A Square 接受了；但当提到四维，球体自己又成了" + "「平面国居民」。<b>每一层视角都有自己的盲区。</b></li>
+</ol>
+
+<h3 class="sub">后续变体</h3>
+<ul>
+<li><b>四维时空：</b>黎曼几何与闵可夫斯基时空让" + "「时间作为第四维」成为科学常识。</li>
+<li><b>Hinton 的四维立方体（超立方体）：</b>用投影让三维生物理解四维——正如我们用" + "「时空立方体」让平面地图理解时间。</li>
+<li><b>历史 GIS（本游戏）：</b>历史地图是" + "「二维截面」，时间维度被压扁。加上时间，因果判断会翻转。</li>
+</ul>
+
+<h3 class="sub">常见误解</h3>
+<div class="callout amber"><b>误解：</b>" + "「平面国只是儿童数学读物。」<br><b>正解：</b>它是尖锐的社会批判。把它用于 GIS 课堂时，最重要的不是" + "「三维很好玩」，而是<b>每一种表征都有它系统性地看不见的东西</b>——包括地图的边界与权力。</div>
+</section>
+<section id="mapping"><h2><span class="no">02</span>二、与教材的对接</h2>
+<div class="tbl-wrap"><table class="tb"><thead><tr><th>教材节点</th><th>游戏对应机制</th><th>习得的判断</th></tr></thead><tbody><tr><td>7.1 给人文加一个坐标</td><td>二维分布图</td><td>坐标是一种选择</td></tr><tr><td>7.2 空间数据：点 / 线 / 面</td><td>20 个地点坐标</td><td>点数据的基本形态</td></tr><tr><td>7.3 历史 GIS：时间 + 空间</td><td>时间纸条与时空图</td><td>加维后结论翻转</td></tr><tr><td>7.4 空间分析：密度 / 邻近 / 扩散</td><td>判断「哪里最严重」「向哪扩散」</td><td>扩散需要时间才能判断</td></tr><tr><td>7.5 地理编码</td><td>地名更改卡</td><td>古今地名不一致的麻烦</td></tr><tr><td>7.6 地图即权力</td><td>权力卡与地图声明</td><td>边界、命名、取舍都是权力</td></tr></tbody></table></div>
+<div class="callout green"><b>一句话锚点：</b>加一维，不只是加一个变量，而是加一种伦理立场。<b>每一种表征都系统性地看不见某些东西。</b></div>
+</section>
+<section id="setup"><h2><span class="no">03</span>三、班级组织（40–45 人）</h2>
+<div class="grid3">
+<div class="infocard"><h4>班级规模</h4><div class="big">40–45 人</div><p>11 组 × 4 人 = 44；余 1 人任" + "「球体使者」，负责投放维度卡。</p></div>
+<div class="infocard"><h4>组内角色</h4><div class="big">4 人 / 组</div><ul><li>平面居民 ×2（坚持第一版结论）</li><li>球体使者 ×1（投放时间/层级卡）</li><li>记录员 ×1（填对照表）</li></ul></div>
+<div class="infocard"><h4>全班角色</h4><div class="big">1 人</div><p>" + "「总球体」由教师担任，掌控新一轮维度的投放节奏。</p></div>
+</div>
+<div class="callout">大班关键：<b>不要让各组同时加维</b>。统一投放：先全做二维，再由教师发时间纸条，最后发权力卡。这样才有" + "「集体翻案」的戏剧性。</div>
+</section>
+<section id="objectives"><h2><span class="no">04</span>四、学习目标</h2>完成本场游戏后，学生应能：<ul><li><b>描述</b>二维地图在呈现扩散过程时的结构性局限（识记层）。</li><li><b>绘制</b>一张「空间 × 时间」的时空图，并据此修正结论（应用层）。</li><li><b>分析</b>行政层级与地名变更如何影响空间统计结果（分析层）。</li><li><b>论证</b>「地图即权力」的具体机制，并写出一份可核查的地图声明（反思层）。</li></ul></section>
+<section id="materials"><h2><span class="no">05</span>五、材料清单与准备</h2><div class="tbl-wrap"><table class="tb"><thead><tr><th>品名</th><th>数量（45 人上限）</th><th>说明</th></tr></thead><tbody><tr><td>二维分布图</td><td>11 张（A3 放大更佳）</td><td>素材页提供 20 个点坐标，教师可先画好底图</td></tr><tr><td>地点坐标与年份表</td><td>11 套</td><td>素材页提供完整数据</td></tr><tr><td>时间纸条</td><td>11 套 × 20 张</td><td>每点一条，含年份</td></tr><tr><td>行政层级卡</td><td>11 套 × 3 张</td><td>府 / 州 / 县</td></tr><tr><td>权力卡</td><td>11 套 × 3 张</td><td>边界 / 改名 / 取舍</td></tr><tr><td>时空图模板</td><td>45 份</td><td>横轴空间、纵轴时间</td></tr><tr><td>地图声明表</td><td>11 份</td><td>每组 1 份</td></tr></tbody></table></div>
+<div class="callout amber"><b>课前准备：</b>把 SPOTS 数据的 20 个点画成一张 A3 底图（或投影），每组一张；时间纸条按套裁好。权力卡在最后一轮才发。</div>
+</section>
+<section id="flow"><h2><span class="no">06</span>六、游戏流程</h2><ol class="flow"><li><div class="ft">平面国：只看二维下结论</div><span class="tm">8′</span><p>发二维图，各组仅凭位置回答：「哪里最严重？扩散方向如何？」写下结论并签名——签名是为了后面「翻案」时有据可查。</p><div class="say"><b>教师引导语：</b>「你现在是平面国的居民。你没有时间的概念，只能看见这些点在哪里。」</div></li><li><div class="ft">球体闯入：加入时间维</div><span class="tm">12′</span><p>发时间纸条与层级卡。各组把时间当纵轴重画时空图。教师提示：注意「承平」这个点——它在图上最靠中心。</p><div class="say"><b>教师引导语：</b>「你刚才说中心最严重。现在看它的年份：1858。而边缘的安平是 1841。谁才是起点？」</div></li><li><div class="ft">平面居民的反驳</div><span class="tm">8′</span><p>每组 2 名「平面居民」坚持第一版结论，质疑加维后的解释。训练学生理解：维度局限不是愚蠢，是结构性的看不见。</p></li><li><div class="ft">权力卡：地图由谁划定</div><span class="tm">12′</span><p>发三张权力卡：①边界由谁定？②某县在统计年份被撤并/改名，密度图会怎样？③「哪些点值得画」由谁决定？各组填写地图声明。</p></li><li><div class="ft">收束与交换</div><span class="tm">5′</span><p>组间交换地图声明，找对方「没声明的立场」。教师点题：加一维不只是加变量，而是加伦理立场。</p></li></ol></section>
+<section id="assets"><h2><span class="no">07</span>七、游戏素材（可打印）</h2>
+<h3 class="sub">素材 A · 二维分布图数据（教师制底图，每组 1 张）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>某区域灾害首见于志书的地点（教学合成样例）</h4><p class="pm-note">20 个点，坐标为 (x,y)，0–10 网格；年份为首见记录年。注意'承平'位于地图中心但年份最晚。</p><div class="wsheet">
+<table class="mm"><tr><th>地名</th><th>x</th><th>y</th><th>年份</th><th>层级</th><th>地名</th><th>x</th><th>y</th><th>年份</th><th>层级</th></tr>
+<tr><td>安平</td><td>2</td><td>3</td><td>1841</td><td>县</td><td>临川</td><td>3</td><td>2</td><td>1842</td><td>县</td></tr><tr><td>清河</td><td>4</td><td>3</td><td>1842</td><td>府</td><td>永定</td><td>2</td><td>5</td><td>1843</td><td>县</td></tr><tr><td>怀远</td><td>5</td><td>2</td><td>1844</td><td>州</td><td>平江</td><td>3</td><td>6</td><td>1844</td><td>县</td></tr><tr><td>广宁</td><td>6</td><td>3</td><td>1846</td><td>府</td><td>宁远</td><td>1</td><td>7</td><td>1847</td><td>县</td></tr><tr><td>定襄</td><td>7</td><td>2</td><td>1848</td><td>州</td><td>新民</td><td>4</td><td>7</td><td>1849</td><td>县</td></tr><tr><td>怀仁</td><td>8</td><td>4</td><td>1850</td><td>县</td><td>靖安</td><td>2</td><td>9</td><td>1851</td><td>县</td></tr><tr><td>镇远</td><td>6</td><td>8</td><td>1852</td><td>府</td><td>长乐</td><td>9</td><td>6</td><td>1853</td><td>县</td></tr><tr><td>归化</td><td>5</td><td>1</td><td>1854</td><td>州</td><td>永泰</td><td>8</td><td>9</td><td>1855</td><td>县</td></tr><tr><td>怀宁</td><td>7</td><td>6</td><td>1857</td><td>县</td><td>承平</td><td>5</td><td>5</td><td>1858</td><td>府</td></tr><tr><td>宁朔</td><td>9</td><td>3</td><td>1859</td><td>县</td><td>昌化</td><td>4</td><td>9</td><td>1860</td><td>县</td></tr>
+</table>
+<div style="border:1px solid #94a9be;height:150px;margin-top:8px;position:relative">
+ <div style="position:absolute;left:8px;top:6px;font-size:10px;color:#718096">y ↑</div>
+ <div style="position:absolute;right:8px;bottom:6px;font-size:10px;color:#718096">x →</div>
+ <div style="position:absolute;left:50%;top:50%;width:8px;height:8px;border:1px solid #c53030;border-radius:50%;transform:translate(-50%,-50%)"></div>
+ <div style="position:absolute;left:52%;top:47%;font-size:9px;color:#c53030">中心点（承平 1858）</div>
+</div>
+</div></div>
+<h3 class="sub">素材 B · 时间纸条与层级卡</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>时间纸条（每套 20 张）</h4><p class="pm-note">每组一套，按地点裁切。发下后学生才可加时间维。</p><div class="pgrid cols-4"><div class="pcard g"><span class="plab">安平 · 1841</span><div class="pbody"><p>安平：首见于 <b>1841</b> 年<br>坐标 (2,3)　层级：县</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">临川 · 1842</span><div class="pbody"><p>临川：首见于 <b>1842</b> 年<br>坐标 (3,2)　层级：县</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">清河 · 1842</span><div class="pbody"><p>清河：首见于 <b>1842</b> 年<br>坐标 (4,3)　层级：府</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">永定 · 1843</span><div class="pbody"><p>永定：首见于 <b>1843</b> 年<br>坐标 (2,5)　层级：县</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">怀远 · 1844</span><div class="pbody"><p>怀远：首见于 <b>1844</b> 年<br>坐标 (5,2)　层级：州</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">平江 · 1844</span><div class="pbody"><p>平江：首见于 <b>1844</b> 年<br>坐标 (3,6)　层级：县</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">广宁 · 1846</span><div class="pbody"><p>广宁：首见于 <b>1846</b> 年<br>坐标 (6,3)　层级：府</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">宁远 · 1847</span><div class="pbody"><p>宁远：首见于 <b>1847</b> 年<br>坐标 (1,7)　层级：县</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">定襄 · 1848</span><div class="pbody"><p>定襄：首见于 <b>1848</b> 年<br>坐标 (7,2)　层级：州</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">新民 · 1849</span><div class="pbody"><p>新民：首见于 <b>1849</b> 年<br>坐标 (4,7)　层级：县</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>时间纸条（续）</h4><p class="pm-note">后 10 张。</p><div class="pgrid cols-4"><div class="pcard g"><span class="plab">怀仁 · 1850</span><div class="pbody"><p>怀仁：首见于 <b>1850</b> 年<br>坐标 (8,4)　层级：县</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">靖安 · 1851</span><div class="pbody"><p>靖安：首见于 <b>1851</b> 年<br>坐标 (2,9)　层级：县</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">镇远 · 1852</span><div class="pbody"><p>镇远：首见于 <b>1852</b> 年<br>坐标 (6,8)　层级：府</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">长乐 · 1853</span><div class="pbody"><p>长乐：首见于 <b>1853</b> 年<br>坐标 (9,6)　层级：县</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">归化 · 1854</span><div class="pbody"><p>归化：首见于 <b>1854</b> 年<br>坐标 (5,1)　层级：州</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">永泰 · 1855</span><div class="pbody"><p>永泰：首见于 <b>1855</b> 年<br>坐标 (8,9)　层级：县</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">怀宁 · 1857</span><div class="pbody"><p>怀宁：首见于 <b>1857</b> 年<br>坐标 (7,6)　层级：县</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">承平 · 1858</span><div class="pbody"><p>承平：首见于 <b>1858</b> 年<br>坐标 (5,5)　层级：府</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">宁朔 · 1859</span><div class="pbody"><p>宁朔：首见于 <b>1859</b> 年<br>坐标 (9,3)　层级：县</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">昌化 · 1860</span><div class="pbody"><p>昌化：首见于 <b>1860</b> 年<br>坐标 (4,9)　层级：县</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>行政层级卡（每套 3 张）</h4><p class="pm-note">用于追问：层级不同，密度统计会怎样变化？</p><div class="pgrid cols-3"><div class="pcard "><span class="plab">府</span><div class="pbody"><p>高层政区。一个府可能覆盖多个「点」。若按府统计，多个县会被合并计数。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">州</span><div class="pbody"><p>中级政区。注意：本样例中部分点在不同年份隶属关系发生变化。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">县</span><div class="pbody"><p>基层政区。密度图若按县画，与按府画可能得出相反结论。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">素材 C · 权力卡与地图声明</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>权力卡（每套 3 张）</h4><p class="pm-note">最后一轮发放。这是本章伦理落点的核心道具。</p><div class="pgrid cols-3"><div class="pcard r"><span class="plab">P1 · 边界由谁定</span><div class="pbody"><p>这张图的区域边界是谁画的？如果换一种边界（如按「水系」而非「行政区」），密度结论会变吗？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard r"><span class="plab">P2 · 改名与撤并</span><div class="pbody"><p>「承平」在 1855 年更名为「永承」，1857 年撤县并入邻府。若用今名检索，会漏掉哪几年？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard r"><span class="plab">P3 · 哪些点值得画</span><div class="pbody"><p>志书只记录了「被官方记载」的灾害。未被记录的村庄在哪里？地图的空白是空无还是沉默？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>时空图模板（每人 1 份）</h4><p class="pm-note">横轴为空间位置（可用 x 坐标或东西向），纵轴为时间。把 20 个点标上去。</p><div class="wsheet">
+<div style="border:1px solid #94a9be;height:190px;margin:8px 0 4px 38px;position:relative">
+ <div style="position:absolute;left:-32px;top:0;bottom:0;display:flex;align-items:center;writing-mode:vertical-rl;font-size:11px;color:#4a5568">时间（1840 → 1860）</div>
+ <div style="position:absolute;left:0;bottom:18px;right:0;border-top:1.5px solid #1a202c"></div>
+ <div style="position:absolute;left:0;bottom:18px;top:0;border-left:1.5px solid #1a202c"></div>
+ <div style="position:absolute;right:8px;bottom:4px;font-size:10px;color:#718096">空间（西 → 东）</div>
+</div>
+<div class="wh">第一版结论（二维）</div><div class="pline"></div>
+<div class="wh">第二版结论（加时间后）</div><div class="pline"></div>
+<div class="wh">结论是否翻转？为什么？</div><div class="pline"></div>
+</div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>地图声明（每组 1 份）</h4><p class="pm-note">参照 7.6「地图即权力」，公开你的表征选择。</p><div class="wsheet">
+<table class="mm"><tr><th style="width:26%">声明项</th><th>本组填写</th></tr>
+<tr><td>采用的边界标准</td><td></td></tr><tr><td>采用的地名年代标准</td><td></td></tr><tr><td>空间维度如何量化</td><td></td></tr><tr><td>时间粒度（年/十年）</td><td></td></tr><tr><td>明确遗漏了什么</td><td></td></tr><tr><td>谁可能因此被" + "「看不见」</td><td></td></tr></table>
+<div class="wh">一句话地图声明</div><div class="pline"></div>
+</div></div></section>
+<section id="debrief"><h2><span class="no">08</span>八、讨论引导（分层）</h2><ol class="debrief"><li><span class="level lv1">识记</span>说出点、线、面三种空间数据形态，并说明本游戏用到哪一种。</li><li><span class="level lv2">分析</span>二维地图漏掉了什么？加上时间后，哪一点的「严重性」判断发生了翻转？</li><li><span class="level lv2">分析</span>行政层级（府/州/县）不同，密度统计会怎样改变？</li><li><span class="level lv3">反思</span>7.6 「地图即权力」在本案例中具体落在哪一步——边界？地名？还是「哪些点值得画」？</li><li><span class="level lv3">反思</span>地名变更给地理编码（7.5）带来的麻烦，能靠技术解决吗，还是必须回到历史考据？</li><li><span class="level lv3">反思</span>《平面国》原作也是等级讽刺小说。「空间的自然秩序」什么时候其实是社会建构？</li></ol></section>
+<section id="assessment"><h2><span class="no">09</span>九、评价与计分</h2>
+<div class="scorebox"><table><thead><tr><th>维度</th><th>分值</th><th>达标描述</th><th>扣分点</th></tr></thead><tbody><tr><td class="b">二维结论</td><td>15</td><td>第一版结论明确、有据、已签名</td><td>结论含糊扣 8 分</td></tr><tr><td class="b">加维翻案</td><td>30</td><td>时空图正确，指出结论翻转的具体点</td><td>未发现翻转扣 20 分</td></tr><tr><td class="b">平面居民反驳</td><td>15</td><td>能从维度局限角度提出有力质疑</td><td>仅为抬杠扣 8 分</td></tr><tr><td class="b">地图声明</td><td>25</td><td>六项声明齐全，遗漏项具体</td><td>缺项每处扣 5 分</td></tr><tr><td class="b">互评参与</td><td>15</td><td>找出他组未声明的立场</td><td>无发现扣 8 分</td></tr></tbody></table></div>
+<div class="callout green"><b>个人加分（+5）：</b>举出一个你见过的" + "「地图空白其实是沉默」的真实例子。</div>
+</section>
+<section id="redline"><h2><span class="no">10</span>十、伦理与安全红线</h2>
+<div class="callout risk"><b>教学红线：</b>①SPOTS 数据为教学合成样例，不得当作真实灾害史引用；②" + "「改名撤并」卡涉及的地名须明确标注为虚构；③讨论" + "「未被记录的村庄」时，须强调这是史料覆盖问题，不是对现实地区的判断。</div>
+</section>
+<section id="tips"><h2><span class="no">11</span>十一、教师提示与变体</h2>
+<details><summary>提示 1 · 数据准备</summary><ul>
+<li><b>底图：</b>建议教师先用 Excel 散点图生成一张 0–10 网格图，投影+打印，省去手绘误差。</li>
+<li><b>关键设计：</b>" + "「承平」(5,5) 位于中心却年份最晚(1858)，" + "「安平」(2,3) 偏僻却最早(1841)。这个反差是本游戏的全部张力所在，不要改动。</li>
+<li><b>时间紧：</b>可只用 10 个点，保留" + "「承平 / 安平」两个关键对。</li>
+</ul></details>
+<details><summary>提示 2 · 变体与联动</summary><ul>
+<li><b>本地化：</b>换成你所在城市的历史地名变迁，冲击力更强，但需确保数据可靠。</li>
+<li><b>进阶：</b>用 QGIS 现场把点数据分层渲染 (按年代配色)，让学生看到" + "「制图软件替你做了选择」。</li>
+<li><b>联动：</b>与游戏 05 对照——可视化决定" + "「看见什么」，维度决定「能看见什么」；再与游戏 09 的" + "「本体即世界观」呼应。</li>
+</ul></details>
+</section>
+</main></div>
+<div class="bottom-nav"><a href="game06.html"><small>← 上一场 · 06</small>六度分隔</a><a class="next" href="game08.html"><small>下一场 · 08 →</small>缸中之脑</a></div><div class="footer">《数据科学与数字人文》教学配套资源 · 思想实验课堂游戏 · 素材仅限教学使用 · 真实史料请注明来源与许可</div>
+</body>
+</html>

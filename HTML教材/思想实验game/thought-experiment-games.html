@@ -1,0 +1,818 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>思想实验·课堂游戏手册 · 数据科学与数字人文</title>
+<style>
+:root{
+  --blue:#1f4e79; --blue2:#2b6cb0; --blue-soft:#eaf2fa;
+  --green:#2f855a; --green-soft:#e9f6ef;
+  --ink:#1a202c; --muted:#4a5568; --line:#d9e2ec;
+  --bg:#f4f7fb; --card:#ffffff; --red:#c53030; --red-soft:#fff5f5;
+  --amber:#b7791f; --shadow:0 2px 10px rgba(31,78,121,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  line-height:1.78;font-size:15px}
+a{color:var(--blue2);text-decoration:none}
+a:hover{text-decoration:underline}
+
+/* top bar */
+.topbar{background:var(--blue);color:#fff;padding:12px 0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.topbar .wrap{max-width:1280px;margin:0 auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.brand{font-size:17px;font-weight:700;letter-spacing:.3px}
+.brand small{display:block;font-size:11.5px;font-weight:400;opacity:.82;letter-spacing:.4px}
+.topbar nav{display:flex;gap:8px;flex-wrap:wrap}
+.topbar nav a,.topbar nav button{color:#fff;border:1px solid rgba(255,255,255,.4);background:transparent;
+  padding:5px 12px;border-radius:6px;font-size:12.5px;cursor:pointer;font-family:inherit}
+.topbar nav a:hover,.topbar nav button:hover{background:rgba(255,255,255,.16);text-decoration:none}
+
+/* hero */
+.hero{background:linear-gradient(120deg,#1f4e79 0%,#2b6cb0 55%,#2f855a 140%);color:#fff;padding:44px 22px 40px}
+.hero .wrap{max-width:1280px;margin:0 auto}
+.hero .kicker{font-size:12.5px;letter-spacing:2px;opacity:.85;margin:0 0 10px}
+.hero h1{margin:0 0 12px;font-size:30px;line-height:1.35;letter-spacing:.5px}
+.hero p.lead{max-width:900px;margin:0;opacity:.94;font-size:15px}
+.hero .stats{display:flex;gap:26px;flex-wrap:wrap;margin-top:24px}
+.hero .stat{border-left:3px solid rgba(255,255,255,.55);padding-left:12px}
+.hero .stat b{display:block;font-size:23px;line-height:1.2}
+.hero .stat span{font-size:12px;opacity:.85}
+
+/* layout */
+.doc{max-width:1280px;margin:0 auto;padding:26px 22px 60px;display:grid;grid-template-columns:250px 1fr;gap:28px;align-items:start}
+.side{position:sticky;top:16px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:16px;box-shadow:var(--shadow);max-height:calc(100vh - 32px);overflow:auto}
+.side h4{margin:2px 0 10px;font-size:13px;color:var(--blue);letter-spacing:.5px}
+.side a{display:block;padding:5px 8px;border-radius:6px;font-size:12.7px;color:var(--muted);line-height:1.45}
+.side a:hover{background:var(--blue-soft);color:var(--blue);text-decoration:none}
+.side .divider{height:1px;background:var(--line);margin:12px 0}
+.side .note{font-size:11.5px;color:var(--muted);line-height:1.6;padding:6px 8px}
+
+.content{min-width:0}
+.content section{background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:26px 28px;margin-bottom:20px;box-shadow:var(--shadow)}
+
+/* overview */
+.overview h2{margin-top:0}
+.tbl-wrap{overflow-x:auto}
+table.gtable{width:100%;border-collapse:collapse;font-size:13px;min-width:780px}
+table.gtable th{background:var(--blue);color:#fff;text-align:left;padding:9px 10px;font-weight:600;white-space:nowrap}
+table.gtable td{border-bottom:1px solid var(--line);padding:9px 10px;vertical-align:top}
+table.gtable tbody tr:nth-child(even){background:#f8fafc}
+table.gtable tbody tr:hover{background:var(--blue-soft)}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11.5px;font-weight:600;white-space:nowrap}
+.pill.b{background:var(--blue-soft);color:var(--blue)}
+.pill.g{background:var(--green-soft);color:var(--green)}
+.pill.a{background:#fff7e6;color:var(--amber)}
+
+.callout{border-left:4px solid var(--blue2);background:var(--blue-soft);border-radius:0 8px 8px 0;
+  padding:12px 16px;margin:14px 0;font-size:13.5px}
+.callout.green{border-left-color:var(--green);background:var(--green-soft)}
+.callout.risk{border-left-color:var(--red);background:var(--red-soft);color:#7b2020}
+.callout p{margin:5px 0}
+.callout b{color:var(--blue)}
+
+/* experiment blocks */
+.exp-head{display:flex;gap:16px;align-items:flex-start;border-bottom:1px solid var(--line);padding-bottom:16px;margin-bottom:18px}
+.exp-head .num{flex:0 0 auto;width:50px;height:50px;border-radius:12px;background:var(--blue);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:20px;font-weight:800;letter-spacing:-.5px}
+.exp-head h2{margin:0 0 4px;font-size:21px;line-height:1.4}
+.exp-head .en{font-size:12px;font-weight:400;color:var(--muted);margin-left:8px}
+.exp-head .sub{margin:0;font-size:13px;color:var(--muted)}
+.exp-head .sub b{color:var(--green)}
+
+.origin{background:#f8fafc;border:1px solid var(--line);border-radius:9px;padding:14px 16px;margin-bottom:16px}
+.origin h4,.block h4{margin:0 0 6px;font-size:13.5px;color:var(--blue)}
+.origin p{margin:4px 0;font-size:13.5px}
+.origin .link{font-size:12.8px;color:var(--muted);border-top:1px dashed var(--line);padding-top:8px;margin-top:9px}
+.origin .link b{color:var(--green)}
+
+.meta{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin-bottom:20px}
+.meta div{background:var(--blue-soft);border:1px solid #cfe0f1;border-radius:8px;padding:9px 12px;font-size:12.8px}
+.meta div b{display:block;color:var(--blue);font-size:11.5px;letter-spacing:.5px;margin-bottom:1px}
+
+.block{margin:18px 0 0}
+.block>h3{font-size:15px;color:var(--blue);margin:0 0 10px;padding-left:10px;border-left:3px solid var(--green)}
+ol.steps{margin:0;padding-left:22px}
+ol.steps li{margin:7px 0;font-size:13.6px}
+ol.steps li b{color:var(--blue)}
+.two-col{display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:14px;margin-top:16px}
+.mini{border:1px solid var(--line);border-radius:9px;padding:13px 15px;background:#fbfdff}
+.mini h4{color:var(--green);margin:0 0 6px;font-size:13px}
+.mini ul,.mini ol{margin:4px 0;padding-left:20px;font-size:13px}
+.mini li{margin:3px 0}
+ul.debrief{margin:0;padding-left:22px;font-size:13.5px}
+ul.debrief li{margin:6px 0}
+details{margin-top:16px;border:1px dashed #b9c9da;border-radius:9px;background:#fafcff;padding:10px 14px}
+details summary{cursor:pointer;color:var(--blue);font-size:13px;font-weight:600;outline:none}
+details[open] summary{margin-bottom:8px}
+details p,details ul{font-size:13px;margin:5px 0;padding-left:20px}
+
+.rubric td:first-child{white-space:nowrap;font-weight:600;color:var(--blue)}
+.footer{text-align:center;color:var(--muted);font-size:12px;padding:10px 20px 40px}
+
+@media(max-width:900px){
+  .doc{grid-template-columns:1fr;padding:18px 14px}
+  .side{position:static;max-height:none}
+  .content section{padding:20px 18px}
+  .hero h1{font-size:24px}
+}
+@media print{
+  body{background:#fff;font-size:11pt}
+  .topbar,.side,.hero .stats,details summary{display:none}
+  .doc{display:block;padding:0;max-width:none}
+  .content section{border:none;box-shadow:none;padding:0 0 18px;margin:0;page-break-inside:avoid}
+  details{display:block;border:none;background:none;padding:0}
+  details>*:not(summary){display:block!important}
+  a{color: inherit}
+  .hero{background:var(--blue)!important;-webkit-print-color-adjust:exact;print-color-adjust:exact;padding:20px}
+}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="wrap">
+    <div class="brand">《数据科学与数字人文》· 教学配套资源<small>思想实验 → 课堂游戏 · 13 章一一对应 · 信息资源管理专业</small></div>
+    <nav>
+      <a href="index.html">返回教材门户</a>
+      <button onclick="window.print()">打印 / 存为 PDF</button>
+    </nav>
+  </div>
+</header>
+
+<div class="hero">
+  <div class="wrap">
+    <p class="kicker">TEACHING COMPANION · THOUGHT EXPERIMENTS AS CLASSROOM GAMES</p>
+    <h1>13 个改变世界的思想实验，<br>13 场可以玩起来的课堂游戏</h1>
+    <p class="lead">本手册把全球最著名的 13 个思想实验，逐一改造成与教材第 1—13 章配套的课堂游戏。每个实验都保留原典最锋利的那一问，再把它落到本章的技术点与伦理坐标上——让学生先"玩到"，再"想到"，最后回到教材的"可复现、案例真实、伦理在场"。</p>
+    <div class="stats">
+      <div class="stat"><b>13</b><span>经典思想实验</span></div>
+      <div class="stat"><b>13</b><span>章节精确对接</span></div>
+      <div class="stat"><b>25–55<span style="font-size:14px">分钟</span></b><span>单场游戏时长</span></div>
+      <div class="stat"><b>6</b><span>通用产出物类型</span></div>
+    </div>
+  </div>
+</div>
+
+<div class="doc">
+  <aside class="side">
+    <h4>目录 · 按章节顺序</h4>
+    <a href="#overview">总览：13 章 × 13 实验映射表</a>
+    <a href="#g01">01 庄周梦蝶 → 第1章 导论</a>
+    <a href="#g02">02 忒修斯之船 → 第2章 数据获取</a>
+    <a href="#g03">03 麦克斯韦妖 → 第3章 数据处理</a>
+    <a href="#g04">04 中文房间 → 第4章 文本挖掘</a>
+    <a href="#g05">05 薛定谔的猫 → 第5章 可视化</a>
+    <a href="#g06">06 六度分隔 → 第6章 社会网络</a>
+    <a href="#g07">07 平面国 → 第7章 空间人文</a>
+    <a href="#g08">08 缸中之脑 → 第8章 图像视觉</a>
+    <a href="#g09">09 罗素悖论 → 第9章 知识图谱</a>
+    <a href="#g10">10 拉普拉斯妖 → 第10章 机器学习</a>
+    <a href="#g11">11 图灵测试 → 第11章 大模型</a>
+    <a href="#g12">12 电车难题 → 第12章 AI前沿</a>
+    <a href="#g13">13 谷堆悖论 → 第13章 综合项目</a>
+    <div class="divider"></div>
+    <a href="#toolkit">附：通用教具与评价量规</a>
+    <div class="note">用法建议：每章讲完核心知识点后，用 45 分钟插入对应游戏；剩余的"讨论引导"可作为课后作业或下一章的导入。</div>
+  </aside>
+
+  <main class="content">
+
+  <!-- ============ OVERVIEW ============ -->
+  <section id="overview">
+    <h2>总览：13 章 × 13 思想实验映射表</h2>
+    <p>选实验的原则有三条：<b>①足够著名</b>（能一句话讲清，学生一听就进情境）；<b>②与本章技术点同构</b>（游戏的机制本身就是本章方法的隐喻，而不是贴标签）；<b>③直指本章"伦理坐标"</b>（玩完之后，教材里那句抽象的判断变成亲历的直觉）。</p>
+    <div class="tbl-wrap">
+    <table class="gtable">
+      <thead><tr><th>#</th><th>思想实验</th><th>对接章节与核心能力</th><th>课堂游戏</th><th>时长</th><th>主要产出</th></tr></thead>
+      <tbody>
+      <tr><td>01</td><td><b>庄周梦蝶</b><br><span class="pill b">认识论</span></td><td>第1章 导论 · 三种相遇方式</td><td>数据身份盲盒：双视角观察</td><td>30′</td><td>双视角观察表</td></tr>
+      <tr><td>02</td><td><b>忒修斯之船</b><br><span class="pill b">同一性</span></td><td>第2章 数据类型与获取 · 合规获取</td><td>数据海关：给船签发数据护照</td><td>35′</td><td>4 轮数据护照</td></tr>
+      <tr><td>03</td><td><b>麦克斯韦妖</b><br><span class="pill b">信息/熵</span></td><td>第3章 Python 与 pandas · 可复现</td><td>人肉 pandas：清洗分拣大赛</td><td>40′</td><td>可复现操作日志</td></tr>
+      <tr><td>04</td><td><b>中文房间</b><br><span class="pill a">理解之争</span></td><td>第4章 文本挖掘与 NLP · 语料偏见</td><td>规则手册盲操作 + 偏见注入</td><td>45′</td><td>理解/处理判定表</td></tr>
+      <tr><td>05</td><td><b>薛定谔的猫</b><br><span class="pill b">观测</span></td><td>第5章 可视化 · 视觉修辞三要素</td><td>一图两态：同数据双叙事</td><td>45′</td><td>两张图 + 修辞手法表</td></tr>
+      <tr><td>06</td><td><b>六度分隔</b><br><span class="pill g">网络</span></td><td>第6章 社会网络 · 中心性</td><td>六度人脉挑战 + 关键先生</td><td>40′</td><td>最短链条 + 中心性图</td></tr>
+      <tr><td>07</td><td><b>平面国</b><br><span class="pill b">维度</span></td><td>第7章 空间人文与 GIS · 地图即权力</td><td>给历史地图补上第三维</td><td>45′</td><td>二维/三维结论对照</td></tr>
+      <tr><td>08</td><td><b>缸中之脑</b><br><span class="pill a">真伪</span></td><td>第8章 图像处理 · 真实与伪造</td><td>缸中之脑影像馆：盲注打分</td><td>45′</td><td>图注表 + 核验清单</td></tr>
+      <tr><td>09</td><td><b>罗素悖论</b><br><span class="pill b">自指</span></td><td>第9章 知识图谱 · 本体即世界观</td><td>理发师的本体：边界补丁</td><td>45′</td><td>本体图 + 补丁说明</td></tr>
+      <tr><td>10</td><td><b>拉普拉斯妖</b><br><span class="pill a">预测</span></td><td>第10章 机器学习 · 评估与可解释性</td><td>全知妖的考试：评估卡反转</td><td>45′</td><td>评估对照 + SHAP 归因</td></tr>
+      <tr><td>11</td><td><b>图灵测试</b><br><span class="pill g">智能</span></td><td>第11章 大模型 · RAG 与幻觉</td><td>人文版模仿游戏：盲测裁判</td><td>50′</td><td>盲测表 + 提示模板</td></tr>
+      <tr><td>12</td><td><b>电车难题</b><br><span class="pill a">两难</span></td><td>第12章 AI 前沿 · 负责任 AI</td><td>算法电车：替你扳道</td><td>50′</td><td>决策书 + 约束清单</td></tr>
+      <tr><td>13</td><td><b>谷堆悖论</b><br><span class="pill b">阈值</span></td><td>第13章 综合项目 · 评价量规</td><td>第几粒沙算研究：模拟答辩</td><td>50′</td><td>答辩记录 + 修订量规</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <div class="callout green"><p><b>一条贯穿全册的暗线：</b>13 场游戏其实在反复追问同一个问题——<b>计算出来的东西，凭什么算作知识？</b>第 1 场问"谁在看"，第 7 场问"从哪看"，第 11 场问"是谁在答"，第 13 场问"做到什么程度才算研究"。讲课时把这四个问题串起来，课程思政与"伦理在场"就有了具体的落点。</p></div>
+    <div class="callout risk"><p><b>使用红线：</b>游戏涉及真实历史人物、少数族群影像与敏感史料时，须遵守教材第 2 章的合规获取要求；AI 生成内容必须标注，不得冒充真实档案；课堂产生的所有数据仅用于教学，不外传、不公开发布。</p></div>
+  </section>
+
+  <!-- ============ 01 ============ -->
+  <section class="exp" id="g01">
+    <div class="callout green"><b>独立教案：</b><a href="game01.html">打开《庄周梦蝶》完整教案与可打印素材 →</a></div>
+    <div class="exp-head">
+      <div class="num">01</div>
+      <div>
+        <h2>庄周梦蝶 <span class="en">Zhuangzi's Butterfly Dream</span></h2>
+        <p class="sub">对接 <b>第1章 导论：当数据科学遇见数字人文</b> ｜ 游戏：<b>数据身份盲盒——你是庄周，还是那只蝶？</b></p>
+      </div>
+    </div>
+    <div class="origin">
+      <h4>原典与核心问题</h4>
+      <p>《庄子·齐物论》：庄周梦见自己化为蝴蝶，醒来后"不知周之梦为胡蝶与，胡蝶之梦为周与"。核心一问：<b>你以为看到的"实在"，是否只是某种视角下的呈现？</b></p>
+      <p class="link"><b>教材对接：</b>1.2 两个主角；1.3 三种相遇方式（方法下沉 / 问题牵引 / 反思升维）；1.4 可复现、案例真实、伦理在场。<b>伦理落点：</b>承认视角的存在，是"伦理在场"的第一步。</p>
+    </div>
+    <div class="meta">
+      <div><b>时长</b>30–35 分钟</div>
+      <div><b>分组</b>4–6 人/组</div>
+      <div><b>形式</b>身份盲盒 + 双视角写作 + 全班表决</div>
+      <div><b>难度</b>★☆☆☆☆</div>
+    </div>
+    <div class="block">
+      <h3>游戏流程</h3>
+      <ol class="steps">
+        <li><b>发身份（3′）：</b>每人抽一张身份卡——"庄周卡"（人文研究者：追问意义、语境、价值）或"蝴蝶卡"（数据/算法视角：只看可得、可测、可算）。身份保密，自己知道即可。</li>
+        <li><b>看同一份证据（7′）：</b>每组发同一套"证据卡"：一张地方志目录的统计表 + 一页原始档案图片 + 一段学者释读。所有组别看到的材料完全相同。</li>
+        <li><b>第一写作（6′）：</b>按自己身份写"我看到了什么？这是什么？"——庄周卡必须写意义与语境，蝴蝶卡必须写模式与数值，不许越界。</li>
+        <li><b>交换身份（3′）：</b>组内互换身份卡，面对同一套证据再写一遍（6′）。</li>
+        <li><b>对读与表决（10′）：</b>组内对照两版答案，标出"冲突点"与"只有某个视角才看得到的东西"；每组推一份"最像真实的描述"上台，全班投票。</li>
+      </ol>
+    </div>
+    <div class="two-col">
+      <div class="mini"><h4>材料与道具</h4><ul><li>身份卡两套（庄周/蝴蝶）</li><li>证据卡：统计表 + 档案图 + 释读各 1</li><li>双视角观察表（两栏对照）</li></ul></div>
+      <div class="mini"><h4>判定与产出</h4><ul><li>胜出标准不是"答对"，而是<b>冲突点找得最准</b></li><li>产出：双视角观察表 + 3 条冲突点</li><li>加分：说出"哪个视角在系统性地漏掉什么"</li></ul></div>
+    </div>
+    <div class="block"><h3>讨论引导</h3><ul class="debrief">
+      <li>数据科学给的是"蝶的视角"还是"庄周的视角"？两者能互相替代吗？</li>
+      <li>1.3 的三种相遇方式（方法下沉 / 问题牵引 / 反思升维），分别站在哪一边？</li>
+      <li>如果"看的方式"决定了"看到的东西"，为什么教材仍承诺"可复现、案例真实"？（提示：可复现约束的是方法，不是视角。）</li>
+    </ul></div>
+    <div class="callout risk"><p><b>教学提醒：</b>此游戏容易被学生玩成"玄学"。主持人要在最后 3 分钟拉回教材：视角多元 ≠ 事实相对主义；承认视角，是为了更诚实地标注局限。</p></div>
+    <details><summary>教师提示与变体</summary><p><b>变体：</b>把身份卡换成"第1章三种相遇方式"卡，让答案直接对应课程知识点。<b>线上版：</b>用腾讯文档分栏，两人同时编辑，冲突处自动高亮。<b>延伸作业：</b>写 300 字《我作为庄周/蝴蝶的观察声明》，作为课程档案。</p></details>
+  </section>
+
+  <!-- ============ 02 ============ -->
+  <section class="exp" id="g02">
+    <div class="callout green"><b>独立教案：</b><a href="game02.html">打开《忒修斯之船》完整教案与可打印素材 →</a></div>
+    <div class="exp-head">
+      <div class="num">02</div>
+      <div>
+        <h2>忒修斯之船 <span class="en">Ship of Theseus</span></h2>
+        <p class="sub">对接 <b>第2章 人文数据的类型与获取</b> ｜ 游戏：<b>数据海关——给忒修斯之船签发护照</b></p>
+      </div>
+    </div>
+    <div class="origin">
+      <h4>原典与核心问题</h4>
+      <p>普鲁塔克记载：忒修斯的船被逐年更换木板，最终所有部件都不是原来的——它还是那艘船吗？核心一问：<b>当一个对象的所有组成部分都被替换，它的"同一性"由什么维系？</b></p>
+      <p class="link"><b>教材对接：</b>2.2 五种类型；2.3 结构化程度；2.4 来源谱系（原生数字 / 数字化副本 / 衍生数据）；2.5 合规获取；2.7 数据护照。<b>伦理落点：</b>来源不清的数据，不能仅凭"内容一样"就当作同一份。</p>
+    </div>
+    <div class="meta">
+      <div><b>时长</b>35–40 分钟</div>
+      <div><b>分组</b>3–4 人/组</div>
+      <div><b>形式</b>四轮换板 + 护照填写 + 同一性投票</div>
+      <div><b>难度</b>★★☆☆☆</div>
+    </div>
+    <div class="block">
+      <h3>游戏流程</h3>
+      <ol class="steps">
+        <li><b>初始登记（5′）：</b>教师展示"原始船"——某地方志的扫描件，各组为它签发第一份数据护照：来源、年代、许可、格式、责任人。</li>
+        <li><b>第一轮换板（6′）：</b>换成 OCR 文本。各组更新护照：增加了什么？丢失了什么？投票"还是不是原来的数据"。</li>
+        <li><b>第二轮换板（6′）：</b>删除页码与版式信息，合并字段，规范异体字。再次更新护照并投票。</li>
+        <li><b>第三轮换板（6′）：</b>加入模型自动校勘的标注（其中 2 处故意标错）。护照必须新增"衍生方式"和"人工复核状态"。</li>
+        <li><b>海关裁决（10′）：</b>教师出示"红线卡"：若来源许可不明 / 若衍生数据未标注 / 若模型输出未经复核。各组判断本轮护照是否"准予通关"，并说明放行或扣留的依据。</li>
+      </ol>
+    </div>
+    <div class="two-col">
+      <div class="mini"><h4>材料与道具</h4><ul><li>同一文献的 4 个版本（扫描/OCR/清洗/标注）</li><li>空白数据护照 4 份/组</li><li>红线卡 3 张</li></ul></div>
+      <div class="mini"><h4>判定与产出</h4><ul><li>胜出：护照字段最完整、改动链最清晰</li><li>产出：4 轮护照 + 一条"同一性判定曲线"</li><li>扣分：任何一轮漏填"衍生方式"</li></ul></div>
+    </div>
+    <div class="block"><h3>讨论引导</h3><ul class="debrief">
+      <li>四轮里，护照的哪个字段最关键？为什么"许可"不会因为内容相同而自动继承？</li>
+      <li>什么时候衍生数据必须重新取得授权？"我只是转换了格式"能成为理由吗？</li>
+      <li>数字人文里是否存在合理的"原件崇拜"？当原件已佚，副本的合法性从何而来？</li>
+    </ul></div>
+    <div class="callout green"><p><b>与教材的勾连：</b>2.7 的"数据护照"不是行政表格，而是忒修斯之船的答案——<b>同一性不来自内容，来自可追溯的改动链</b>。这句话值得板书。</p></div>
+    <details><summary>教师提示与变体</summary><p><b>变体：</b>把"船"换成学生自己的手机相册——原图、压缩图、加滤镜图、AI 修图，同一性追问会立刻变得切身。<b> caution：</b>第三轮的错标必须提前准备并明确告知"这是教学用的合成样例"，避免学生误信为真史料。</p></details>
+  </section>
+
+  <!-- ============ 03 ============ -->
+  <section class="exp" id="g03">
+    <div class="callout green"><b>独立教案：</b><a href="game03.html">打开《麦克斯韦妖》完整教案与可打印素材 →</a></div>
+    <div class="exp-head">
+      <div class="num">03</div>
+      <div>
+        <h2>麦克斯韦妖 <span class="en">Maxwell's Demon</span></h2>
+        <p class="sub">对接 <b>第3章 数据处理基础：Python 与 pandas</b> ｜ 游戏：<b>人肉 pandas——麦克斯韦妖清洗大赛</b></p>
+      </div>
+    </div>
+    <div class="origin">
+      <h4>原典与核心问题</h4>
+      <p>麦克斯韦 1867 年设想：一个能分辨分子快慢的小妖精把快分子与慢分子分到两边，似乎不耗功就降低了熵。核心一问：<b>"分类"需要知道什么？规则的代价藏在哪里？</b></p>
+      <p class="link"><b>教材对接：</b>3.3 pandas 三件套；3.4 数据清洗四板斧（缺失、重复、格式、字段）；3.6 可复现即学术诚信。<b>伦理落点：</b>清洗不是擦除，规则必须被写下并被别人复现。</p>
+    </div>
+    <div class="meta">
+      <div><b>时长</b>40–45 分钟</div>
+      <div><b>分组</b>4 人/组（两两互检）</div>
+      <div><b>形式</b>卡片分拣 + 伪代码日志 + 交叉复现</div>
+      <div><b>难度</b>★★☆☆☆</div>
+    </div>
+    <div class="block">
+      <h3>游戏流程</h3>
+      <ol class="steps">
+        <li><b>领脏数据（5′）：</b>每组一叠卡片，对应教材四个真实案例：形成时间缺失、合并目录后的重复记录、编年中年份格式不一、人物表与作品表字段名不一致。</li>
+        <li><b>妖精分拣（12′）：</b>不许写代码，只用卡片手工执行四板斧。每执行一步，必须在"操作日志"上写清楚伪代码，例如 <code>df.drop_duplicates(subset=['题名','责任者'])</code>。</li>
+        <li><b>封存交接（3′）：</b>把清洗后的卡片与操作日志一起封袋，交给相邻组。</li>
+        <li><b>交叉复现（12′）：</b>接收组只能看日志，不能看原卡片的处理结果，尝试从原始脏卡片复现出同样结果。记录"日志没写清而卡住"的地方。</li>
+        <li><b>记分揭晓（8′）：</b>双计分：清洗准确率 + 复现成功率。复现失败的一方要指出"妖精的规则漏在哪"。</li>
+      </ol>
+    </div>
+    <div class="two-col">
+      <div class="mini"><h4>材料与道具</h4><ul><li>脏数据卡片 40–60 张/组（含 4 类问题）</li><li>操作日志模板（步骤 / 规则 / 伪代码）</li><li>封袋与计分表</li></ul></div>
+      <div class="mini"><h4>判定与产出</h4><ul><li>胜出：<b>准确率 × 复现率</b> 最高组</li><li>产出：清洗结果 + 可复现操作日志</li><li>特别奖：找出最多"规则歧义"的组</li></ul></div>
+    </div>
+    <div class="block"><h3>讨论引导</h3><ul class="debrief">
+      <li>妖精分拣前必须"知道"什么？如果规则里没写"民国 38 年≈1949 年"，会发生什么？</li>
+      <li>为什么操作日志 = 可复现 = 学术诚信？把这三件事画成一条因果链。</li>
+      <li>清洗有没有"制造"数据？你删掉的那张重复卡，会不会恰好是一条独立证据？</li>
+    </ul></div>
+    <div class="callout green"><p><b>教师点睛：</b>麦克斯韦妖的现代答案是"信息也是有代价的"——<b>获取规则、记录规则、擦除记忆都要付出代价</b>。这正是 pandas 日志的意义：清洗的代价必须被记账。</p></div>
+    <details><summary>教师提示与变体</summary><p><b>无电脑版：</b>全程用卡片完成，伪代码写在纸上即可。<b>有电脑版：</b>第二环节改用 Jupyter 现场跑，把复现变成真正的 notebook 交接。<b>进阶：</b>给不同组发放略有差异的"规则手册"，观察清洗结果如何因规则不同而分叉。</p></details>
+  </section>
+
+  <!-- ============ 04 ============ -->
+  <section class="exp" id="g04">
+    <div class="callout green"><b>独立教案：</b><a href="game04.html">打开《中文房间》完整教案与可打印素材 →</a></div>
+    <div class="exp-head">
+      <div class="num">04</div>
+      <div>
+        <h2>中文房间 <span class="en">Chinese Room · Searle</span></h2>
+        <p class="sub">对接 <b>第4章 文本挖掘与 NLP</b> ｜ 游戏：<b>规则手册盲操作 + 偏见注入</b></p>
+      </div>
+    </div>
+    <div class="origin">
+      <h4>原典与核心问题</h4>
+      <p>塞尔 1980 年：一个不懂中文的人待在房间里，按规则手册对递进来的中文符号作出恰当回应，屋外人以为他懂中文。核心一问：<b>正确地处理符号，等于理解吗？</b></p>
+      <p class="link"><b>教材对接：</b>4.2 分词与预处理；4.3 词云 / TF-IDF / LDA；4.4 命名实体识别；4.6 语料偏见与"客观"幻象。<b>伦理落点：</b>统计上的"客观"，可能只是规则手册里的权重偏见。</p>
+    </div>
+    <div class="meta">
+      <div><b>时长</b>45 分钟</div>
+      <div><b>分组</b>4 人/组（房间组 vs 提问组）</div>
+      <div><b>形式</b>规则盲操作 + 图灵式判别 + 偏见注入</div>
+      <div><b>难度</b>★★★☆☆</div>
+    </div>
+    <div class="block">
+      <h3>游戏流程</h3>
+      <ol class="steps">
+        <li><b>发手册（5′）：</b>"房间组"拿到一本极简规则手册：出现"灾荒/饥馑/赈济"≥2 次 → 主题判为灾荒；"字/号"前有二字人名 → 抽为人名；出现"奏/疏"→ 判为公文。手册之外一律不许用自己的理解。</li>
+        <li><b>盲操作（12′）：</b>发 4 段真实史料片段，房间组严格按手册输出主题与实体，不得解释、不得查工具。</li>
+        <li><b>判别（8′）：</b>"提问组"只看输出，投票判断：屋里的人"懂不懂"这些文本？写下判断理由。</li>
+        <li><b>偏见注入（12′）：</b>教师给房间组换一本"偏见版手册"——把"灾荒"类的权重悄悄调高、把女性称谓规则删掉。对同一批文本重做一遍。</li>
+        <li><b>揭底对读（8′）：</b>对比两版输出，找出被"制造"出来的主题与"消失"的人物。提问组判定：这个房间的回答，客观吗？</li>
+      </ol>
+    </div>
+    <div class="two-col">
+      <div class="mini"><h4>材料与道具</h4><ul><li>规则手册（正常版 / 偏见版）</li><li>真实史料片段 4 段（含 1 段女性人物材料）</li><li>主题与实体输出表</li></ul></div>
+      <div class="mini"><h4>判定与产出</h4><ul><li>胜出：<b>找出最多偏见痕迹</b>的组</li><li>产出：两版输出对照 + "理解/处理"判定表</li><li>必答：偏见是通过哪条规则进入结果的？</li></ul></div>
+    </div>
+    <div class="block"><h3>讨论引导</h3><ul class="debrief">
+      <li>TF-IDF、LDA、NER 到底"理解"文本了吗？还是更高级的中文房间？</li>
+      <li>4.6 说"客观"是幻象——偏见藏在哪一层？语料、分词表、还是权重？</li>
+      <li>如果统计方法只是处理符号，人文学者的"理解"在流程中处于什么位置？</li>
+    </ul></div>
+    <div class="callout risk"><p><b>伦理提醒：</b>偏见版手册中的规则需明确标注为"教学用合成样例"，课后收回，避免学生把其中的刻板印象当作史实。</p></div>
+    <details><summary>教师提示与变体</summary><p><b>与第11章联动：</b>本游戏是"中文房间"的手工版，第11章的"盲测裁判"是它的 LLM 版；两场连上，塞尔之问与大模型的"理解"之争会形成完整闭环。<b>线上版：</b>用表单收集输出，匿名后投影判别。</p></details>
+  </section>
+
+  <!-- ============ 05 ============ -->
+  <section class="exp" id="g05">
+    <div class="callout green"><b>独立教案：</b><a href="game05.html">打开《薛定谔的猫》完整教案与可打印素材 →</a></div>
+    <div class="exp-head">
+      <div class="num">05</div>
+      <div>
+        <h2>薛定谔的猫 <span class="en">Schrödinger's Cat</span></h2>
+        <p class="sub">对接 <b>第5章 数据可视化与视觉修辞</b> ｜ 游戏：<b>一图两态——同一数据的两种叙事</b></p>
+      </div>
+    </div>
+    <div class="origin">
+      <h4>原典与核心问题</h4>
+      <p>薛定谔 1935 年：盒子里的猫在打开之前处于死与活的叠加态。核心一问：<b>在观测/呈现之前，对象有没有唯一确定的状态？谁决定了它被看成什么？</b></p>
+      <p class="link"><b>教材对接：</b>5.1 图从来不是中立的；5.3 叙事可视化与 framing；5.4 视觉修辞三要素（路径 / 视角 / 色彩）；5.6 误导与操控的红线。<b>伦理落点：</b>数据没变，图却说了两个故事——责任在呈现者。</p>
+    </div>
+    <div class="meta">
+      <div><b>时长</b>45 分钟</div>
+      <div><b>分组</b>2–3 人/组</div>
+      <div><b>形式</b>同数据双叙事 + 手法互猜 + 红线判定</div>
+      <div><b>难度</b>★★☆☆☆</div>
+    </div>
+    <div class="block">
+      <h3>游戏流程</h3>
+      <ol class="steps">
+        <li><b>领同一份数据（3′）：</b>每组拿到完全相同的真实数据表（如某学科 20 年论文数量，含起伏）。</li>
+        <li><b>画"增长态"（10′）：</b>要求用尽合法手段让图看起来"蒸蒸日上"：截断纵轴、选有利起点、换配色、加趋势注解。</li>
+        <li><b>画"停滞态"（10′）：</b>同一份数据，让图看起来"停滞甚至衰退"：换起点、改比例尺、用冷色、换标注措辞。</li>
+        <li><b>手法互猜（12′）：</b>组间交换两图，接收方必须指出对方用了哪些修辞手段，并按教材 5.4 的"路径/视角/色彩"三要素归类。</li>
+        <li><b>红线裁决（10′）：</b>全班投票：哪张图"说谎"了？如果两张图都没改数据，谁该为误导负责？对照 5.6 给出判定。</li>
+      </ol>
+    </div>
+    <div class="two-col">
+      <div class="mini"><h4>材料与道具</h4><ul><li>真实数据表 1 份/组</li><li>坐标纸与彩笔（无电脑版）或 Excel/绘图工具</li><li>三要素对照表 + 红线判定卡</li></ul></div>
+      <div class="mini"><h4>判定与产出</h4><ul><li>胜出：<b>两图差异最大且都能自圆其说</b></li><li>产出：两张图 + 修辞手法对照表</li><li>必答：哪一处是"手法"，哪一处已是"欺骗"？</li></ul></div>
+    </div>
+    <div class="block"><h3>讨论引导</h3><ul class="debrief">
+      <li>"猫"到底死还是活？同一份数据为什么能支撑相反结论？</li>
+      <li>如果都没篡改数值，误导的责任在谁——数据、工具、还是制图者？</li>
+      <li>教材 5.6 的红线，你认为应该画在"截断纵轴"这里吗？为什么？</li>
+    </ul></div>
+    <div class="callout green"><p><b>教师点睛：</b>薛定谔用猫讽刺量子力学的"观测决定状态"；可视化课堂则把它翻转过来——<b>不是观测决定了数据，而是呈现决定了公众看到的数据</b>。这一句可作为本章的收束。</p></div>
+    <details><summary>教师提示与变体</summary><p><b>延伸：</b>让学生找一张真实新闻图表，反向拆解其 framing，与自己的两张图并排展示。<b>评价提示：</b>提醒学生"合法手法"与"红线"的边界常常是争议点，争议本身就是最好的讨论材料，不必急着统一答案。</p></details>
+  </section>
+
+  <!-- ============ 06 ============ -->
+  <section class="exp" id="g06">
+    <div class="callout green"><b>独立教案：</b><a href="game06.html">打开《六度分隔》完整教案与可打印素材 →</a></div>
+    <div class="exp-head">
+      <div class="num">06</div>
+      <div>
+        <h2>六度分隔 <span class="en">Six Degrees of Separation</span></h2>
+        <p class="sub">对接 <b>第6章 社会网络分析</b> ｜ 游戏：<b>六度人脉挑战——从档案里找出关键先生</b></p>
+      </div>
+    </div>
+    <div class="origin">
+      <h4>原典与核心问题</h4>
+      <p>卡林西 1929 年提出"链条"设想，后经米尔格拉姆的小世界实验广为人知：任意两人之间，平均只需六个中间人即可相连。核心一问：<b>关系的结构，能否被量化？"关键人物"是感觉还是指标？</b></p>
+      <p class="link"><b>教材对接：</b>6.1 关系即数据；6.2 节点 / 边 / 度 / 路径；6.3 中心性；6.4 社群发现；6.6 网络也会偏见；6.7 任务三"用完全图检验普遍联系"。<b>伦理落点：</b>网络不是中立的镜子，它同时在生产"谁重要"。</p>
+    </div>
+    <div class="meta">
+      <div><b>时长</b>40 分钟</div>
+      <div><b>分组</b>全班参与 + 4 人核对组</div>
+      <div><b>形式</b>人物卡链条竞速 + 网络揭晓 + 中心性标注</div>
+      <div><b>难度</b>★★☆☆☆</div>
+    </div>
+    <div class="block">
+      <h3>游戏流程</h3>
+      <ol class="steps">
+        <li><b>发人物卡（4′）：</b>每人领一张取自某文人交游圈的人物卡，含籍贯、科第、结社、著作，以及与他人的一条关系线索。</li>
+        <li><b>六度竞速（12′）：</b>主持人给出起点"甲"与终点"乙"。全班只能靠大声询问"谁与谁同乡/同科/同社/互赠诗文"来传递，找出最短链条，看能否在 6 度以内到达。</li>
+        <li><b>网络揭晓（6′）：</b>投影完整关系网。各组把刚才的口头链条画成节点—边图，核对是否最短。</li>
+        <li><b>找关键先生（10′）：</b>先凭直觉投票"谁最重要"；再计算/观察度数与中介位置，标出度中心性与中介中心性最高的节点，对比直觉与计算。</li>
+        <li><b>完全图反证（8′）：</b>教师出示 6.7 任务三的"完全图"：如果人人互相连接，每个人都同样"关键"。讨论：这样的网络里，中心性还有信息量吗？</li>
+      </ol>
+    </div>
+    <div class="two-col">
+      <div class="mini"><h4>材料与道具</h4><ul><li>人物卡（每人 1 张，20–30 人份）</li><li>完整关系网投影图</li><li>完全图对照图</li></ul></div>
+      <div class="mini"><h4>判定与产出</h4><ul><li>胜出：<b>找到最短链条</b>且能画出正确网络的小组</li><li>产出：最短链条 + 中心性标注图</li><li>加分：指出一个"直觉认为重要、数据并不支持"的人物</li></ul></div>
+    </div>
+    <div class="block"><h3>讨论引导</h3><ul class="debrief">
+      <li>为什么"六度"在你们这张小网络里可能不成立？规模如何改变结论？</li>
+      <li>中心性指标和你的直觉一致吗？"关键人物"是被数据发现的，还是被数据建构的？</li>
+      <li>6.6 说"网络也会偏见"——如果史料只记录了男性的交游，这张网会怎样？</li>
+    </ul></div>
+    <div class="callout green"><p><b>教师点睛：</b>完全图那一问是本章最锋利的反思：<b>当"人人都有联系"时，联系就不再是信息</b>。把它与第3章的"信息有代价"对照讲，学生会突然理解"结构"的意义。</p></div>
+    <details><summary>教师提示与变体</summary><p><b>数据准备：</b>人物卡可直接取自教材第6章的"人物关系网"案例，避免临时编造。<b>线上版：</b>用在线白板，学生把卡片拖成网络，实时观察结构浮现。<b>进阶：</b>引入"桥接人物"卡，专门制造社群之间的唯一通路，让中介中心性一目了然。</p></details>
+  </section>
+
+  <!-- ============ 07 ============ -->
+  <section class="exp" id="g07">
+    <div class="callout green"><b>独立教案：</b><a href="game07.html">打开《平面国》完整教案与可打印素材 →</a></div>
+    <div class="exp-head">
+      <div class="num">07</div>
+      <div>
+        <h2>平面国 <span class="en">Flatland · Abbott</span></h2>
+        <p class="sub">对接 <b>第7章 空间人文与 GIS</b> ｜ 游戏：<b>给历史地图补上第三维</b></p>
+      </div>
+    </div>
+    <div class="origin">
+      <h4>原典与核心问题</h4>
+      <p>艾博特 1884 年《平面国》：二维世界的居民无法理解"上/下"，直到一个球体闯入。核心一问：<b>你的表征维度，是否决定了你能看见什么、看不见什么？</b></p>
+      <p class="link"><b>教材对接：</b>7.1 给人文加一个坐标；7.2 空间数据；7.3 历史 GIS（时间 + 空间）；7.5 地理编码；7.6 地图即权力。<b>伦理落点：</b>地图的坐标、边界与名称，都是权力选择的结果。</p>
+    </div>
+    <div class="meta">
+      <div><b>时长</b>45 分钟</div>
+      <div><b>分组</b>3–4 人/组</div>
+      <div><b>形式</b>二维局限体验 + 加维翻案 + 权力追问</div>
+      <div><b>难度</b>★★★☆☆</div>
+    </div>
+    <div class="block">
+      <h3>游戏流程</h3>
+      <ol class="steps">
+        <li><b>平面国视角（8′）：</b>只发一张二维地图（某历史事件在州县层面的分布点）。各组仅凭平面位置回答："哪里最严重？扩散方向如何？"写下结论并签名。</li>
+        <li><b>球体闯入（12′）：</b>发"时间纸条"（每点发生的年份）与"层级卡"（府/州/县）。要求把时间当作第三维，重画一张时空图（横轴空间、纵轴时间），再看结论是否翻转——例如"看似中心的点，其实是最晚才波及的"。</li>
+        <li><b>平面国居民的反驳（8′）：</b>请一组扮演"二维居民"，坚持认为第一版结论才对，质疑加维后的解释。训练学生理解"维度局限"不是愚蠢，而是结构性的看不见。</li>
+        <li><b>权力卡（12′）：</b>发卡：这张地图的边界由谁划定？某县在统计年份被撤并/改名，会怎样改变密度图？各组重写一张"地图声明"：本图采用了什么边界、什么地名标准、遗漏了谁。</li>
+      </ol>
+    </div>
+    <div class="two-col">
+      <div class="mini"><h4>材料与道具</h4><ul><li>二维分布图 1 张/组</li><li>时间纸条 + 行政层级卡</li><li>权力卡 + 地图声明模板</li></ul></div>
+      <div class="mini"><h4>判定与产出</h4><ul><li>胜出：<b>结论翻转最有据</b>且地图声明最诚实的一组</li><li>产出：二维/三维结论对照表 + 地图声明</li><li>必答：你的第一版结论漏掉了什么？</li></ul></div>
+    </div>
+    <div class="block"><h3>讨论引导</h3><ul class="debrief">
+      <li>二维地图漏掉了什么？加上时间后，因果关系如何改变？</li>
+      <li>7.6 "地图即权力"在这个案例里具体落在哪一步——边界？地名？还是"哪些点值得画"？</li>
+      <li>地名变更给地理编码（7.5）带来的麻烦，能不能靠技术解决，还是必须回到历史考据？</li>
+    </ul></div>
+    <div class="callout green"><p><b>教师点睛：</b>《平面国》的原作是维多利亚时代的等级讽刺小说——"二维居民看不见第三维"与"史料只记录某一阶层的空间经验"是同构的。<b>加一维，不只是加一个变量，而是加一种伦理立场。</b></p></div>
+    <details><summary>教师提示与变体</summary><p><b>数据准备：</b>建议用教材第7章的历史时空案例，或本地方志中的灾害/书院分布。<b>变体：</b>若无可靠时间数据，可用"层级维度"代替（府/州/县三级叠加），同样能制造结论翻转。<b>提示：</b>务必准备"改名/撤并"的真实案例，否则权力卡的冲击力会打折。</p></details>
+  </section>
+
+  <!-- ============ 08 ============ -->
+  <section class="exp" id="g08">
+    <div class="callout green"><b>独立教案：</b><a href="game08.html">打开《缸中之脑》完整教案与可打印素材 →</a></div>
+    <div class="exp-head">
+      <div class="num">08</div>
+      <div>
+        <h2>缸中之脑 <span class="en">Brain in a Vat · Putnam</span></h2>
+        <p class="sub">对接 <b>第8章 图像处理与计算机视觉</b> ｜ 游戏：<b>缸中之脑影像馆——盲注打分</b></p>
+      </div>
+    </div>
+    <div class="origin">
+      <h4>原典与核心问题</h4>
+      <p>普特南 1981 年：一个大脑被置于营养液中，由计算机供给全部感官信号，它如何知道自己不在"真实世界"？核心一问：<b>仅凭接收到的信号，能否判断所见为实？</b></p>
+      <p class="link"><b>教材对接：</b>8.2 二值化与校正；8.3 OCR；8.4 图像检索；8.5 视觉语言模型（VLM）；8.6 真实、残缺与伪造；8.7 影像核验。<b>伦理落点：</b>模型只接收像素，它没有能力判断真伪——辨别真伪的能力在人，责任也在人。</p>
+    </div>
+    <div class="meta">
+      <div><b>时长</b>45 分钟</div>
+      <div><b>分组</b>3–4 人/组</div>
+      <div><b>形式</b>盲注 + 可信度打分 + 揭晓对账 + 核验工具</div>
+      <div><b>难度</b>★★★☆☆</div>
+    </div>
+    <div class="block">
+      <h3>游戏流程</h3>
+      <ol class="steps">
+        <li><b>盲注（12′）：</b>教师展示 6 张影像，不给任何来源信息：2 张真实历史照、2 张同图的裁剪/调色/篡改版、2 张 AI 生成或风格化图。各组像"缸中的分析师"一样写图注：时间、地点、人物、事件，并给可信度 0–10 分。</li>
+        <li><b>揭晓对账（8′）：</b>公开来源与生成方式，各组计算自己的"误信率"与"错认率"，标出最自信却错得最离谱的一张。</li>
+        <li><b>核验工具卡（15′）：</b>发"核验工具卡"：反向搜图、EXIF 检查、来源交叉比对、OCR 文字校勘、与已知档案比对。同样 6 张图再判一轮，记录分数变化。</li>
+        <li><b>VLM 对照（6′）：</b>教师展示一段 VLM 对其中一张图的生成式描述，让学生核对：描述中哪些是"看见的"，哪些是"猜出来的"（幻觉）。</li>
+        <li><b>守门人裁定（4′）：</b>对照 8.6 与 8.7，各组写下一条"历史影像使用守则"。</li>
+      </ol>
+    </div>
+    <div class="two-col">
+      <div class="mini"><h4>材料与道具</h4><ul><li>6 张影像（真实/篡改/生成各 2）</li><li>盲注表（图注 + 可信度）</li><li>核验工具卡 + VLM 描述样例</li></ul></div>
+      <div class="mini"><h4>判定与产出</h4><ul><li>胜出：<b>误信率下降幅度最大</b>的组</li><li>产出：图注表 + 核验前后对照 + 使用守则</li><li>扣分：把 AI 生成图当作真实史料且未标注</li></ul></div>
+    </div>
+    <div class="block"><h3>讨论引导</h3><ul class="debrief">
+      <li>只看像素，能否判断真伪？"缸中之脑"的困境与图像模型的局限有什么相通？</li>
+      <li>8.7 任务二要求"生成影像图注并人工复核"——为什么人工复核不可替代？</li>
+      <li>如果一张伪造影像在教学中被当作真实使用了十年，责任链该怎么追溯？</li>
+    </ul></div>
+    <div class="callout risk"><p><b>教学红线：</b>所有 AI 生成/篡改影像必须在揭晓环节明确标注为教学样例；不得使用真实人物的敏感影像做篡改演示；使用的真实历史影像须注明来源与许可（回扣第2章）。</p></div>
+    <details><summary>教师提示与变体</summary><p><b>技术版：</b>现场用 VLM 对同一张图做两次不同提示词的描述，对比幻觉差异。<b>变体：</b>把"图"换成"OCR 结果"，让学生判断一段识别文字是否可信，直接对接 8.3。<b>提醒：</b>本游戏与第11章盲测构成"视觉幻觉 vs 语言幻觉"的对称结构，可跨章连讲。</p></details>
+  </section>
+
+  <!-- ============ 09 ============ -->
+  <section class="exp" id="g09">
+    <div class="callout green"><b>独立教案：</b><a href="game09.html">打开《罗素悖论》完整教案与可打印素材 →</a></div>
+    <div class="exp-head">
+      <div class="num">09</div>
+      <div>
+        <h2>罗素悖论 <span class="en">Russell's Paradox / Barber</span></h2>
+        <p class="sub">对接 <b>第9章 知识图谱与语义技术</b> ｜ 游戏：<b>理发师的本体——给你的图谱划边界</b></p>
+      </div>
+    </div>
+    <div class="origin">
+      <h4>原典与核心问题</h4>
+      <p>罗素 1901 年，通俗版即"理发师悖论"：给且只给不给自己刮胡子的人刮胡子的理发师，该不该给自己刮胡子？核心一问：<b>当分类规则把自己也卷进去时，体系会怎样崩溃？</b></p>
+      <p class="link"><b>教材对接：</b>9.1 把零散事实连成网络；9.2 URI / RDF / 本体；9.3 本体设计（类、属性、关系）；9.4 图谱构建与对齐；9.6 本体即世界观。<b>伦理落点：</b>本体不是客观分类，它是一套关于"什么存在、如何相关"的承诺。</p>
+    </div>
+    <div class="meta">
+      <div><b>时长</b>45 分钟</div>
+      <div><b>分组</b>3–4 人/组</div>
+      <div><b>形式</b>本体搭建 + 悖论卡冲击 + 补丁答辩 + 互找漏洞</div>
+      <div><b>难度</b>★★★★☆</div>
+    </div>
+    <div class="block">
+      <h3>游戏流程</h3>
+      <ol class="steps">
+        <li><b>搭本体（10′）：</b>各组为"某一文人圈子"设计一个小本体：类（人 / 机构 / 事件 / 作品）、属性（生于、任职、参与、撰写）、关系约束。画成类图。</li>
+        <li><b>悖论卡冲击（12′）：</b>教师依次抛出三张卡：①"本品目收录所有不收录自己的目录"；②"这位'作者'其实是一个虚构的集体笔名，但它署名了 30 部作品"；③"关系'影响了'能不能指向自身？"每组必须现场改本体并写下补丁理由。</li>
+        <li><b>补丁答辩（8′）：</b>各组用 1 分钟说明：你加了什么约束、排除了什么情况、代价是什么（例如：排除自指会漏掉真实的自传性写作吗？）。</li>
+        <li><b>互找漏洞（10′）：</b>组间交换本体，专门寻找对方体系里的"自指漏洞"或"无法归类的对象"，找到最多者胜。</li>
+        <li><b>回到 9.6（5′）：</b>全班一句话总结：为什么"本体即世界观"不是修辞，而是技术事实。</li>
+      </ol>
+    </div>
+    <div class="two-col">
+      <div class="mini"><h4>材料与道具</h4><ul><li>本体设计模板（类/属性/关系三栏）</li><li>悖论卡 3 张 + 追加卡若干</li><li>大白纸与便签</li></ul></div>
+      <div class="mini"><h4>判定与产出</h4><ul><li>胜出：<b>补丁最简洁且代价说明最诚实</b></li><li>产出：本体图 + 悖论处理说明</li><li>加分：主动指出自己本体的一个漏洞</li></ul></div>
+    </div>
+    <div class="block"><h3>讨论引导</h3><ul class="debrief">
+      <li>本体为什么是"世界观"而不是"客观分类"？你的补丁体现了什么价值取舍？</li>
+      <li>遇到自指与边界案例时，分类体系必须做什么让步？这些让步影响谁？</li>
+      <li>RDF 三元组能不能表达"这句话是假的"？如果不能，图谱的边界在哪里？</li>
+    </ul></div>
+    <div class="callout green"><p><b>教师点睛：</b>罗素悖论最终催生了类型论与公理化集合论——<b>体系不是被"修好"的，而是被"限制"的</b>。这与 9.6 的伦理判断完全一致：任何本体都在通过"不描述什么"来表达立场。</p></div>
+    <details><summary>教师提示与变体</summary><p><b>简化版：</b>若学生基础较弱，只用"理发师"一张卡，围绕"人"这个类反复追问即可。<b>进阶版：</b>引入 OWL 的"类不能是自身的实例"约束，把悖论讨论落到具体语义技术上。<b>提醒：</b>题目中的"集体笔名"最好取自真实出版史案例，说明分类难题不是哲学虚构。</p></details>
+  </section>
+
+  <!-- ============ 10 ============ -->
+  <section class="exp" id="g10">
+    <div class="callout green"><b>独立教案：</b><a href="game10.html">打开《拉普拉斯妖》完整教案与可打印素材 →</a></div>
+    <div class="exp-head">
+      <div class="num">10</div>
+      <div>
+        <h2>拉普拉斯妖 <span class="en">Laplace's Demon</span></h2>
+        <p class="sub">对接 <b>第10章 机器学习与深度学习基础</b> ｜ 游戏：<b>全知妖的考试——评估卡反转</b></p>
+      </div>
+    </div>
+    <div class="origin">
+      <h4>原典与核心问题</h4>
+      <p>拉普拉斯 1814 年：若有一个智能知道每一粒子的位置与动量，它就能用同一套规律推演全部未来与过去。核心一问：<b>如果"全知"真的可能，预测还是不是知识？</b></p>
+      <p class="link"><b>教材对接：</b>10.2 监督学习；10.3 无监督学习；10.4 评估：准确率之外；10.5 可解释性（SHAP 与注意力）；10.6 从历史数据学的"历史偏见"。<b>伦理落点：</b>高准确率不等于有用，更不等于正当。</p>
+    </div>
+    <div class="meta">
+      <div><b>时长</b>45 分钟</div>
+      <div><b>分组</b>3–4 人/组</div>
+      <div><b>形式</b>全知承诺 → 评估卡反转 → 指标重算 → SHAP 归因</div>
+      <div><b>难度</b>★★★★☆</div>
+    </div>
+    <div class="block">
+      <h3>游戏流程</h3>
+      <ol class="steps">
+        <li><b>全知宣言（5′）：</b>各组扮演"拉普拉斯妖"，拿到一份历史数据（如某时期科举及第者特征表）与一个任务："预测谁会中举"。给 5 分钟，让他们宣布自己模型的准确率并夸口"预测成功"。</li>
+        <li><b>第一张评估卡（8′）：</b>教师揭示：及第率仅 3%，全预测"不中"就有 97% 准确率。各组重算混淆矩阵、精确率、召回率、F1，看"成功"如何蒸发。</li>
+        <li><b>第二张评估卡（8′）：</b>揭示"时间穿越"：训练数据来自后世，测试数据来自前世。讨论：这种高精度是预测还是作弊？</li>
+        <li><b>第三张 SHAP 卡（12′）：</b>教师给出该模型的"归因结果"：最重要的特征竟然是"籍贯属于某地区"或"父辈是否任职"——即历史偏见本身。各组解释：模型学到了什么？它在复制怎样的不平等？</li>
+        <li><b>给妖定罪（8′）：</b>对照 10.4 与 10.6，各组写一份"拉普拉斯妖判决书"：这个模型缺的是数据、是方法，还是对不确定性的敬畏？</li>
+      </ol>
+    </div>
+    <div class="two-col">
+      <div class="mini"><h4>材料与道具</h4><ul><li>历史数据集（含类别不平衡与偏见特征）</li><li>评估卡 3 张 + 混淆矩阵模板</li><li>SHAP 归因示意卡</li></ul></div>
+      <div class="mini"><h4>判定与产出</h4><ul><li>胜出：<b>最早发现"97% 准确率陷阱"</b>的组</li><li>产出：前后评估对照表 + SHAP 归因说明 + 判决书</li><li>加分：主动指出自己模型的伦理风险</li></ul></div>
+    </div>
+    <div class="block"><h3>讨论引导</h3><ul class="debrief">
+      <li>为什么高准确率可能毫无价值？"全知"做不到，缺的是数据，还是不确定性本身？</li>
+      <li>10.6 "从历史数据学历史偏见"在这个游戏里是如何发生的？有哪些特征应当被禁用？</li>
+      <li>可解释性是装饰，还是负责任研究的必需品？如果不给 SHAP 卡，你们会发现问题吗？</li>
+    </ul></div>
+    <div class="callout risk"><p><b>教学红线：</b>偏见特征（籍贯、性别、族属）只用于揭示模型机制，必须明确声明为教学样例；讨论中禁止把任何真实群体与"能力/品行"挂钩。</p></div>
+    <details><summary>教师提示与变体</summary><p><b>无电脑版：</b>全部数值由教师卡片给出，学生手算混淆矩阵即可。<b>有电脑版：</b>用 sklearn 现场跑一遍，让学生亲手看到 97% 的"优秀"模型。<b>跨章联动：</b>本游戏是第12章"电车难题"的前置——当模型"全知但不正当"时，决策的伦理问题才真正出现。</p></details>
+  </section>
+
+  <!-- ============ 11 ============ -->
+  <section class="exp" id="g11">
+    <div class="callout green"><b>独立教案：</b><a href="game11.html">打开《图灵测试》完整教案与可打印素材 →</a></div>
+    <div class="exp-head">
+      <div class="num">11</div>
+      <div>
+        <h2>图灵测试 <span class="en">Turing Test · Imitation Game</span></h2>
+        <p class="sub">对接 <b>第11章 大语言模型与生成式 AI</b> ｜ 游戏：<b>人文版模仿游戏——盲测裁判</b></p>
+      </div>
+    </div>
+    <div class="origin">
+      <h4>原典与核心问题</h4>
+      <p>图灵 1950 年《计算机器与智能》：如果提问者通过文字对话无法区分对方是人还是机器，就可认为机器具有智能。核心一问：<b>"看起来像"能不能作为"是"的判据？</b></p>
+      <p class="link"><b>教材对接：</b>11.1 生成式 AI 进了人文书房；11.2 提示工程；11.3 RAG；11.5 幻觉、版权与学术诚信；11.6 署名、透明、不替代思考。<b>伦理落点：</b>盲测能骗过人眼，但骗不过证据核查。</p>
+    </div>
+    <div class="meta">
+      <div><b>时长</b>50 分钟</div>
+      <div><b>分组</b>裁判组 + 应答组</div>
+      <div><b>形式</b>三轮盲测 + 幻觉标注 + 提示工程挑战</div>
+      <div><b>难度</b>★★★☆☆</div>
+    </div>
+    <div class="block">
+      <h3>游戏流程</h3>
+      <ol class="steps">
+        <li><b>准备匿名答案（教师课前，10′）：</b>就同一批古籍相关问题，准备三类答案各 3 条并编号为 A–I：①学生人工撰写；②LLM 裸答；③LLM+RAG（接入指定古籍语料）答案。全部隐去来源。</li>
+        <li><b>盲测投票（10′）：</b>学生当裁判，读问题与 9 条答案，投票"哪些是人写的"，并给每条标注"有据 / 无据 / 无法判断"。</li>
+        <li><b>揭晓对账（8′）：</b>公开来源，统计：裸答的幻觉率 vs RAG 的幻觉率；"把 AI 误认为人"的比例；学生标"有据"的答案中有多少其实无据。</li>
+        <li><b>提示工程挑战（15′）：</b>学生分组写提示词，要求模型回答同一批问题时"必须引用原文、给出处、不确定则说明"。比谁的提示词带来的幻觉最少、证据最可查。</li>
+        <li><b>署名与透明（7′）：</b>对照 11.6：如果你在论文中使用了刚才最优的 AI 答案，应该在何处声明、如何署名？"不替代思考"的边界在哪里？</li>
+      </ol>
+    </div>
+    <div class="two-col">
+      <div class="mini"><h4>材料与道具</h4><ul><li>9 条匿名答案（人工/裸答/RAG 各 3）</li><li>盲测投票表（来源判断 + 有据标注）</li><li>提示词设计单</li></ul></div>
+      <div class="mini"><h4>判定与产出</h4><ul><li>胜出：<b>幻觉率降低最多</b>的提示词组</li><li>产出：盲测表 + 幻觉率对照 + 提示模板</li><li>必答：通过图灵测试 = 理解了吗？（回扣第4章中文房间）</li></ul></div>
+    </div>
+    <div class="block"><h3>讨论引导</h3><ul class="debrief">
+      <li>通过了图灵测试就等于"理解"吗？第4章的中文房间怎么回答这个问题？</li>
+      <li>RAG 为什么能减少幻觉？它的局限在哪——检索错了会怎样？</li>
+      <li>如果 AI 答案比人写得更好，人还要不要署名？署名到底在声明什么？</li>
+    </ul></div>
+    <div class="callout risk"><p><b>学术诚信：</b>盲测答案须由教师课前准备好，课堂不临时生成不可控内容；所有 AI 生成材料在揭晓后必须明确标注；提醒学生：课程作业中的 AI 使用必须按 11.6 声明。</p></div>
+    <details><summary>教师提示与变体</summary><p><b>答案来源：</b>建议用教材第11章"用 RAG 问一本古籍"的案例准备材料，保证与本章一致。<b>变体：</b>把"人写的"换成"学生自己写的"，加入自我识别环节，冲击力更强。<b>跨章联动：</b>与第8章影像盲注并列，构成"语言幻觉 / 视觉幻觉"双实验。</p></details>
+  </section>
+
+  <!-- ============ 12 ============ -->
+  <section class="exp" id="g12">
+    <div class="callout green"><b>独立教案：</b><a href="game12.html">打开《电车难题》完整教案与可打印素材 →</a></div>
+    <div class="exp-head">
+      <div class="num">12</div>
+      <div>
+        <h2>电车难题 <span class="en">Trolley Problem · Foot</span></h2>
+        <p class="sub">对接 <b>第12章 人工智能前沿进展</b> ｜ 游戏：<b>算法电车——当 AI 智能体替你扳道</b></p>
+      </div>
+    </div>
+    <div class="origin">
+      <h4>原典与核心问题</h4>
+      <p>富特 1967 年提出：失控电车将撞向五人，你能否扳道让车转向只撞一人？核心一问：<b>当最优解必须牺牲某些人时，"最优"由谁定义、"责任"由谁承担？</b></p>
+      <p class="link"><b>教材对接：</b>12.2 大模型与自动化数据分析；12.4 AI 智能体与数据工作流（MCP）；12.6 数据治理、版权与负责任 AI；12.8 算力、经费与学术共同体。<b>伦理落点：</b>"负责任 AI"必须写进目标函数，而不是写在声明里。</p>
+    </div>
+    <div class="meta">
+      <div><b>时长</b>50 分钟</div>
+      <div><b>分组</b>4 个角色组（每组 3–4 人）</div>
+      <div><b>形式</b>双难选择 + 角色辩论 + 目标函数改写 + 责任裁定</div>
+      <div><b>难度</b>★★★★☆</div>
+    </div>
+    <div class="block">
+      <h3>游戏流程</h3>
+      <ol class="steps">
+        <li><b>设置两难（6′）：</b>教师给出场景：某数字图书馆项目用 AI 智能体（MCP 工作流）批量数字化史料。<b>选项 A</b>——OCR 全自动，快且省钱，但会系统性误识某类少数民族文字；<b>选项 B</b>——人工逐字校勘，质量高，但导致其余馆藏无力数字化。全班先无记名投票。</li>
+        <li><b>智能体先扳道（6′）：</b>教师宣布：智能体的目标函数是"单位成本处理页数最大化"，它自动选了 A。问：它错了吗？</li>
+        <li><b>角色辩论（18′）：</b>四组分别扮演算法设计者、馆藏方、少数社群代表、伦理审查委员。每组陈述立场，并给出"如果由我定义目标函数，我会加上哪一条约束"。</li>
+        <li><b>改写目标函数（12′）：</b>各组把"效率最大化"改写为含伦理约束的版本，例如"在少数文字识别准确率不低于 X% 的前提下最大化吞吐"。互换评估：这条约束可测量吗？会不会导致项目失败？</li>
+        <li><b>责任裁定（8′）：</b>发"责任卡"：若误识造成史料失真，责任在开发者、部署者、还是模型？对照 12.6 与 12.8，写一份"负责任 AI 条款"。</li>
+      </ol>
+    </div>
+    <div class="two-col">
+      <div class="mini"><h4>材料与道具</h4><ul><li>场景卡 + 选项 A/B 说明</li><li>角色卡 4 套 + 责任卡 3 张</li><li>目标函数改写单</li></ul></div>
+      <div class="mini"><h4>判定与产出</h4><ul><li>胜出：<b>约束最可测量且最不回避代价</b>的组</li><li>产出：决策书 + 改写后的约束清单 + 责任声明</li><li>加分：承认自己方案的成本与局限</li></ul></div>
+    </div>
+    <div class="block"><h3>讨论引导</h3><ul class="debrief">
+      <li>为什么"效率最大化"不够？它缺省了谁的价值？</li>
+      <li>"负责任 AI"具体要把什么写进约束？谁来验收这些约束？</li>
+      <li>12.8 的算力与经费不均，如何加剧了这类两难？资源少的馆藏是否注定要承担更高风险？</li>
+    </ul></div>
+    <div class="callout green"><p><b>教师点睛：</b>电车难题的经典教训是"扳道的手不干净"。换个说法：<b>智能体替你扳道，但方向盘仍是人设计的</b>。把这句话写进课程思政的落点，比空谈"科技向善"更有力。</p></div>
+    <details><summary>教师提示与变体</summary><p><b>本土化：</b>把场景换成地方志数字化中方言/少数民族史料的识别问题，与用户的方志研究背景高度契合。<b>变体：</b>用真实 MCP 工作流演示一次"自动决策"，让学生亲眼看到默认目标。<b>提醒：</b>角色辩论要避免把少数社群代表变成"哭诉者"，应赋予其专业数据包，让其论证有据。</p></details>
+  </section>
+
+  <!-- ============ 13 ============ -->
+  <section class="exp" id="g13">
+    <div class="callout green"><b>独立教案：</b><a href="game13.html">打开《谷堆悖论》完整教案与可打印素材 →</a></div>
+    <div class="exp-head">
+      <div class="num">13</div>
+      <div>
+        <h2>谷堆悖论 <span class="en">Sorites Paradox</span></h2>
+        <p class="sub">对接 <b>第13章 综合项目与课程反思</b> ｜ 游戏：<b>第几粒沙算研究？——结题答辩模拟法庭</b></p>
+      </div>
+    </div>
+    <div class="origin">
+      <h4>原典与核心问题</h4>
+      <p>古希腊麦加拉学派：一粒沙不成堆，再加一粒也不成堆——那么从哪一粒开始成"堆"？核心一问：<b>当变化是连续的，我们如何为正当地划一条线？</b></p>
+      <p class="link"><b>教材对接：</b>13.1 从"做实验"到"做研究"；13.2 好选题三要素；13.3 四要素闭环；13.4 评价量规（Rubric）；13.5 答辩与结课寄语。<b>伦理落点：</b>模糊的判断必须转化为可核查的证据，才能称为学术评价。</p>
+    </div>
+    <div class="meta">
+      <div><b>时长</b>50 分钟</div>
+      <div><b>分组</b>答辩组 + 评委组（轮换）</div>
+      <div><b>形式</b>渐进卡片 + 模拟质询 + 阈值辩论 + 量规共建</div>
+      <div><b>难度</b>★★★☆☆</div>
+    </div>
+    <div class="block">
+      <h3>游戏流程</h3>
+      <ol class="steps">
+        <li><b>发进度卡（5′）：</b>教师准备 8 张渐进卡片，从"跑通一段代码"逐粒加沙到"完整可复现、有证据、有反思的研究"。每组抽一张，声称"我的项目已经是一项研究"。</li>
+        <li><b>模拟答辩（15′）：</b>评委组依教材 13.4 的五个维度逐一质询："你的数据许可呢？""方法参数为何这样设？""结论有没有过界？"答辩组必须指出自己还差哪几粒沙。</li>
+        <li><b>阈值辩论（12′）：</b>关键一问：从"演示"到"研究"，那条线应该画在第几粒？各组陈述并给出理由——是数据量？可复现性？还是反思的深度？</li>
+        <li><b>共建量规（12′）：</b>全班把教材 13.4 的百分比维度，改写为"可观测的达标证据"。例如"数据合规 15%"改成"能出示许可文件 + 数据护照 + 引用格式"。</li>
+        <li><b>结课寄语（6′）：</b>回到 13.5：方法组合不是目的，可复现、可解释、能说明局限，才使成果成为研究。请每人在卡片背面写下一句"我缺的那粒沙"。</li>
+      </ol>
+    </div>
+    <div class="two-col">
+      <div class="mini"><h4>材料与道具</h4><ul><li>渐进进度卡 8 张/班</li><li>教材 13.4 量规投影版</li><li>量规改写表 + 结课卡片</li></ul></div>
+      <div class="mini"><h4>判定与产出</h4><ul><li>胜出：<b>量规改写最可观测</b>且答辩最诚实的一组</li><li>产出：答辩记录 + 修订版量规 + 个人结课卡</li><li>加分：主动承认自己项目的局限</li></ul></div>
+    </div>
+    <div class="block"><h3>讨论引导</h3><ul class="debrief">
+      <li>从"做实验"到"做研究"的临界点在哪？为什么它不可能是一个精确的数值？</li>
+      <li>量规里的百分比（20%/15%/25%…）是精确的吗？它的作用是什么？</li>
+      <li>13.3 的四要素闭环，如何把模糊的"堆"变成可核查的证据链？</li>
+    </ul></div>
+    <div class="callout green"><p><b>教师点睛：</b>谷堆悖论的实用答案不是"找到那一粒"，而是<b>约定一条线并公开说明约定理由</b>。这正是 Rubric 的哲学：评价的合法性来自程序的透明，而非阈值的绝对精确。以此收束全书，呼应第1章"可复现、案例真实、伦理在场"。</p></div>
+    <details><summary>教师提示与变体</summary><p><b>真实版：</b>直接用学生本学期的小组项目作为进度卡素材，代入感最强。<b>延伸：</b>把全班修订的量规保留为下一届课程的评分依据，让学生体验"规则由被评价者共同制定"的治理感。<b>提醒：</b>质询环节要设定"对事不对人"的规则，避免演变成互相贬低。</p></details>
+  </section>
+
+  <!-- ============ TOOLKIT ============ -->
+  <section id="toolkit">
+    <h2>附：通用教具与评价量规</h2>
+    <p>13 场游戏共用一套低成本教具与一套统一评价标准，教师可一次性准备、全学期复用。</p>
+    <div class="two-col">
+      <div class="mini"><h4>通用教具包（一次准备，全书复用）</h4><ul>
+        <li><b>卡片类：</b>身份卡、证据卡、红线卡、悖论卡、评估卡、进度卡、角色卡——统一尺寸，可塑封重复使用</li>
+        <li><b>表格类：</b>数据护照、观察表、操作日志、盲测表、图注表、盲测投票表、量规改写表</li>
+        <li><b>工具类：</b>坐标纸与彩笔、计时器、投票贴纸、大白纸与便签；有电脑时加 Jupyter / Excel / 在线白板</li>
+        <li><b>材料类：</b>真实史料样例（须注明来源与许可）、明确标注的合成样例（AI 生成 / 篡改 / 偏见版规则）</li>
+      </ul></div>
+      <div class="mini"><h4>统一评价量规（100 分）</h4>
+        <table class="gtable rubric" style="min-width:0">
+          <thead><tr><th>维度</th><th>权重</th><th>达标描述</th></tr></thead>
+          <tbody>
+            <tr><td>情境还原</td><td>15%</td><td>准确说出思想实验的原典与核心问题</td></tr>
+            <tr><td>方法对接</td><td>25%</td><td>游戏机制与本章技术点同构，不是贴标签</td></tr>
+            <tr><td>证据意识</td><td>20%</td><td>产出有来源、有标注、可核查</td></tr>
+            <tr><td>伦理反思</td><td>25%</td><td>直指本章伦理坐标，能说明局限与代价</td></tr>
+            <tr><td>协作表达</td><td>15%</td><td>分工清晰，陈述简洁，能回应质询</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+    <div class="callout"><p><b>跨章串联建议：</b>把 13 场游戏按"认识论三问"分三组讲——<b>谁在看</b>（01 庄周梦蝶 / 05 薛定谔的猫 / 07 平面国 / 08 缸中之脑）、<b>怎么算</b>（02 忒修斯之船 / 03 麦克斯韦妖 / 04 中文房间 / 06 六度分隔 / 09 罗素悖论 / 10 拉普拉斯妖）、<b>谁负责</b>（11 图灵测试 / 12 电车难题 / 13 谷堆悖论）。期末用一次"游戏复盘会"让学生重访三组问题，课程思政的线索自然浮现。</p></div>
+    <p style="text-align:center;margin-top:22px;font-size:13px;color:var(--muted)">——《数据科学与数字人文》教学配套资源 · 思想实验课堂游戏手册 · 完——</p>
+  </section>
+
+  </main>
+</div>
+
+<div class="footer">本手册为教学辅助资源，与教材第 1—13 章配套使用 · 所有合成样例须明确标注，真实史料须注明来源与许可</div>
+
+</body>
+</html>

@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏 04｜中文房间 · 数据科学与数字人文</title>
+<style>
+:root{
+  --blue:#1f4e79; --blue2:#2b6cb0; --blue3:#3b82c4;
+  --soft:#eaf2fa; --soft2:#f5f9fd;
+  --green:#2f855a; --gsoft:#e9f6ef;
+  --ink:#1a202c; --muted:#4a5568; --faint:#718096;
+  --line:#d9e2ec; --line2:#edf1f6;
+  --bg:#f4f7fb; --card:#ffffff;
+  --red:#c53030; --rsoft:#fff5f5; --rline:#feb2b2;
+  --amber:#b7791f; --asoft:#fffaf0;
+  --shadow:0 2px 12px rgba(31,78,121,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  line-height:1.78;font-size:15px}
+a{color:var(--blue2);text-decoration:none}
+a:hover{text-decoration:underline}
+code{background:var(--soft);padding:1px 5px;border-radius:4px;font-family:Consolas,"Courier New",monospace;font-size:.9em;color:var(--blue)}
+
+/* ---------- top bar ---------- */
+.topbar{background:var(--blue);color:#fff;padding:11px 0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.topbar .wrap{max-width:1240px;margin:0 auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{font-size:15.5px;font-weight:700}
+.brand small{display:block;font-size:11px;font-weight:400;opacity:.8;letter-spacing:.3px}
+.topbar nav{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.topbar nav a,.topbar nav button{color:#fff;border:1px solid rgba(255,255,255,.42);background:transparent;
+  padding:5px 11px;border-radius:6px;font-size:12.5px;cursor:pointer;font-family:inherit;line-height:1.4}
+.topbar nav a:hover,.topbar nav button:hover{background:rgba(255,255,255,.16);text-decoration:none}
+.topbar nav .current{background:rgba(255,255,255,.2);border-color:#fff}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(120deg,#1f4e79 0%,#2b6cb0 52%,#2f855a 140%);color:#fff;padding:34px 22px 30px}
+.hero .wrap{max-width:1240px;margin:0 auto}
+.hero .kicker{font-size:11.5px;letter-spacing:2px;opacity:.85;margin:0 0 8px}
+.hero .tag{border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 10px;display:inline-block;font-size:11px;margin-bottom:10px}
+.hero h1{margin:0 0 6px;font-size:29px;line-height:1.3}
+.hero .en{font-size:13px;font-weight:400;opacity:.8;margin-left:8px}
+.hero .game-name{font-size:16px;font-weight:600;opacity:.96;margin:0 0 10px}
+.hero .lead{max-width:930px;margin:0;opacity:.93;font-size:13.8px}
+.stats{display:flex;gap:0;flex-wrap:wrap;margin-top:22px;border-top:1px solid rgba(255,255,255,.28);padding-top:16px}
+.stats .st{padding:0 20px;border-left:2px solid rgba(255,255,255,.4);min-width:120px}
+.stats .st:first-child{padding-left:0;border-left:none}
+.stats .st b{display:block;font-size:17px;line-height:1.3}
+.stats .st span{font-size:11px;opacity:.82}
+
+/* ---------- layout ---------- */
+.doc{max-width:1240px;margin:0 auto;padding:24px 22px 56px;display:grid;grid-template-columns:248px 1fr;gap:26px;align-items:start}
+.side{position:sticky;top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:15px;box-shadow:var(--shadow);max-height:calc(100vh - 28px);overflow:auto}
+.side h4{margin:2px 0 10px;font-size:12.5px;color:var(--blue);letter-spacing:.5px}
+.side a{display:block;padding:5px 8px;border-radius:6px;font-size:12.4px;color:var(--muted);line-height:1.45}
+.side a:hover{background:var(--soft);color:var(--blue);text-decoration:none}
+.side .jp{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.side .jp a{font-size:11.8px}
+.content{min-width:0}
+.content section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px 26px;margin-bottom:18px;box-shadow:var(--shadow)}
+.content section>h2{margin:0 0 14px;font-size:19px;color:var(--blue);padding-bottom:10px;border-bottom:2px solid var(--gsoft)}
+.content section>h2 .no{color:var(--green);font-size:13px;margin-right:8px}
+h3.sub{font-size:14.5px;color:var(--blue);margin:18px 0 8px;padding-left:9px;border-left:3px solid var(--green)}
+h3.sub:first-of-type{margin-top:4px}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:5px 0}
+b,strong{color:var(--blue)}
+.small{font-size:12.8px;color:var(--muted)}
+
+/* ---------- blocks ---------- */
+.quote{background:var(--soft2);border-left:4px solid var(--blue3);border-radius:0 8px 8px 0;padding:12px 16px;margin:10px 0;font-size:13.6px}
+.quote .src{display:block;font-size:11.8px;color:var(--faint);margin-top:6px}
+.think{border:1px solid var(--line);border-radius:10px;padding:13px 16px;background:#fbfdff;margin:12px 0}
+.think .q{font-weight:700;color:var(--green);font-size:14px;margin-bottom:5px}
+.level{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:6px;vertical-align:1px}
+.lv1{background:var(--soft);color:var(--blue)}
+.lv2{background:var(--gsoft);color:var(--green)}
+.lv3{background:var(--asoft);color:var(--amber)}
+.callout{border-left:4px solid var(--blue2);background:var(--soft);border-radius:0 8px 8px 0;padding:11px 15px;margin:12px 0;font-size:13.4px}
+.callout.green{border-left-color:var(--green);background:var(--gsoft)}
+.callout.risk{border-left-color:var(--red);background:var(--rsoft);border:1px solid var(--rline);border-left-width:4px;color:#7b2020}
+.callout.amber{border-left-color:var(--amber);background:var(--asoft)}
+
+/* ---------- setup cards ---------- */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:12px 0}
+.infocard{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--soft2)}
+.infocard h4{margin:0 0 6px;font-size:12.6px;color:var(--blue);letter-spacing:.3px}
+.infocard .big{font-size:19px;font-weight:700;color:var(--green);line-height:1.3}
+.infocard p,.infocard ul{font-size:12.9px;margin:4px 0}
+.infocard ul{padding-left:18px}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;margin:12px 0}
+table.tb{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+table.tb th{background:var(--blue);color:#fff;text-align:left;padding:8px 10px;font-weight:600;font-size:12.5px}
+table.tb td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+table.tb tbody tr:nth-child(even){background:#f8fafc}
+table.tb.compact{font-size:12.5px}
+table.tb.compact th,table.tb.compact td{padding:6px 8px}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill.b{background:var(--soft);color:var(--blue)}
+.pill.g{background:var(--gsoft);color:var(--green)}
+.pill.r{background:var(--rsoft);color:var(--red)}
+
+/* ---------- flow ---------- */
+ol.flow{margin:10px 0;padding:0;list-style:none;counter-reset:flow}
+ol.flow>li{position:relative;padding:12px 14px 12px 52px;margin:10px 0;border:1px solid var(--line);border-radius:9px;background:#fbfdff;counter-increment:flow}
+ol.flow>li:before{content:counter(flow);position:absolute;left:13px;top:12px;width:27px;height:27px;border-radius:8px;
+  background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+ol.flow>li .ft{font-weight:700;color:var(--blue);font-size:14px}
+ol.flow>li .tm{float:right;background:var(--gsoft);color:var(--green);font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px}
+ol.flow>li .say{background:var(--asoft);border-left:3px solid var(--amber);padding:7px 11px;margin-top:8px;font-size:12.8px;color:#6b4f1d;border-radius:0 6px 6px 0}
+ol.flow>li p{font-size:13.2px;margin:5px 0}
+
+/* ---------- printable materials ---------- */
+.pm{border:2px dashed #b9c9da;border-radius:11px;padding:15px 17px;margin:16px 0;background:#fff;page-break-inside:avoid}
+.pm-h{margin:0 0 3px;font-size:14.5px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.pm-h .tagp{background:var(--green);color:#fff;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.pm-note{font-size:12.3px;color:var(--muted);margin:0 0 12px;background:var(--soft2);padding:6px 10px;border-radius:6px}
+.pgrid{display:grid;gap:12px}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+.pcard{border:1.5px solid #94a9be;border-radius:8px;padding:11px 12px;min-height:118px;background:#fcfdff;display:flex;flex-direction:column}
+.pcard .plab{font-size:10.8px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--blue);border-radius:4px;padding:2px 7px;display:inline-block;align-self:flex-start;margin-bottom:7px}
+.pcard.g .plab{background:var(--green)}
+.pcard.r .plab{background:var(--red)}
+.pcard.a .plab{background:var(--amber)}
+.pcard .pbody{font-size:12.6px;line-height:1.62;flex:1}
+.pcard .pbody p{margin:3px 0}
+.pcard .pcut{margin-top:9px;border-top:1px dashed #b9c9da;padding-top:5px;font-size:9.5px;color:var(--faint);text-align:center}
+.wsheet{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fcfdff;font-size:12.8px}
+.wsheet .wh{font-weight:700;color:var(--blue);margin:10px 0 5px;font-size:13px}
+.wsheet .wh:first-child{margin-top:0}
+.pline{border-bottom:1px solid #c3cfdb;height:26px;margin:5px 0}
+.pline.short{width:55%}
+.wsheet table.mm{width:100%;border-collapse:collapse;font-size:12px}
+.wsheet table.mm th,.wsheet table.mm td{border:1px solid #c3cfdb;padding:6px 7px;text-align:left;vertical-align:top}
+.wsheet table.mm th{background:var(--soft);color:var(--blue);font-size:11.5px}
+.wsheet table.mm td.empty{height:34px}
+.scorebox{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
+.scorebox table{width:100%;border-collapse:collapse;font-size:12.5px}
+.scorebox th{background:var(--green);color:#fff;padding:7px 9px;text-align:left}
+.scorebox td{border-bottom:1px solid var(--line);padding:6px 9px}
+.scorebox td.b{background:#fbfdff}
+
+/* ---------- debrief / tips ---------- */
+ol.debrief{margin:10px 0;padding-left:0;list-style:none;counter-reset:db}
+ol.debrief li{position:relative;padding:9px 12px 9px 42px;margin:7px 0;border-left:3px solid var(--gsoft);background:#fbfdff;border-radius:0 8px 8px 0;font-size:13.3px;counter-increment:db}
+ol.debrief li:before{content:counter(db);position:absolute;left:11px;top:9px;color:var(--green);font-weight:800;font-size:13px}
+details{margin:12px 0;border:1px solid var(--line);border-radius:9px;background:var(--soft2);padding:10px 14px}
+details summary{cursor:pointer;color:var(--blue);font-size:13.2px;font-weight:700}
+details[open] summary{margin-bottom:8px}
+details ul,details p{font-size:13px}
+
+/* ---------- bottom nav ---------- */
+.bottom-nav{max-width:1240px;margin:0 auto 40px;padding:0 22px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bottom-nav a{flex:1;min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow);font-size:13px}
+.bottom-nav a:hover{border-color:var(--blue2);text-decoration:none}
+.bottom-nav a small{display:block;color:var(--faint);font-size:11px}
+.bottom-nav a.next{text-align:right}
+.footer{text-align:center;color:var(--faint);font-size:11.8px;padding:0 20px 34px}
+
+/* ---------- responsive ---------- */
+@media(max-width:920px){
+  .doc{grid-template-columns:1fr;padding:18px 14px}
+  .side{position:static;max-height:none}
+  .content section{padding:19px 17px}
+  .hero h1{font-size:24px}
+  .cols-3,.cols-4{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+
+/* ---------- print ---------- */
+@media print{
+  body{background:#fff;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .topbar,.side,.bottom-nav,.footer{display:none!important}
+  .doc{display:block;padding:0;max-width:none}
+  .content section{border:none;box-shadow:none;padding:0 0 14px;margin:0 0 14px;page-break-inside:auto;border-bottom:1px solid #ddd;border-radius:0}
+  .hero{background:#1f4e79!important;padding:14px 0;color:#fff}
+  .hero h1{font-size:20pt}
+  .hero .lead,.stats .st span{font-size:9pt}
+  .pm{page-break-before:auto;page-break-inside:avoid;border:2px dashed #777}
+  .pcard{min-height:105px}
+  details{display:block;border:none;background:none;padding:0}
+  details>summary{display:none}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap"><div class="brand">《数据科学与数字人文》· 思想实验课堂游戏<small>第 04 / 13 场 · 40–45 人班级版</small></div><nav><a href="thought-experiment-games.html">返回总览</a><a href="game03.html">← 上一场</a><a href="game05.html">下一场 →</a><button onclick="window.print()">打印素材</button></nav></div></header>
+<div class="hero"><div class="wrap"><p class="kicker">THOUGHT EXPERIMENT → CLASSROOM GAME · 04 / 13</p><span class="tag">对接 第4章 文本挖掘与 NLP</span><h1>中文房间<span class="en">Chinese Room · Searle</span></h1><p class="game-name">课堂游戏：规则手册盲操作 + 偏见注入</p><p class="lead">学生被关进「中文房间」：只能按一本规则手册处理史料，不许用自己的理解。第二轮，教师悄悄换上有偏见的手册——同一批文本，主题与人物立刻变了。学生会亲手看到：所谓「客观统计」，可能只是规则里的权重在说话。</p><div class="stats"><div class="st"><b>50 分钟</b><span>建议时长</span></div><div class="st"><b>40–45 人</b><span>适用班级</span></div><div class="st"><b>10 组 × 4–5 人</b><span>分组方式</span></div><div class="st"><b>★★★★☆</b><span>难度</span></div></div></div></div>
+<div class="doc"><aside class="side"><h4>本场目录</h4><a href="#origin">一、思想实验原典与展开</a><a href="#mapping">二、与教材的对接</a><a href="#setup">三、班级组织（40–45 人）</a><a href="#objectives">四、学习目标</a><a href="#materials">五、材料清单与准备</a><a href="#flow">六、游戏流程</a><a href="#assets">七、游戏素材（可打印）</a><a href="#debrief">八、讨论引导（分层）</a><a href="#assessment">九、评价与计分</a><a href="#redline">十、伦理与安全红线</a><a href="#tips">十一、教师提示与变体</a><div class="jp"><a href="game03.html">← 03 麦克斯韦妖</a><a href="game05.html">→ 05 薛定谔的猫</a></div></aside>
+<main class="content">
+<section id="origin"><h2><span class="no">01</span>一、思想实验原典与展开</h2>
+<h3 class="sub">原典原文（节译）</h3>
+<div class="quote">设想我被关在一个房间里，不懂一个字的中文。房里有一本英文写的规则手册，告诉我当收到某种形状的符号时该如何回应。外面的人递进中文问题，我查手册、拼出中文符号递出去。我的回答可以好到让屋外人相信我懂中文——但我实际上一个字也不懂。
+<span class="src">——塞尔《心智、大脑与程序》（Minds, Brains and Programs），1980</span></div>
+
+<h3 class="sub">提出者与论战</h3>
+<p>约翰·塞尔（John Searle，1932— ），美国哲学家。此文直接反驳当时强人工智能主张" + "「正确运行程序即具有心智」的观点。文章引发持续四十年的论战，是心灵哲学与 AI 哲学引用最多的文本之一。</p>
+
+<h3 class="sub">思想实验的展开</h3>
+<ol>
+<li><b>句法 ≠ 语义：</b>手册操作是<b>句法</b>（符号到符号），理解是<b>语义</b>（符号到意义）。前者不蕴含后者。</li>
+<li><b>系统回复：</b>反对者说：不是你懂中文，是" + "「你 + 手册 + 房间」整个系统懂。塞尔回答：让系统把手册全背下来、在脑子里操作，系统仍无理解。</li>
+<li><b>机器人回复：</b>给房间装上眼睛和手，让它能在世界中活动。塞尔坚持：仍只是更复杂的符号操作。</li>
+<li><b>意识馆回复：</b>把" + "「人」换成「神经元的系统性活动」，塞尔回应：模拟意识不等于意识，除非有因果能力。</li>
+</ol>
+
+<h3 class="sub">常见误解</h3>
+<div class="callout amber"><b>误解：</b>" + "「塞尔是反 AI 的。」<br><b>正解：</b>塞尔承认机器可以有心智，但反对" + "「仅凭程序」就够——需要因果与意向性。对数字人文更重要的启发是：<b>统计方法处理的是符号，意义由人来承担</b>。这不是贬低计算，而是划清责任边界。</div>
+</section>
+<section id="mapping"><h2><span class="no">02</span>二、与教材的对接</h2>
+<div class="tbl-wrap"><table class="tb"><thead><tr><th>教材节点</th><th>游戏对应机制</th><th>形成的判断</th></tr></thead><tbody><tr><td>4.2 分词与预处理</td><td>规则手册的「切分条款」</td><td>分词表本身就是一套规则，不是中立的</td></tr><tr><td>4.3 词频 / TF-IDF / LDA</td><td>手册中的计数与权重规则</td><td>主题是算出来的，不是「读出来的」</td></tr><tr><td>4.4 命名实体识别</td><td>「人名抽取条款」与遗漏的女性称谓</td><td>NER 的漏抽是系统性的</td></tr><tr><td>4.6 语料偏见与客观幻象</td><td>偏见版手册注入</td><td>偏见藏在权重与规则里，不在数据里</td></tr></tbody></table></div>
+<div class="callout green"><b>一句话锚点：</b>TF-IDF 与 LDA 不理解文本，它们高效地操作符号。<b>理解与责任，始终在房间外的人那里。</b></div>
+</section>
+<section id="setup"><h2><span class="no">03</span>三、班级组织（40–45 人）</h2>
+<div class="grid3">
+<div class="infocard"><h4>班级规模</h4><div class="big">40–45 人</div><p>10 组 × 4–5 人；每组内 2 人扮" + "「房间」、2–3 人扮「提问者」，第二轮互换。</p></div>
+<div class="infocard"><h4>房间侧</h4><div class="big">20–25 人</div><p>不许说话、不许解释，只递纸条。这是本场的硬规则。</p></div>
+<div class="infocard"><h4>提问侧</h4><div class="big">20–25 人</div><p>只看输出，写" + "「懂 / 不懂」判定与理由；第二轮负责溯源偏见。</p></div>
+</div>
+<div class="callout">大班关键：房间侧人数多，容易有人" + "「忍不住解释」。给房间侧发一张<b>「禁语牌」</b>，上面划掉" + "「我觉得」「意思是」，违规一次扣 5 分。</div>
+</section>
+<section id="objectives"><h2><span class="no">04</span>四、学习目标</h2>完成本场游戏后，学生应能：<ul><li><b>复述</b>中文房间论证的核心：句法操作不等于语义理解（识记层）。</li><li><b>执行</b>纯规则驱动的文本处理，体验「输出正确但不理解」的状态（应用层）。</li><li><b>溯源</b>偏见是通过哪一条规则、哪一个权重进入结果的（分析层）。</li><li><b>判断</b>统计方法的「客观」幻象从何而来，并说明人文学者的理解在流程中的位置（反思层）。</li></ul></section>
+<section id="materials"><h2><span class="no">05</span>五、材料清单与准备</h2><div class="tbl-wrap"><table class="tb"><thead><tr><th>品名</th><th>数量（45 人上限）</th><th>说明</th></tr></thead><tbody><tr><td>规则手册（正常版 A）</td><td>10 份</td><td>A4 双面；素材页可复印</td></tr><tr><td>规则手册（偏见版 B）</td><td>10 份</td><td>第二轮换发，课前不要提前发放</td></tr><tr><td>史料片段卡 S1–S4</td><td>10 套 × 4 张 = 40 张</td><td>含 1 段女性人物材料（偏见触发点）</td></tr><tr><td>主题与实体输出表</td><td>45 份</td><td>房间侧填写</td></tr><tr><td>理解 / 处理判定表</td><td>25 份</td><td>提问侧填写</td></tr><tr><td>偏见溯源表</td><td>10 份</td><td>第四环节各组填写</td></tr><tr><td>禁语牌</td><td>25 张</td><td>房间侧每人 1 张</td></tr></tbody></table></div>
+<div class="callout amber"><b>关键准备：</b>偏见版手册与正常版<b>外观必须一致</b>（同样纸张、同样标题），只在内容上改动三条权重。学生必须在揭晓后才发现" + "「被换手册」——这是本场冲击力的来源。</div>
+</section>
+<section id="flow"><h2><span class="no">06</span>六、游戏流程</h2><ol class="flow"><li><div class="ft">发手册、宣布禁语</div><span class="tm">5′</span><p>房间侧发正常版手册 A 与禁语牌；提问侧只拿输出表。强调：房间侧「只能查手册，不许用自己的理解」。</p><div class="say"><b>教师引导语：</b>「接下来 12 分钟，你就是一个不懂中文、但有一本很好用手册的人。请严格照做。」</div></li><li><div class="ft">第一轮盲操作</div><span class="tm">12′</span><p>发 S1–S4 四段史料。房间侧严格按手册输出主题与实体，不得解释、不得提问。提问侧只接收纸条。</p></li><li><div class="ft">图灵式判别</div><span class="tm">8′</span><p>提问侧只看输出，投票「屋里的人懂不懂这些文本」，并写下判断理由。揭晓：房间侧承认自己「一个字也没懂」。</p><div class="say"><b>教师引导语：</b>「输出这么准确，为什么说不懂？——这就是塞尔problem的核心。」</div></li><li><div class="ft">偏见注入：换手册</div><span class="tm">12′</span><p>教师「因印刷错误」换发偏见版手册 B，对同样四段文本重做。学生不知情。</p></li><li><div class="ft">揭底对读与溯源</div><span class="tm">8′</span><p>公开两版手册差异。各组对比两版输出，找出被「制造」的主题与「消失」的人物，填偏见溯源表。</p></li><li><div class="ft">收束：责任在谁</div><span class="tm">5′</span><p>回到 4.6：偏见不在语料里，而在规则与权重里。请学生写一句「人文学者在流程中的职责」。</p></li></ol></section>
+<section id="assets"><h2><span class="no">07</span>七、游戏素材（可打印）</h2>
+<h3 class="sub">素材 A · 规则手册（两版外观须一致）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>规则手册 A（正常版）</h4><p class="pm-note">复印 10 份。规则故意简化，便于手工执行。</p><div class="pgrid cols-2"><div class="pcard g"><span class="plab">手册 A · 正面</span><div class="pbody"><p><b>主题判定规则：</b></p><p>① 文本中「灾荒 / 饥馑 / 赈济 / 蠲免」任一出现 ≥2 次 → 主题＝灾荒。<br>② 「奏 / 疏 / 上谕」出现且主题词 ≥1 → 主题＝公文。<br>③ 以上皆不满足 → 主题＝其他。</p><p><b>实体抽取规则：</b>二字或三字人名后紧接「字」「号」「撰」→ 抽为人名；地名后接「县 / 府 / 省」→ 抽为地名。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">手册 A · 背面</span><div class="pbody"><p><b>输出格式：</b>每段文本输出一行，格式固定为：</p><p><code>【主题】___ ｜【人名】___ ｜【地名】___</code></p><p><b>禁止事项：</b>不得解释、不得补充手册外的判断、不得询问递进纸条的人。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>规则手册 B（偏见版 · 秘密换发）</h4><p class="pm-note">复印 10 份，与 A 版用同样纸张。三处改动已用粗体标出，但发给学生时不要提示。</p><div class="pgrid cols-2"><div class="pcard r"><span class="plab">手册 B · 正面</span><div class="pbody"><p><b>主题判定规则：</b></p><p>① 文本中「灾荒 / 饥馑 / 赈济 / 蠲免」任一出现 <b>≥1 次</b>（原为 2 次）→ 主题＝灾荒。<br>② 「奏 / 疏 / 上谕」出现 → 主题＝公文。<br>③ <b>新增：</b>出现「祠 / 旌表 / 节孝」→ 主题＝教化（优先于①）。</p><p><b>实体抽取规则：</b>人名规则同 A；<b>删除</b>「称谓型人物」条款——即「某氏」「某女」不再抽为人名。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard r"><span class="plab">手册 B · 背面</span><div class="pbody"><p>输出格式与禁止事项同 A 版，<b>外观不得有任何差异</b>。</p><p><b>三处改动：</b>阈值 2→1；新增「教化」优先规则；删除称谓型人物抽取。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">素材 B · 史料片段卡 S1–S4</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>史料片段（每组一套 4 张）</h4><p class="pm-note">S3 是偏见触发点：含「某氏」称谓，在 B 版手册下会消失。</p><div class="pgrid cols-4"><div class="pcard "><span class="plab">S1 · 灾荒</span><div class="pbody"><p>「光绪三年，岁大饥，斗米钱二千。知县某开仓赈济，蠲免田赋十之三。民赖以活者数千家。」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">S2 · 公文</span><div class="pbody"><p>「臣某谨奏：为请恤事。查本年水患，淹田若干顷，伏乞圣鉴施行。」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard a"><span class="plab">S3 · 列女（关键）</span><div class="pbody"><p>「王某妻李氏，年二十七夫亡，守节四十余年，旌表其门。又有陈氏女，未嫁而夫死，矢志不嫁，乡人义之。」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">S4 · 混合</span><div class="pbody"><p>「县北有某祠，祀前明死事者。光绪间重修，邑人某撰碑记，记其始末。」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">素材 C · 输出表与溯源表</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>主题与实体输出表（房间侧每人 1 份）</h4><p class="pm-note">严格按手册输出，不得添加任何手册外的文字。</p><div class="wsheet">
+<table class="mm"><tr><th style="width:12%">片段</th><th style="width:26%">【主题】</th><th style="width:31%">【人名】</th><th style="width:31%">【地名】</th></tr>
+<tr><td>S1</td><td></td><td></td><td></td></tr><tr><td>S2</td><td></td><td></td><td></td></tr><tr><td>S3</td><td></td><td></td><td></td></tr><tr><td>S4</td><td></td><td></td><td></td></tr></table>
+<p style="margin-top:10px"><b>手册编号：</b>A / B（由教师填写）　　<b>操作人：</b>＿＿＿＿</p>
+</div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>理解 / 处理判定表（提问侧）</h4><p class="pm-note">只看输出纸条，不许与房间侧交谈。</p><div class="wsheet">
+<div class="wh">你的判定</div><p>□ 屋里的人<b>懂</b>这些文本　　□ 只是<b>处理</b>符号　　□ 无法判断</p>
+<div class="wh">理由（至少两条）</div><div class="pline"></div><div class="pline"></div>
+<div class="wh">输出中你最" + "「不敢相信是机器写的」的一句</div><div class="pline"></div>
+</div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>偏见溯源表（每组 1 份）</h4><p class="pm-note">揭晓后填写：偏见是通过哪条规则进入结果的？</p><div class="wsheet">
+<table class="mm"><tr><th style="width:8%">#</th><th style="width:30%">两版输出的差异</th><th style="width:30%">导致差异的规则条款</th><th style="width:32%">谁因此被" + "「制造」或「消失」</th></tr>
+<tr><td>1</td><td></td><td></td><td></td></tr><tr><td>2</td><td></td><td></td><td></td></tr><tr><td>3</td><td></td><td></td><td></td></tr></table>
+<div class="wh">一句话结论</div><div class="pline"></div>
+</div></div></section>
+<section id="debrief"><h2><span class="no">08</span>八、讨论引导（分层）</h2><ol class="debrief"><li><span class="level lv1">识记</span>用一句话说出中文房间的核心论证：「句法」与「语义」的区别是什么？</li><li><span class="level lv2">分析</span>房间侧输出正确却不理解——TF-IDF、LDA、NER 在哪些地方与它同构？</li><li><span class="level lv2">分析</span>偏见是通过哪三条规则进入结果的？阈值、优先规则、抽取条款各造成了什么？</li><li><span class="level lv3">反思</span>4.6 说「客观」是幻象——幻象藏在哪一层？语料、分词表、还是权重？</li><li><span class="level lv3">反思</span>如果统计方法只处理符号，人文学者的「理解」在流程中处于什么位置？谁对结果负责？</li><li><span class="level lv3">反思</span>与游戏 11（图灵测试）对读：能通过盲测的 AI，是否仍是「中文房间」里的那个人？</li></ol></section>
+<section id="assessment"><h2><span class="no">09</span>九、评价与计分</h2>
+<div class="scorebox"><table><thead><tr><th>维度</th><th>分值</th><th>达标描述</th><th>扣分点</th></tr></thead><tbody><tr><td class="b">角色忠实</td><td>20</td><td>房间侧全程只按手册操作，无解释性语言</td><td>违规 1 次扣 5 分</td></tr><tr><td class="b">操作准确</td><td>20</td><td>输出与手册规则完全一致</td><td>每处错判扣 3 分</td></tr><tr><td class="b">偏见溯源</td><td>30</td><td>准确指出三处规则改动及其后果</td><td>每漏 1 处扣 10 分</td></tr><tr><td class="b">理解判断</td><td>15</td><td>判定有据，能区分「输出正确」与「理解」</td><td>仅凭直觉扣 8 分</td></tr><tr><td class="b">参与表达</td><td>15</td><td>两侧全员参与，讨论发言有分工</td><td>有人旁观扣 5 分</td></tr></tbody></table></div>
+<div class="callout green"><b>个人加分（+5）：</b>说出一条你自己在日常统计中" + "「默认接受、从未检查」的规则。</div>
+</section>
+<section id="redline"><h2><span class="no">10</span>十、伦理与安全红线</h2>
+<div class="callout risk"><b>教学红线：</b>①偏见版手册中的条款须明确标注为" + "「教学用合成样例」，课后收回，防止刻板印象外溢；②S3 涉及的女性守节叙事只用于演示抽取规则的技术后果，不得对历史人物做价值评判；③" + "「秘密换手册」是教学设计，揭晓后必须说明，不得让学生带着被欺骗感离场。</div>
+</section>
+<section id="tips"><h2><span class="no">11</span>十一、教师提示与变体</h2>
+<details><summary>提示 1 · 控场要点</summary><ul>
+<li><b>禁语牌：</b>房间侧每人一张，上面写" + "「不许说：我觉得 / 意思是 / 应该是」。这能保证游戏成立。</li>
+<li><b>换手册的时机：</b>必须在第一轮判别" + "「房间侧其实不懂」这一刻之后，否则失去对照。</li>
+<li><b>人数多：</b>提问侧可只收 3 组输出实物，其余组用投影统一展示，减少传纸条时间。</li>
+</ul></details>
+<details><summary>提示 2 · 变体与联动</summary><ul>
+<li><b>纯手工版：</b>本手册即为纯手工版，无需电脑，适合机房不足的班级。</li>
+<li><b>代码版：</b>第二环节用一段 20 行的 TF-IDF 代码替换手册，让学生看到" + "「手册就是代码」。</li>
+<li><b>三连问：</b>04 中文房间 → 11 图灵测试 → 12 电车难题，分别追问" + "「懂不懂 / 像不像 / 该不该」，可作为期末复盘主线。</li>
+</ul></details>
+</section>
+</main></div>
+<div class="bottom-nav"><a href="game03.html"><small>← 上一场 · 03</small>麦克斯韦妖</a><a class="next" href="game05.html"><small>下一场 · 05 →</small>薛定谔的猫</a></div><div class="footer">《数据科学与数字人文》教学配套资源 · 思想实验课堂游戏 · 素材仅限教学使用 · 真实史料请注明来源与许可</div>
+</body>
+</html>

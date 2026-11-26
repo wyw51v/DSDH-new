@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>研究生开学第一课·破冰游戏</title>
+    <title>开学第一课·破冰游戏</title>
     <style>
         *{box-sizing:border-box;margin:0;padding:0;font-family:"Microsoft YaHei",sans-serif;}
         body{background:#f4f7fb;padding:24px;line-height:1.6;color:#222;max-width:1400px;margin:0 auto;}
@@ -19,8 +19,9 @@
         .btn-sm{background:#2b5797;color:white;}
         .btn-warning{background:#d48806;color:#fff;}
         .btn-danger{background:#c23531;color:white;}
+        .btn-feature{background:transparent;color:#2c4b80;border:2px solid #cbd5e1;padding:14px 20px;font-size:20px;display:inline-flex;align-items:center;gap:12px;}
         button:hover{opacity:0.85}
-        .log{height:300px;overflow-y:auto;background:#f8fafc;padding:14px;border-radius:8px;font-size:16px;white-space:pre-line;line-height:1.7;}
+        .log{min-height:44px;background:#f8fafc;padding:10px 14px;border-radius:8px;font-size:16px;white-space:pre-line;line-height:1.6;overflow:hidden;}
         .question-box{background:#fff3cd;border:1px solid #ffeeba;padding:18px;border-radius:10px;margin-top:15px;}
         .question-title{font-weight:bold;color:#856404;margin-bottom:8px;}
         .final-panel{grid-column:1/-1;background:#e8f0fe;padding:20px;border-radius:12px;margin-top:10px;display:none;}
@@ -30,17 +31,26 @@
         .student-item.highlight{background:#ffefb3;}
         .input-wrap{margin:12px 0;}
         input[type="text"]{padding:8px 10px;font-size:16px;width:260px;border:1px solid #ccc;border-radius:6px;}
+        #userGuessInput{width:140px;}
+        .modal-mask{display:none;position:fixed;inset:0;background:rgba(0,0,0,.4);z-index:99;align-items:center;justify-content:center;}
+        .modal-mask.show{display:flex;}
+        .modal-card{background:#fff;padding:18px 20px;border-radius:10px;min-width:360px;box-shadow:0 6px 24px rgba(0,0,0,.2);}
+        .modal-card h3{margin:0 0 10px;font-size:17px;}
+        .modal-card .input-wrap{margin:8px 0;}
+        .modal-card label{display:inline-block;width:90px;}
+        .student-item{cursor:pointer;}
+        .student-item:hover{background:#eef6ff;}
     </style>
+    <script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
 </head>
 <body>
-    <h1>研究生开学第一课·破冰游戏</h1>
+    <h1>开学第一课·破冰游戏</h1>
     <div class="rule-block">
         <h4>📋游戏规则</h4>
         <ol style="padding-left:20px;">
-            <li>一字长蛇依次在1‑2029范围内报数；</li>
-            <li>输入同学报出数字，系统自动判断大小并更新搜索区间；</li>
-            <li>成功猜中，填写答题同学姓名，自动随机抽取一道问题（亚瑟阿伦36问 / 普鲁斯特问卷）写入操作日志；也可选择现场同学给出问题或者大冒险选项；</li>
-            <li>全部数字猜完，展示全部数字集合。</li>
+            <li>按座次从右向左一字长蛇依次在设定的报数范围内报数；系统会自动判断大小并更新搜索区间；</li>
+            <li>成功猜中后，系统自动随机抽取一道问题（亚瑟阿伦36问 / 普鲁斯特问卷）显示在问题预览区；也可选择大冒险选项；</li>
+            <li>猜中数字的同学真心话 / NEXT 可换题，但最多只能换2次</li>
         </ol>
     </div>
 
@@ -48,22 +58,17 @@
         <!-- 左侧游戏主面板 -->
         <div class="card">
             <h2>🎮猜数字交互面板</h2>
-            <div class="info-line">搜索区间 low=<span id="low">1</span> ，high=<span id="high">2029</span></div>
             <div class="info-line">当前第 <span id="studentIndex">1</span> 位同学</div>
 
             <div class="input-wrap">
-                <label>同学报的数字：</label>
-                <input id="userGuessInput" type="text" placeholder="请输入同学报出的数字">
-                <button class="btn-sm" onclick="submitUserGuess()">确认报数</button>
-            </div>
-            <div class="input-wrap">
-                <label>答题同学姓名：</label>
-                <input id="studentNameInput" type="text" placeholder="猜对后填写姓名">
+                <label>请猜数字：</label>
+                <input id="userGuessInput" type="text" placeholder="输入同学猜的数字">
+                <button class="btn-sm" onclick="submitUserGuess()">🎲 抽奖</button>
             </div>
             <div class="btn-group">
-                <button class="btn-warning" onclick="getRandomMixQuestion()">🎲随机抽取问题(阿伦/普鲁斯特)</button>
-                <button class="btn-warning" onclick="getRandomDare()">随机大冒险</button>
-                <button class="btn-danger" onclick="resetGame()">🔄 重置全部游戏</button>
+                <button class="btn-feature" onclick="passQuestion()"><img src="data:image/png;base64,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" alt="真心话" style="width:72px;height:72px;vertical-align:middle;margin-right:12px">真心话 / NEXT</button>
+                <button class="btn-feature" onclick="getRandomDare()"><img src="data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAEAAAABACAYAAACqaXHeAAAqSElEQVR42sW7abRm113e+dtnPu883ffOU82jSlWSLGuwJRlkK46xcWwVxAxtwBAIJivQMdBpQqkwTYJDslaatdy9DB1DzNQlAgZjjCXbVbIGW1KVSqq5btWd5/vO05nP2f2hLIa4AafbSfbHs846Zz/Pf9h7r/08gm/jkPKUAoeFECfjN5+dOXNGPfxweaLbb+/zPOceXdcLSSiO65ooiQQpY1BVRfjRoKmqzsU4jtv5bO6CagdzT73wxbWnTz4d/9X3z6hwVQpxOvl2zVl8W4CfOaPy5JOJEEICfPaFX82Wy0OP6qQelbHyuKowrWlJTrMEQocoCNBkQMpU0TUVRdGwbR0BOAMXKRNk5HY1VS5n0tazaqyec3LBuSHxkd4dIqTg6acVcfKviP4fQoA8dUrhKXgzIqvN37sr9KKfimL5DzTDHFd0E3fgEwU+glAaWpik9QSBFLZhICKFy68v8MrLV2j3Yx5/zwn5wH2HcbxIUdRAWJaKZpgQx7hesC5l8gXNUH/dND986a8y7q/+/9+VAHn2lCYeOx0BtNv/6fE4UT4m0d5hpS3VHfh4fpQkSZxEUagoaiRsQwhNidFIMDWdXqvDM1+4yc1rPW7Or/O5L7zA5FSBD3zgfn7qpz9ANqdJZCAVRCKlVExTU7SUjdsPYqTylTgR/zZb+MFnv0GEJsSdufw3J0BKKXjqKSFOn07Wnj21T1QLp4f2jn0vQtDvO8RxHINQhBIJoQQgEhSRoCsgJEipEjox/+d/+GNePr/J2NQ0q6sbeI5Lys7SDQI+8k8e4h9/7wP02h1UTUNRIEmklFJNEqmpZiqFlAqB7/+B78SnqhM/Nnfq1Cnlqaeekm+W4X8TAuSZM+qbdees/NYvtLe2/4VhKXljKJdompSJCBQUKQQJqohIlIBYSgQmCiogMHSbq6+u8vFf/H1avsfx/eN899uOUd9Z4bnzW9Rkiep4zK9+4r0E/gApQFEESIFAJZaKjBU1SRJFFAoZxfP8jirErxnWP/vlO033SfXkX2ucf9/QvvXIn1GFOBnLnS+M9lzn06YZvUtYNk44iDXfVxVVQ5GCRMaoeoQkRJIgAEECQiAUDTUxWLm1g27APTNTvOvEAYayNmpU5eF7Df7gi/PskKO25VMe0Qmj4BuRUkCAImIhRKLGiqDfbcaWpeU1hY9vXfqVh4dHHvohUX1k868H6u8byrfy0tmzpzQhTsbbt//goUave0FRedf88k5UrE7KkekZNXBDVuc3WFxYJowCEkUhFAIpVBA6EkEsQdE06ttd1ldX+e73fycHdk0zMTPL9VubLK21GRkuYeqCnY0+c/MbGCkLoagoQieSEMkEoaqomoap6+iGqjaX2vL2M50o7+TftXLuTy98/vTjD4mTJ2N59pT2bckAefasJh57LFo//5s/mkJ+stFsadcXb8ZhEGtqAn7Qo7uzRr6cY9/d+4i0gAhQhIaQMQJBoih3qi1RifD4ng9/N5tbTWorHfKlYaoTa+zZfZCVhVv02nVur0RMTe3HafVwO32sVAEtayJkQtBz8Z2IONDwHYi2ciIe1LULN/48VoJotJJPnTv/6R/4p+Kx07/xrTRH7e9O+7OaEI9FC1/+xI/6zc1PvXphTfpOJ8loqCSCF25cR6oq9z10DzMHdpOoKkmSoAgA9c56LgSKAIGKTFTKI0MIVMZTFgY6wSAk8KDXHGBaaU4cmOGBu8fR3RLtjRQEQ6xeepWUkSJOVISao1A9hCZUlHoNd3uVbn0ONYlUkckkZqGgbna7n3rhsz+LEKd/4+zZU9pjj/3tJPytBJw5c0YV4rHo5f/9Qz/aW7r2qeXVlbhe6yjlQlbxMzbNgYsahew/ehf7jx9EpBRiARoCQUwiBUiJqkiEAKS48zshkBJyFQMjKvHSn1xgtFxmde02f/L5C0xmbd76FouwvkUxvwuBi+iGNJp1pg8+RHlmF06/SeP2a3Tmr+PHEXHWZmTv3Ri5nHLx5VekVR2OH/quD37K774DM/fEb0gpVSFE/C2vAm920gsvn3mgt7nyohKG0gsDEaiaSKwRGovncVfmqB46zoPvfBzFdND1gCiOUYREIUZRVBIUvFASxneAq4qKqlqAQhz1ECLN+d//Qy6fv8LKVh+n2ea9D05TLqeZOXgIz5GEkUPgbiFFlqGRcdr1DeJ+AykgzI1SPHCM6r670CV89fP/ifpWnQ/82D+Xai4nVSLRaDQfmph479fOyDPqSfHNjfGbCDh16pTyS790Ovn53/2N4d3DQ5cymdKQ5yFNQ1PiSOJJQeJ3IewiUjbOoEcma5Cy0gT9HlnboFLIEgUJbS+i7br0XB8FFVMzMFUDwzRxfJ1C/xb7Um2ef/Z1vNoCR/aUyIiQKAhJTJ3y0AyJHNCqr7C24WLbOnahSJAuEZR3kZ19G+mhcaJoG679KZdffYPhh78Pe2g/geMkleqQcH2/Nndj865//qH3bZ86dUo5ffpv7hq/qQQOHz4spEQZLQ9/JjasaqPVjYWqq91+gCIV0uk0ZqZAy0nR6/VQ1Ayhp9P3DDLWGB4aS22JE0aoiorr6BiKiq5LhGLiSIX6IGa4P8excovJ/W9nvDBOe/51Qt+j39rEsCP0fIny+G40xaQVmkQT++gXyqxFCpGapVgYxREGZt1huPYy185/ndF7foDi1IM4fgcjVVBaPT+2srnqzH4+c0rKJw6D4PTpv70HnJFSPSlE/MkvffVfFsqVx3udRpTOFrQkirFSCs1en74XYiQJsSfIa3lyOZtEOvhBjOMl1Ft9BqGPUBJUYZLECoqIEapACEmCQjlY43hqk7RaZufyLbzOMl6QkE5XsCIfZICWyuFIQSW/CyO9ysw976brRJQViUw0bE0jl7EJNr/ErTe+DLkHMGYeY26nRifwCH1JJZVW82E32rdn5PHC3KWff3T/sV95E+ObmNW/nvo/+eij0t/38K6hoeJnev1A264HarcXC8f1MG2bQsakmE0xUR1BCJ04At0wEBh0Bh7dgUcUayiqiRA6mmKg6dqdddu0UVWd3Szw6FCL6tA0MtbQVYkTS6xcBcvOUd9cIp218dHI5ao4jS3WeyG1wgHqrTZbrR5eFKOoGqXBAqsv/Bbr8QjaiQ+x0vWII0FKh1I2hRckNHqu2Gk2kyTR3/LuD3/kzPdPjbeeAuX0c8/Jv7EROnz4sFAURe6u6r+ahF7O63fYN2SLe3Zn2TuWRol6KKGDgWRpbYPVjTrr/ZDrWz1ubDn0AhPNzGOYBrZuUEjlyKYyCFSSWMHzE7xGjUO2R3XkKCJTZnvhAvOvP8/Q3kNUj72NxM5SKBZIAh9TtzBUiAdbrPYUrq332BlA1w3R9TSWqLN54/9msZ4gDr8PL9ExhUBTwVIEIgkQ0qWQsoQqLJzYzDld91eFEPLpw4fF3yiBN5eJ87euPzY2Uvpgr9+PAy9QK3mVRISQWJAU2Ww7LG330DSLQsbGDCNSKY1yJoOSaLhJTBBLHN9HIvAjkGgoqoIfQlrVkK0u6qFh4sEia5dfxlQtcBxkqodmSHyvR6++zczoLlAiVuZuIkcfZqySQ3h9ElHBdzo4q89QX1ond8/300tNErkDhKGTSEHXkwwVdPZOVmn3B9RaXVWJjHhmbPSDv3Pu64+dfPStZ8+cOaOePHkyfrMHSEBMFbP/qmRnZVlNiAsmbhCgaha6aqKqKlHcQNN0el5MFEUMZdNMjoyQ1lLUak3ma008LJJMikbPoR2FGJZKEEXoQiVvGDjbS2xd/gu0tIWZrSBcB6+3gShm0XM5CoVhdpbmabVbJFsbtOrbjD98FD9l0vL7WJok03mV+vw1sns/SHnfCbYbPUTewItj3DAinzWYKBeJBi56EnHX7DilTJp8tijrO+l/JSXn4EkJoEkpFSFEIuXGIUi9jaSPaiVqrRuRtnRSponnBSiJZCibJWPHRESEnkcqm2Gr7bJV22S8WmV6fAg/jOi7MZV8Dt91iGKBk9zZEaa0EtKdIezW0LJHmTn2ODdf+FPc5haVXfvpuC0aW2sYuk7oBZiJQalSJj9cwrd0hvLjROvPcuPyn2GV76N86EFcd8B42cbSdYSSxgs8TEtDoGOnVKrlCtVsCtOUaiz7cnI4/7armxsHj4yJa1JKRTvHOQVIOo7zM4qqaBuNRnR9eU27tdAil7XJpFMUCiUQgiQKKGRMcpkMKWHz+kaTZ15+jV67T7VS4oG77yJjpVne3kRoJoazgdHZwNx1L103IJUWiOpxcs3LjI/sxZg6RL++xNbNN4gHPq1ui3KljGWaeK5PqlJFtQuIQRPdzsDGFW6+9FkCfYrHnngfnibp6AqaKtBVgW1BPpXH0k2iWKXhuISxZGvgELcC8lkzHh8ua7Om+BngI+fOnVMEIK7IK+nLz/Xm672oentpWTqhI6RUiCKJ0AVjI6M4nkvgOggi0pbFo/ccp9Zs8WfPPk+xUCRwHdLVEkJRCH0XDRPDd5jovoybq9CpHieOY/JZi0fkPNNWhDkyRHdxiaU3vsaeYw+S23svhiq48dUvkMukcPpdOu0e4vDDmFIhaSyxuHGbA098mJFdexEyIJQKCTo9N6TdD8hl0shEY+BLHKnQ7nS4cnWOnicZrqTlg3cfEbunyjsT6eJuIcRAA+SrL3mPZCvD1c72laTTbymj01OEYUQcBaRsmzB0UUSAZIDT94kCyR99+XlGh0cYnZwiiT00M4tuWPiei6rqxF5EP1ARqTGU9gb6aIiwUvQ8l0A4JHLA9rVNgnYHP4TG9iqKnUdRbFAUUDUUYTC87yiZShXhNPBFkax9CM1I04kUhlI6SZLlK5duMLe4CqpBLDWkIrFMm3gQEUURnXaHKIpodVticaOdTEyOVR2n8wjweQ1geXXzHam+Qz+KkvJoVRG6wDZMwkBFKiqKkWBoKRIiwMDSs8RJTGfQw87ZCMUkjiRSgqZnsAyToOfgWgkdt4y68TpxZRlr93ECXWNnZ8DBEUE5O0LLj8jmyxjFIRShEYUhdn4YvZDFKiXkSlNY2SqN0CUM1rl58zpL8STt620OjpYxsg6X1jYQJHj9PlYqT9pKEwU+zU4bIUwypTLEAWGgECOSdt9V4iR5B/B5cerMGcMN4guaaR5BikQ3LCWJQwzdIAmTO2d6XeCH4Z0DDQpRDDKJkUh000IVEpKEwIdsOottqORSBrEXEjgNOl/7zwyCBHv3QdojuxkJdvgOZ46pIw+zuXKTTLlCdniaQbPDoLZKLmsThwFzl16h3U84fP9DBN0dbt+c51p+D9vVSdQQUHQSVWLqBoauE4cCpMJopULkJ9S7PUIpURBomkISqwS+n5iWqaiqvHLz2mv3aH0YVw0xI1SJpurC0DWI7hxlbdMgl7FpDbogEyLknfO+mpC3E8qGTpRE1N2IXHaI4akRSrkIGSUEvs3RIyZaVOWZlVH6t19nt5Knnd6NNjaLe3OHbqvG2OH76a3MsfnVP0KS4MUh6602Ts/BC0Ls4Tx/9uwXCSeO408/SlSpUoobSKHiRiqJUMiYGZIoJpfOsHt8ClP4pNMaS1s68+stEhVUXUVDkMumhYgTJqtDMx85+dS4Npor7TENPbPdrElFRiJlq7hhiBCQSunkbJ20WWa71aDnDZiwLfaXIizhEddWUFWVBadLt5enou1hyo4pjO4jpES/NU+rscixA2N0rDa1pdvMFDJUyzN4VY3a5hyrN16ltXQLzVDQ7BSdXg8FBcPUGZsZ5sbqJsXSNMV9YzT7DYzWOq3WGjoCNT1BPzVCYFpMlKs8duQuVNnF9SKyhYixjIlNjk4SfSNrI7KWKap2Wu6dqGas/sYecWW19nPlUunfnL/+RqLrmpIxMoRJhKqDhUDVNZZqLQK/w1jBYCjpkdN8VpdXaW7cZGpijAvnL3Dt0g1MRccwEvYdOEqxmCeJA/LlCuVcDr9XZ2VlGdUwKYxM48Yq3qCD4bWx0yXG9t6NrQmctdvU1uZxE5dWf0C/PiBrZIgsl7xlYGbzKJkSly5cZGpqjFs7PkMPvpdHHzlJtaKw1VzD0CwMVcMNO8RxTIyN64ZEUUA5nwOSxLJUpdnq/LyWtr3SWmMBiGTKVNGUEC9UQYGMpVBMm5h+CdF1MTsrhErEphugCBVdCC5+/RWaOzuMlFJ4/T6T4yWGszsM6jeJEkmjl2LdVdDUDEOjIzTbW8xdukhhbB9Jq442aKAUPJTMKF6S0Ou28eOYQRjTqrWZMQr0kpiuMHCaMcHWNmO7AoqjRRodj5nJgyieoN/ewgkTNMNHjXP0fQuhpxm4XeLIZ8/sXpI4pNvdQaBJZAZT1UvqB3/iIx8Lg3h3vxeSy+VFMW+TshP6vRaD1g4ZrU/aGNDfvMz89XMEgc/42Cw7a8u8/uIXCfp1Du7aha7peI7Dgf2zlKvDGGmVSiGLqYFhKKxttGm3BuydLtPebiOMNFbXo6Bb9NYbbF65wvWLrxIrPmFW58bVW0yJLN3VbdKTB0lPHaQZNOkqMbW6g+IpGKbF0voarfpN9GqJVKWCF/o4nkMQdRkkLknooak6fVeiaypRCIpQ6YSxeGlhY6A1a24V3aTR97h4/QITpSJH980wkVEpVW3iGAzNxldiVC1HY3URSxmwcOUipXzE9Pgo6ayJMDr0BhaJmqbWVJicGsPpuCShQiYF3f7LBJ5HPgv9wEVtbFCxNEb3HCZTrhA6A+K1FazqENdWFym6Ou2tOnoicetrxBmB16ijCoESKzQ6TfKhhRI4BH3BoB+x2U4YdHVq23UOH9xLu91jogSKJqh3OnR7DUqZAsV8llvrG9ze2Kqq977n+35kfnV7/NK167LX8sTCwg7nL15ipgS7p4bwex5eY0BrcxEzjli8fYX1228wO14kZRqMTs9ipTWQOlvrWxhWhuP3n2Bl+SqmlcXMTOEELrV6Dd+RTE4XCYMAp+5TDGK6O5vkhvKIlE5qssobC7fQl1sMYeNEMUYiUfSEVtDA7Tm0Wx10AflCjms3lxgqFRku5Gkrs7yx47O+PeDarVWWNhqsbG0TYlDMl9BUjSRWEZqGncnITCYv9g9NrWoHp/Js12BrSScKfXTb4uiERTmT0OwMcHZus/Tqn+O1e4RRn3JRYbxyhDBwsFIVMuU9tGsbxJFHuVzAzpT5+sXbLM3t8O4nZsnk0rS6Cpl0mUJKUqkUcLptrHSK1laL8Uqa7s4m7kiJi7eWKcQqdz90P1tLW/jXu9iGQcfxSUp5nCgkTBLCBLZ2WvSdkM2tAakJhbzcorbu0XcVLNOk22uhRFl6XQPHUQhCn6FMnnKuRKPZoVAsMQjrqD/80R/+pwnhiKblZaPVEkkc8I7jwwyl71xpVYbHiLDpun20tMVoaYxcIcv2zg5hlKWQH6XRWkfXVRy/Q6KP8YdfvMjqZszk1H4EgkZ9m/lbi4yPFjEUnSTxCZOIoOaQ9FzMmWHWIp/OwhYPTR9CojA0NISmmSwur2AOFfGyKaIYkkSjkM1Qb/fwNZ3y+DT1rs+gv06crxLoIwShh+fGKLGCmjbZ6bsMgoim6xMIlZfmbsqVdlu8cOn1mqrvPvGPturubs/1ZSpXEPl0wlv3FtDUmObOOrXtNRYWF++kd5BQW1xlZKRCqVxmcWWeftcjl8/Qai/iOAkjo+MUVIOCmWGjvoFhelx87TxJFCL9iIxuoaDQ7A0I3AAtm0adLDF3aY59rkXs9hGGimaZlEeqCM0iSWXI7dpFanQvY5NTxF4DLVehPDNFdmiY8ZldlIbGqUzMUKpOkKTz5IeqmJkUialhZdI4YcBmt8N6u4MXhrLtOWLgeZfUo29/x1Hbyj6UhCROGCm7p0vMZBxqq8vge2QI8BYXmMiZFIhRlRjpeniuz8TeMdq9FtXKKJru0qq32b9nP4cP7KVS0RkZTtFtNui2GoxVirQbDp2ex4EjBwllRKacwd41xpVry2TrERPFDFrORhOCKEkIUBkfHYM4YqtWp9vqoMg6m6uLtLoe3d6A3bv2cPz4Q2QzWZTmOkOGy/j+w7Q9DzVjYBoKxAlCUTA1FZHEIGRiWaZiq+p/1rLZbDORCVKzRAx0mg38kkHGSuO4Hepbq2T8Pinbxo0hl84ThC66oeD1BJX8MIu3Fzl+Yi8iTjF/6yZBeBs/ijH1iMTdYXq4QmOrj+t4uL2QXjckDgNSWZ2F5RWCTQ+2ujQsE6/WxlYUSsMFrKKLE4aMV6soqsIrV88zaNukS9OUKsOkNZvRUpqla1+h0+6RSpfYt/8Q2ZKkHMV0FJsbNQdXgCIjClaaSqFC4HsiUQSdyG+qb3niyZQwjB9QlZC37TbFo7urrN+6Rqmco+/5bCytkScmndZwHR/HHRDFMflcGRkFtBo1WtsbbG802H/0AN3OFl/581fpdXoU8xqTY0M0VnuYQqNUKtDqtDEtjfGZMW4urKCrOmXFor60Q6/ro6kaGBqpTAoRS7ZrO1ilHNWREqofkCnMMvOWt5PWFWxVUK8toWgwuf8BDt73TpJEsnjjAoONOcZthdnZWQahYKI8RFpTyJoq4+UCY+WiKKWsT6jvfPeHZVuEP/LApGn+o3uHpNddFbevvU5taxPXi3HchBtfu0Jvp41hJVi2SbWSxuv3iEJJtz1g79QosT9Aaiq6JnHbIYcO7ufI3UfxQnjj/GXsXB6rUAQkhUqO1qDP6soWE+NjWL2AUipFq9dCixWCMGLg+fS6DsOjZYQh6cUBEwePIKRNKT2KbUJ1eD+lob1kiyNEYYLneawt3CSO+rS7bS5ffI2MAgfGx0nJiPJQiaydklnLEgayP1oq/W/qO37oFxwnaH3P/dN21fDW5euXr4mxkWGcThvdCAnCPqOWQsYQCFVn7vomcSKx0xmuXFlkrJoFAVK1KE3uRdV6OJ02vg9xrHHxlZsM+gk+Ok4cks7qjEyPcf3qbQ7OziDaDtpOj+FyFk3TaHccNCkQgWB8vEoUuOiapHzoCCMH3sLyra+jCJvM8AyJblIYmUU1Cgz6q+gmTI4U2Vmfx+s1GRsqUcxoNG+9QO/Wi6TtInZxVBYLGUEczY1Xqr+mPvf0J+N/+IM/sWd3NnrA2VmIp2b2Kql0BqnqrC0usLOyxpGDe7AMhXShRK3WQBE212+t4rsJu3cNowmD2nYXo1hibPdeGjsDXnvxCsvz66iKz9ZGh9JQHtUQ3PfwXXz13Kv4rYQDM7MUMVHdgG6zSeiFFIppUqZNGEe0Ok0sBIZtUDmwC8PO0VldxHH7lGYP44YeVirPwHGJQw8lbhEMuvTrG6RU2N5scHtujmtXb+D5DsHOBsrWSqymNMUemvqdnJ3+ggbwriOzX9H7139GMxQlV8xRq/XJlHZx7wNjXDr/ZXyhYwiNtY7D7hNH6NQ7FDMZVMdj/tY2fT9ATRTe+L2/QC9P0F/bwGs4aJmYA3t3oUVgMuDovQ9x9do618/PM1osk6CjaJLEVPBCaDT65HI2ulRpKT4TsxOkfEksJb1WG7RFkkQB0igoBE6D+rbAjRyCdpte/SokPdJ2liCRLCyu4ocBMzMVZu5+lMVukTeuv6bsMq9wfOjwV968GRIPHpx+Lqt1dhRFUWqb63Iw8JBhwMLydaJE0l1aJZszsAsZBp5DvdUl0GzGZopMT2bRlISl25vIto977TqW2+PQwRIpO6bTdnD9HhP7ZukOXM4/f5H3vfcD/PQvf5wj974FM2uRGApS0YkSndZOQE0ozDy0n6HpEXpRQPHwQcx0hp3FywyCPqn8ON12h9sLC6QyKTIZjSj02a41SZI+3fY229tb+EHA9rbLxtYAO1ugcNc90vjO71e2Kkd2/uOf3H4OENrZU4+oQoj+5z75g58rV2d/JFW04sVbF7R+t0XWtom8PkZGUGt3iGObes9nbHo/y4tLxGkojw5xqDKLp18mG0UYgU8rkEzvmSLW19hu7HD0/rtJlYc5d/ZrfOjDP8KxBx6ls7nC1Ytn8Wtr7AxcQEWoCv2shb9nirRlYTQ66JUiU2/7DkLXw6ktksQxxZkZ+r5LKjuClcrS29okkSqaUeb8xRfx3ITx8Qq6plMoS0bGSrTrHfqD67E5dEhzB4PPffKjj/VPnT2raed4LgH4oz/8o38/MXXwf3r0ne9SR0t5mjJieWGe2HcpayGlbIH15gBPybByY5G86DJWmCaSOsXdR0k2Ipz5m2QyCYZI2NlpIBQojZWYPXCAz/7pl3jsbd/JiYP7mfvqH7N0+SWkF9AMFJYdjb6vshZCS4uJbi/zoL0fxSxw9wP7UU0LRerEMkCNPLpuB9cHU8+yub7CzvoGXjekWW+TsfNoaoCmWezbV6UykqfR6FAuFDl8113qQpKLnrvc+PcATz36aKKcPk1y6hTKp7/Su64I+fzi9YuogRPbOtimwcjwKJnhXYRWFj30yLQXSKs9rLRJ4MR4fsj6hWeJrl9A8dr4MeiKRqPZIVYSHn70AZ5//kXKqQxH94zyxkuf5ebl54mCCDexuNRP0S9OsKDEXO332ekMEH7Cznqd1PAYitQJG00622toUqLEPbYXbzB39Sa2YhP1WjS2t6ntrDPotth3cA+ZrEYmnQN8fDdEtbIohaE4NzbFXSX9+V958n3X37wRU+7cDD8pQMgPfuD9H989NSmWbs+xPLdAe6fN+lKdVKlIo9WjYhsc3j/F6FgONJM4EmRSBl67S1DvkM+ZbG+32Gm0iAg58Za7ub60TH19k4ePHWBj8Srbq8uYhonnCS7cqjF+8DCBJ1la2SAkIZNJMzY8yq6JKXKWTdJ1cNs1gs4OIg5RhKTfWSJtr9HceZGN+XOk1CZCabCwuswb124jdA1Dk/RaTWK3j+f6vLCl8wevrotnLm98XAghn376afGX+oCnn74mz5x5Un3H+3994YkH9x5JmcoRRdHjdDavxGHE8uoySb/NVCmDM4gwzTy+qmJqEk0JUZQcg3bAwOmDbtB2O9z79uOga3z9+Vd48OARxifKLK/OU6v12Vzrs7zUoHr0LjpRTK/vMPBcVF2hlMtxYHY3D7zlOJOTE/Q359GVPpHXIRrUCSKL6ePvIY4taq02peoJ/NBmfHI3mp1hZfU240M5CmmbQiFFFPvUAj32p9+u7rR7f/iz3/3OTzx55ox6+htCyr/UB1y9ekhKEF994cWfW1ra6GZSFgcO7JLHju/mwJG9mNUqrThBSSD0XWxF0HP7aEaK9Ow++nmbbizYrDfZf99h7EqJv3j2HAemZpndP0OtscmtWy3m55ss1Xtc7zrEtoWqhOSyBj/8fR/gY//sxzlx10F0EgIvQCoaiirwGstEXpMkToiUHFouDYbKsWNPUCgOEQYurUaP3TPH0FWTyPMY9AYIzWTvwftlKj1EnLhdLZ/7OSmlOHT1qvwmhchzzz0nDz+J+nOf7TQnLF+pb69+58LCXOz0esrU5DjZSp6e69MNAzqNBratUe90kZHK8KGjrNbXcdp1xqYrHHvoPs4+/zL7Z/Zx7MhRMmmDfqPOF89dI1JjMuUi7bbH0XvvJVUuYaoad+07yEh5iO3tNTr1TdrrWxRyFfrdDXS/gZlOMRgMcOMseq7I9NRe+oMd1lavYaoG6VSOpflFVpYvU8rZeJ6HmUqTsXOxJw1tPS780r/5x+/708OHD6sf/ehHk28iAODpa0h55kn1YubdL+yfsh7ct2vv3uXl5ThMhHLi3kdwgh5SVzByKZzQRddMPM+nvbzC5s3b5IcM7n/kG+APHOPkB7+XzbUliDxsTccJfFqhz9RUntEhm5GxWfafeCvXrl1HlSrtRo0k6FBKp5isZnG9LTQ1Rvg9UmkbP/QQ9jiaUqJZa3F77jZJGCLo4frbCLqkzIBivkQ2kyII4/j67eta4IXPBv4nfvwnf/KacvLk6b8hlVP/S5XYU4eeFI/90unkj7989ZnS+OwPxlGUmbt5TV69ekPEoceu2Rl6josTJqSzNiOTIzTaHQaRx8PveivXbi2zs92iXMkTxz6ZYpXC1CzN7TXUoE+947HRaFKtFLFEn6jd5+HveIKxiRHWV+fobC5z9+GjVItVCLYZNBuIOCGdSRFHMS3PI0z6rK1eQdf6CNFmfW2OTCamWjYYLlewbZNKuZw4jq/MLW3Ucnuq7/xffvFD/UOHronnnkP+nQScfu45eebMk+qRIyd7b7t714ua5v9Iplriha88x/rcgpgcr6KokCQqqm3Rbjfo97rsP34Xg8TgxRdfJZ9PI6WP2+tx7cJN0tURJifGGTRq2DLGQmN1rUO+YFCt6tQ2brF69Tz9xhqDZo1SzmbQb7Gxs0O/18ZUFXLZHImiUGtu0ey1UEQCBDTqNXTVIJtKs7y6yk6thq1rsrbdYnu7KdLp1Dv/53939saZJ59UP/rJa9/kLFH/35SiTz99TUop1QN3P7zym7/3ext33fvu90rPS7SgJoZHcmJjawvX87nn3rdimga2bVGdnOCZZ76EQZrXX1ui3fKZ2jXD7K4RFq9eJ1e6I1zIFyoY2SxXrs4zPlUmlC6L84ukdIMkCjlycJbr16+x09ikUingRyG+6zJSLZJIgRtAGEnCMMT3XPK5DJEf0ul2MS0TITQp0RLX9dUwTv7Jx/7jq39y5syT6snTT8f/1YaJs2fPao899ljky60fNSh+qr7ygjz/zKfky+deV7r9GF3TOXH8CMfuOcbn/+zPsW2DTtdlc6uLO0hoNjvsP1iimMkyOTFO2jAxDZuN2gZBp8XdJw5y4fXLrG80uPf4IVzfY3OjzezsOHpKo91sU6s3qGRzHDuwHyHh+vw8LgmeGxCHIZZhEIcKZs6m7/rJ9NguMToxLKxs6scOfddTv3H21CPaY6ef+1vF0urfRcBv//ZvJ1JKTRPZ8x/7lz+9UShNvbtSnVLzwxNxgqb0Gtu8533fxUsvfZ1w0ODE8fsoD08Qy4h0xqRSTtPaGbC+tsX2Zp04hmxBJ2UpxEFILl+gUh6i1+2zuLDB5OQ4iYxZWa1h6jqmqmIIlbSdZmJmN9mRaSpjs7hujNPtYykKXiAx0xnS2XScsmx1ZGQ01mzrx+96/8f/XvDfsmVGSqkJISLHWXrItnNPQ3H08iu/G8Wb8+rmTk38+R//MSOlLFbRYvfMfu595/fTbdT40p/8JrapE0cK8zc36Hd6vP/9j5POWlx+4xqB63Ho4F6a7Q6Li+ukMxYAOztdhJD0+iGtlsODDx/g4bc+QK48jZ2vMOhsc/mV5zGFhp5NySs3r8Qpw9C2Gs3N20vrT/5f52ovfivg/6s8Q29qCfv986NuV/n0YPPGu5ZuXOOrzz4THzp6j9oZJHz9pecYKqY4dOI+7rv/UaS7wc2rL2IZJqCysbxN5PtMTE/iOg7tZot02qJULhDLAc4gZtCLCYMIL4o4//oCa+ttfvH0j7P/wDGMVJkw8ultLRH1e6i6GQ98V11cvM7lSze/uLzS+KFPPb+y+aYG8NvqGRJCxHd8Q/duAk/cfO63fuH8K5f/xYd+8ufytVQxEVcvS+vVF5WF1ZrY2PkzNpeucHD3DJEb03EHZLIFVBMa9Sbu3AArZdBpuaysRRjGBqqmksQBzqDP6PgoU7v3YmezdFsDclaGzbXboG1QGp6QdiaT9AYD0ff66oXLVzq6zq/9r7938ZeRcObJJ79l8P/fbXMghBDJV3//U/tO/MPvOZ1Y9vf2a/N8+l//BJcuvB4P+pHynne8RQxXcqxtbVEZqXDfg9+BjDXmbnyVrS2HQbeD57gsLLVYXq4hDIOZiQInjswwu3uaTDHFwq1FxkYnaXZ8zr/yNRk4gySTraoIA8tO0fHbf/DyaxdOffkGc6dAeeqOLUP+dzJO3vESfYOUx4GPNddff8fZ3/0P6vbiLcbHc8nN2+vJ0kZdSaVtMTJcEulylfd9309gZip8/fOfYeP2ebxIo9VLuH2rxv3HDnHX3TP0Bm10LZHdTkeurtSSF16aV973we9UcnmN8y+/Hje2nK88/8r8v70y4Nk7Qu9HtNPfQr1/262z3zArIoRIvkHEXdHWaz+1vbn6D8Lu2vj1Sxe5fPEim5s17LQpdx/Ylxy+751M7NkvujtL3H75GfRsmmIxTyGdZ2d7R75+6QZbmw2lXE6LciFPo9bEiyLe/sTb11HUL3z9+ed//Wf/j4uXEAKZ/KLy1FOnOX2a5H+seVpKFfhL87SUMutHW49GO4uPbrx29vGllfXpSzfncoZiUt9ZZ6iYZmZmlhMnHsEZtFm6/Rpfe+0KSQymrpPOpNjeqXcVaSwLwmcNWz/3md+5dO4m9L4hbBYnQXka/n+bp7VvBwFvGpKklAo8LYQQPeBzwOeklOpeWhOHL35p3+//1m/eU2vUC8165/j6RquUKZblrcuv0t7YEaSyzXd/9xMX52++2k6Z+oVds9W593zsj9b4ayDlmTPqU1dPSnEn4vG3Y+7/D8KIkDqAVUfXAAAAAElFTkSuQmCC" alt="大冒险" style="width:72px;height:72px;vertical-align:middle;margin-right:12px">大冒险</button>
+                <button class="btn-sm" onclick="showStory()">📖 游戏叙事</button>
             </div>
 
             <div style="margin-top:12px">操作日志：</div>
@@ -72,33 +77,69 @@
             <div class="question-box">
                 <div class="question-title">本轮问题预览</div>
                 <div id="questionText">等待猜中数字后...</div>
+                <div style="margin-top:14px;display:flex;gap:10px;flex-wrap:wrap;align-items:center">
+                    <input id="answerInput" type="text" placeholder="填写同学的回答" style="width:420px">
+                    <button class="btn-sm" onclick="submitAnswer()">提交回答</button>
+                </div>
             </div>
         </div>
 
         <!-- 右侧：学生名单 -->
         <div class="card">
             <h2>👨‍🎓选修学生名单</h2>
+            <div style="margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap">
+                <span>
+                    <button class="btn-sm" onclick="document.getElementById('studentFileInput').click()">📥导入学生名单（Excel/CSV）</button>
+                    <input id="studentFileInput" type="file" accept=".xlsx,.xls,.csv" style="display:none" onchange="importStudents(this)">
+                </span>
+                <button class="btn-danger" onclick="resetGame()">🔄 重置游戏</button>
+            </div>
+            <div style="font-size:12px;color:#888;margin-bottom:6px">表格列顺序：学号 / 姓名 / 专业；猜中后点击名单条目，在左侧操作日志区公布中奖同学。</div>
             <div class="student-list" id="studentListBox"></div>
         </div>
 
         <div class="final-panel" id="finalPanel">
-            <h2>✅全部数字挑战完成！三组汇总</h2>
-            <div class="group-item">👤第一组：11，33，420，520，45</div>
-            <div class="group-item">🌍第二组：44，5，1004，199</div>
-            <div class="group-item">☁️第三组：126，6，17，3</div>
+            <h2>✅全部数字挑战完成！各组汇总</h2>
+            <div id="finalGroups"></div>
             <p style="margin-top:12px;font-size:16px">课堂讨论：数字人文中，人、地、天如何构成知识网络？</p>
         </div>
     </div>
 
+    <!-- 弹窗①：设置报数范围 -->
+    <div class="modal-mask" id="rangeModal">
+        <div class="modal-card">
+            <h3>① 设置报数范围</h3>
+            <div class="input-wrap"><label>下限 low：</label><input id="rangeLowInput" type="text" value="1"></div>
+            <div class="input-wrap"><label>上限 high：</label><input id="rangeHighInput" type="text" value="2029"></div>
+            <div class="btn-group">
+                <button class="btn-sm" onclick="submitRange()">下一步：设置预设数字</button>
+                <button class="btn-danger" onclick="closeModals()">取消</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- 弹窗②：设置预设数字 -->
+    <div class="modal-mask" id="presetModal">
+        <div class="modal-card">
+            <h3>② 自定义组别名称与预设数字（数字用逗号或空格分隔）</h3>
+            <div id="presetRows"></div>
+            <div class="btn-group">
+                <button class="btn-sm" onclick="addPresetRow()">＋ 增加一组</button>
+                <button class="btn-sm" onclick="submitPresets()">开始游戏</button>
+                <button class="btn-danger" onclick="closeModals()">取消</button>
+            </div>
+        </div>
+    </div>
+
 <script>
-//三组数据
-const batches = [
-    {nums:[11,33,420,520,45]},
-    {nums:[44,5,1004,199]},
-    {nums:[126,6,17,3]}
+//三组数据（可被“预设数字”设置覆盖）
+let batches = [
+    {name:"第一组", nums:[11,33,420,520,45]},
+    {name:"第二组", nums:[44,5,1004,199]},
+    {name:"第三组", nums:[126,6,17,3]}
 ];
-//学生名单
-const studentData = [
+//学生名单（可通过右侧“导入学生名单”按钮用 Excel/CSV 覆盖）
+let studentData = [
     {sid:"20264203026",name:"方李",major:"信息资源管理"},
     {sid:"20264203027",name:"陈一帆",major:"信息资源管理"},
     {sid:"20264203028",name:"董慧鑫",major:"信息资源管理"},
@@ -228,10 +269,21 @@ const dareList = [
 let batchIdx = 0;
 let targetList = [];
 let currentTarget = null;
-let low = 1;
-let high = 2029;
+let rangeLow = 1;    // 报数范围下限（可在重置弹窗中修改）
+let rangeHigh = 2029; // 报数范围上限
+let low = rangeLow;
+let high = rangeHigh;
 let studentCounter = 1;
 let log = "";
+//猜中进度与换题限制
+let totalGuessed = 0;      // 已猜中的数字总数（跨组累计）
+let currentHitIndex = 0;   // 最近一次猜中是第几个数字
+let hitPending = false;    // 是否处于“刚猜中、待公布中奖同学”状态
+let passCount = 0;         // 本轮已 PASS 换题次数
+const MAX_PASS = 2;        // 猜中同学最多换题两次
+//叙事记录：每条 {group,number,student,content,answer}
+let hitRecords = [];
+let currentRecord = null;
 
 //渲染学生名单
 function renderStudentList(){
@@ -241,8 +293,56 @@ function renderStudentList(){
         const div = document.createElement("div");
         div.className = "student-item";
         div.innerText = `${s.sid}｜${s.name}｜${s.major}`;
+        // 点击名单条目：猜中时高亮该同学并在日志区公布“猜中第XX/XX个数字”
+        div.onclick = function(){
+            highlightStudent(s.name);
+            announceWinner(s.name);
+        };
         box.appendChild(div);
     })
+}
+
+//导入学生名单：支持 xlsx/xls（SheetJS）与 csv（内置解析）
+function importStudents(input){
+    const file = input.files[0];
+    if(!file) return;
+    const reader = new FileReader();
+    if(/\.csv$/i.test(file.name)){
+        reader.onload = e=> applyImportedRows(parseCsvText(e.target.result));
+        reader.readAsText(file, "utf-8");
+    }else{
+        if(typeof XLSX === "undefined"){
+            alert("Excel 解析库未加载（需联网加载一次）；也可改用 CSV 文件导入。");
+            input.value = "";
+            return;
+        }
+        reader.onload = e=>{
+            const wb = XLSX.read(new Uint8Array(e.target.result), {type:"array"});
+            const rows = XLSX.utils.sheet_to_json(wb.Sheets[wb.SheetNames[0]], {header:1, defval:""});
+            applyImportedRows(rows);
+        };
+        reader.readAsArrayBuffer(file);
+    }
+    input.value = "";
+}
+
+function parseCsvText(text){
+    return text.split(/\r?\n/).filter(l=>l.trim()).map(l=>l.split(/[，,\t]/).map(c=>c.trim()));
+}
+
+//把表格行写入学生名单：列顺序为 学号/姓名/专业，自动跳过含“姓名”的表头行
+function applyImportedRows(rows){
+    const body = rows.filter(r=>r.some(c=>String(c).trim()))
+                     .filter((r,i)=>!(i===0 && r.join("").includes("姓名")));
+    const imported = body.map(r=>({sid:String(r[0]??""), name:String(r[1]??r[0]??""), major:String(r[2]??"")}))
+                         .filter(s=>s.name);
+    if(!imported.length){
+        alert("未解析到学生姓名，请检查表格列顺序（学号/姓名/专业）");
+        return;
+    }
+    studentData = imported;
+    renderStudentList();
+    addLog(`📥已导入学生名单：共 ${imported.length} 人`);
 }
 
 //高亮某位学生
@@ -257,108 +357,297 @@ function highlightStudent(name){
     })
 }
 
-function initBatch(){
+function initBatch(keepRange){
     const b = batches[batchIdx];
     targetList = [...b.nums];
-    low = 1;
-    high = 2029;
+    if(!keepRange){
+        low = rangeLow;
+        high = rangeHigh;
+    }
     nextTarget();
 }
 function nextTarget(){
     if(targetList.length ===0){
         batchIdx++;
         if(batchIdx >= batches.length){
-            document.getElementById("finalPanel").style.display="block";
+            addLog("🏁本轮游戏结束");
             return;
         }
-        initBatch();
+        // 猜中时区间已重置为预设总区间，进入下一组直接沿用即可
+        initBatch(true);
         return;
     }
     currentTarget = targetList[0];
+    // 若新目标超出当前区间，在现有区间基础上最小扩展，而不是重置
+    if(currentTarget < low){
+        low = currentTarget;
+        addLog(`→区间向左扩展以包含本轮目标：[${low}, ${high}]`);
+    }else if(currentTarget > high){
+        high = currentTarget;
+        addLog(`→区间向右扩展以包含本轮目标：[${low}, ${high}]`);
+    }
     updateRangeUi();
 }
 function updateRangeUi(){
-    document.getElementById("low").textContent = low;
-    document.getElementById("high").textContent = high;
+    // 区间显示行可隐藏，存在时才更新，避免元素缺失导致脚本中断
+    const lowEl = document.getElementById("low");
+    const highEl = document.getElementById("high");
+    if(lowEl) lowEl.textContent = low;
+    if(highEl) highEl.textContent = high;
     document.getElementById("studentIndex").textContent = studentCounter;
 }
 function addLog(s){
-    log += s+"\n";
+    // 日志区只保留并显示最新一条内容，无需拖动滚动条
+    log = s;
     document.getElementById("logBox").textContent = log;
-    document.getElementById("logBox").scrollTop = document.getElementById("logBox").scrollHeight;
 }
 
-//随机抽取混合题库，写入日志
+//猜中后点击名单条目：在日志区公布中奖同学及猜中进度
+function announceWinner(name){
+    if(!hitPending){
+        addLog("请先猜中数字，再点击名单中猜中的同学姓名");
+        return;
+    }
+    const total = batches.reduce((sum,b)=>sum+b.nums.length,0);
+    if(currentRecord) currentRecord.student = name;
+    addLog(`恭喜${name}同学猜中第${currentHitIndex}/${total}个数字`);
+}
+
+//随机抽取混合题库，只更新问题预览，不占用日志区
 function getRandomMixQuestion(){
     const idx = Math.floor(Math.random()*allQuestionBank.length);
     const q = allQuestionBank[idx];
-    addLog(`❓本轮破冰问题：${q}`);
     document.getElementById("questionText").innerText = q;
+    if(currentRecord) currentRecord.content = q;
+    return q;
+}
+
+//PASS / NEXT：猜中同学换题，最多换两次
+function passQuestion(){
+    if(!hitPending){
+        addLog("请先猜中数字，猜中后才可 PASS / NEXT 换题");
+        return;
+    }
+    if(passCount >= MAX_PASS){
+        addLog(`该同学最多只能 PASS 两次（换题两次），已用完`);
+        return;
+    }
+    passCount++;
+    const q = getRandomMixQuestion();
+    addLog(`🔄PASS ${passCount}/${MAX_PASS} 换题：${q}`);
 }
 
 function getRandomDare(){
     const idx = Math.floor(Math.random()*dareList.length);
     const q = "🎲大冒险："+dareList[idx];
+    if(currentRecord) currentRecord.content = q;
     addLog(`${q}`);
     document.getElementById("questionText").innerText = q;
 }
 
-function submitUserGuess(){
-    const val = document.getElementById("userGuessInput").value.trim();
-    const num = parseInt(val,10);
-    if(isNaN(num) || num<1 || num>2029){
-        alert("请输入1‑2029之间的有效数字");
+// ===== 自定义预设组别 =====
+const defaultPresetRows = [
+    {name:"第一组", nums:"11,33,420,520,45"},
+    {name:"第二组", nums:"44,5,1004,199"},
+    {name:"第三组", nums:"126,6,17,3"}
+];
+let presetRows = defaultPresetRows.map(r=>({...r}));
+function renderPresetRows(){
+    const box = document.getElementById("presetRows");
+    box.innerHTML = "";
+    presetRows.forEach((r,i)=>{
+        const wrap = document.createElement("div");
+        wrap.className = "input-wrap";
+        const nameInput = document.createElement("input");
+        nameInput.type="text"; nameInput.className="preset-name"; nameInput.value=r.name;
+        nameInput.placeholder="组别名称"; nameInput.style.width="140px";
+        const numsInput = document.createElement("input");
+        numsInput.type="text"; numsInput.className="preset-nums"; numsInput.value=r.nums;
+        numsInput.placeholder="数字，逗号分隔"; numsInput.style.width="220px";
+        wrap.appendChild(nameInput); wrap.appendChild(numsInput);
+        if(presetRows.length>1){
+            const del = document.createElement("button");
+            del.className="btn-danger"; del.textContent="×"; del.title="删除该组";
+            del.onclick=()=>{ syncPresetRows(); presetRows.splice(i,1); renderPresetRows(); };
+            wrap.appendChild(del);
+        }
+        box.appendChild(wrap);
+    });
+}
+function syncPresetRows(){
+    document.querySelectorAll("#presetRows .input-wrap").forEach((wrap,i)=>{
+        presetRows[i].name = wrap.querySelector(".preset-name").value.trim() || ("第"+(i+1)+"组");
+        presetRows[i].nums = wrap.querySelector(".preset-nums").value;
+    });
+}
+function addPresetRow(){
+    syncPresetRows();
+    presetRows.push({name:"第"+(presetRows.length+1)+"组", nums:""});
+    renderPresetRows();
+}
+
+//提交回答
+function submitAnswer(){
+    const v = document.getElementById("answerInput").value.trim();
+    if(!v){ alert("请先填写同学的回答"); return; }
+    if(currentRecord) currentRecord.answer = v;
+    addLog(`✍️本轮回答：${v}`);
+    document.getElementById("answerInput").value="";
+}
+
+//游戏叙事：全部猜中后逐行输出
+function showStory(){
+    const total = batches.reduce((sum,b)=>sum+b.nums.length,0);
+    if(hitRecords.length < total){
+        alert(`还有数字未猜完（已完成 ${hitRecords.length}/${total}），请全部猜完后再生成叙事`);
         return;
     }
-    addLog(`第${studentCounter}位同学报数：${num}`);
+    const lines = hitRecords.map((r,i)=>{
+        const content = r.content ? r.content : "（无题目）";
+        const answer = r.answer ? `｜回答：${r.answer}` : "";
+        return `${i+1}. ${r.group}｜数字${r.number}｜${r.student||"（未公布）"}｜${content}${answer}`;
+    });
+    addLog("📖 游戏叙事：\n"+lines.join("\n"));
+}
+
+//解析预设数字文本（支持中英文逗号、空格分隔）
+function parseNums(text){
+    return text.split(/[，,\s]+/).map(s=>parseInt(s,10)).filter(n=>!isNaN(n));
+}
+
+function openModal(id){ document.getElementById(id).classList.add("show"); }
+function closeModals(){ document.querySelectorAll(".modal-mask").forEach(m=>m.classList.remove("show")); }
+
+//弹窗①提交：保存报数范围，并进入预设数字弹窗
+function submitRange(){
+    const lo = parseInt(document.getElementById("rangeLowInput").value.trim(),10);
+    const hi = parseInt(document.getElementById("rangeHighInput").value.trim(),10);
+    if(isNaN(lo)||isNaN(hi)||lo<1||lo>=hi){
+        alert("请输入有效范围：下限需为正整数且小于上限");
+        return;
+    }
+    rangeLow = lo;
+    rangeHigh = hi;
+    closeModals();
+    openModal("presetModal");
+}
+
+//弹窗②提交：保存三组预设数字并开始新一局
+function submitPresets(){
+    syncPresetRows();
+    const groups = presetRows.map(r=>({name:r.name, nums:parseNums(r.nums)}));
+    if(groups.some(g=>g.nums.length===0)){
+        alert("每组至少填写一个有效数字");
+        return;
+    }
+    if(groups.some(g=>g.nums.some(n=>n<rangeLow||n>rangeHigh))){
+        alert(`预设数字需在报数范围 ${rangeLow}‑${rangeHigh} 之间`);
+        return;
+    }
+    batches = groups;
+    closeModals();
+    addLog(`🎯报数范围：[${rangeLow}, ${rangeHigh}]；预设组别：${groups.map(g=>g.name+"["+g.nums.join(",")+"]").join(" ")}`);
+    renderFinalPanel();
+    startFreshGame();
+}
+
+//按当前预设动态生成最终汇总
+function renderFinalPanel(){
+    document.getElementById("finalGroups").innerHTML = batches.map((b,i)=>
+        `<div class="group-item">${b.name||("第"+(i+1)+"组")}：${b.nums.join("，")}</div>`
+    ).join("");
+}
+
+function submitUserGuess(){
+    // 猜中数字的同学必须先回答问题并提交，才可继续抽奖
+    if(currentRecord && !currentRecord.answer){
+        alert("请输入问题答案后继续抽奖");
+        return;
+    }
+    const val = document.getElementById("userGuessInput").value.trim();
+    const num = parseInt(val,10);
+    if(isNaN(num) || num<rangeLow || num>rangeHigh){
+        alert(`请输入${rangeLow}‑${rangeHigh}之间的有效数字`);
+        return;
+    }
+    hitPending = false; // 新一轮报数，上一轮的“待公布中奖同学”状态结束
     document.getElementById("userGuessInput").value="";
+    let msg = `第${studentCounter}位同学报数：${num}`;
 
     //系统自动判断大小
     if(num < currentTarget){
-        addLog(`→系统判断：猜小了，答案更大。更新范围：[${num+1}, ${high}]`);
         low = num + 1;
+        msg += `；猜小了，答案更大。更新范围：[${low}, ${high}]`;
         studentCounter++;
     }else if(num > currentTarget){
-        addLog(`→系统判断：猜大了，答案更小。更新范围：[${low}, ${num-1}]`);
         high = num -1;
+        msg += `；猜大了，答案更小。更新范围：[${low}, ${high}]`;
         studentCounter++;
     }else{
-        addLog(`→系统判断：✅猜对！数字：${num}`);
-        const nameInputDom = document.getElementById("studentNameInput");
-        const name = nameInputDom.value.trim();
-        if(name){
-            addLog(`👉本轮答题同学：${name}`);
-            highlightStudent(name);
-        }
-        //猜对自动抽题，直接输出到日志
+        totalGuessed++;
+        currentHitIndex = totalGuessed;
+        hitPending = true;
+        passCount = 0;
+        currentRecord = {
+            group: batches[batchIdx].name || ("第"+(batchIdx+1)+"组"),
+            number: num, student:"", content:"", answer:""
+        };
+        hitRecords.push(currentRecord);
+        document.getElementById("answerInput").value="";
+        // 每次猜中后区间重置为最初预设的总区间
+        low = rangeLow;
+        high = rangeHigh;
+        const total = batches.reduce((sum,b)=>sum+b.nums.length,0);
+        msg += `；✅猜中！数字：${num}（第${currentHitIndex}/${total}个），区间已重置为[${low}, ${high}]，请点击名单中猜中的同学姓名`;
+        //猜对自动抽题，题目只显示在问题预览区，不占用日志区
         getRandomMixQuestion();
 
         targetList.shift();
         setTimeout(()=>{
             studentCounter++;
-            nameInputDom.value = "";
             nextTarget();
             updateRangeUi();
         },1200);
     }
+    addLog(msg);
     updateRangeUi();
 }
 
+//点击“重置全部游戏”：先弹窗设置报数范围
 function resetGame(){
+    document.getElementById("rangeLowInput").value = rangeLow;
+    document.getElementById("rangeHighInput").value = rangeHigh;
+    presetRows = batches.map(b=>({name:b.name||"组", nums:b.nums.join(",")}));
+    renderPresetRows();
+    openModal("rangeModal");
+}
+
+//两个弹窗都提交完成后，真正开始新一局
+function startFreshGame(){
     batchIdx = 0;
     studentCounter =1;
-    low=1;high=2029;
+    low=rangeLow;high=rangeHigh;
     log = "";
+    totalGuessed = 0;
+    currentHitIndex = 0;
+    hitPending = false;
+    passCount = 0;
+    hitRecords = [];
+    currentRecord = null;
+    document.getElementById("answerInput").value="";
     document.getElementById("logBox").textContent="";
+    addLog(`🎯本轮游戏开始｜预设区间：[${rangeLow}, ${rangeHigh}]，共 ${batches.length} 组 ${batches.reduce((s,b)=>s+b.nums.length,0)} 个数字`);
     document.getElementById("questionText").textContent="等待猜中数字后...";
-    document.getElementById("studentNameInput").value="";
+    document.querySelectorAll(".student-item").forEach(el=>el.classList.remove("highlight"));
     document.getElementById("finalPanel").style.display="none";
     initBatch();
     updateRangeUi();
 }
 
 window.onload = function(){
+    renderPresetRows();
     renderStudentList();
+    renderFinalPanel();
     initBatch();
     updateRangeUi();
 }

@@ -1,0 +1,293 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏 01｜庄周梦蝶 · 数据科学与数字人文</title>
+<style>
+:root{
+  --blue:#1f4e79; --blue2:#2b6cb0; --blue3:#3b82c4;
+  --soft:#eaf2fa; --soft2:#f5f9fd;
+  --green:#2f855a; --gsoft:#e9f6ef;
+  --ink:#1a202c; --muted:#4a5568; --faint:#718096;
+  --line:#d9e2ec; --line2:#edf1f6;
+  --bg:#f4f7fb; --card:#ffffff;
+  --red:#c53030; --rsoft:#fff5f5; --rline:#feb2b2;
+  --amber:#b7791f; --asoft:#fffaf0;
+  --shadow:0 2px 12px rgba(31,78,121,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  line-height:1.78;font-size:15px}
+a{color:var(--blue2);text-decoration:none}
+a:hover{text-decoration:underline}
+code{background:var(--soft);padding:1px 5px;border-radius:4px;font-family:Consolas,"Courier New",monospace;font-size:.9em;color:var(--blue)}
+
+/* ---------- top bar ---------- */
+.topbar{background:var(--blue);color:#fff;padding:11px 0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.topbar .wrap{max-width:1240px;margin:0 auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{font-size:15.5px;font-weight:700}
+.brand small{display:block;font-size:11px;font-weight:400;opacity:.8;letter-spacing:.3px}
+.topbar nav{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.topbar nav a,.topbar nav button{color:#fff;border:1px solid rgba(255,255,255,.42);background:transparent;
+  padding:5px 11px;border-radius:6px;font-size:12.5px;cursor:pointer;font-family:inherit;line-height:1.4}
+.topbar nav a:hover,.topbar nav button:hover{background:rgba(255,255,255,.16);text-decoration:none}
+.topbar nav .current{background:rgba(255,255,255,.2);border-color:#fff}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(120deg,#1f4e79 0%,#2b6cb0 52%,#2f855a 140%);color:#fff;padding:34px 22px 30px}
+.hero .wrap{max-width:1240px;margin:0 auto}
+.hero .kicker{font-size:11.5px;letter-spacing:2px;opacity:.85;margin:0 0 8px}
+.hero .tag{border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 10px;display:inline-block;font-size:11px;margin-bottom:10px}
+.hero h1{margin:0 0 6px;font-size:29px;line-height:1.3}
+.hero .en{font-size:13px;font-weight:400;opacity:.8;margin-left:8px}
+.hero .game-name{font-size:16px;font-weight:600;opacity:.96;margin:0 0 10px}
+.hero .lead{max-width:930px;margin:0;opacity:.93;font-size:13.8px}
+.stats{display:flex;gap:0;flex-wrap:wrap;margin-top:22px;border-top:1px solid rgba(255,255,255,.28);padding-top:16px}
+.stats .st{padding:0 20px;border-left:2px solid rgba(255,255,255,.4);min-width:120px}
+.stats .st:first-child{padding-left:0;border-left:none}
+.stats .st b{display:block;font-size:17px;line-height:1.3}
+.stats .st span{font-size:11px;opacity:.82}
+
+/* ---------- layout ---------- */
+.doc{max-width:1240px;margin:0 auto;padding:24px 22px 56px;display:grid;grid-template-columns:248px 1fr;gap:26px;align-items:start}
+.side{position:sticky;top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:15px;box-shadow:var(--shadow);max-height:calc(100vh - 28px);overflow:auto}
+.side h4{margin:2px 0 10px;font-size:12.5px;color:var(--blue);letter-spacing:.5px}
+.side a{display:block;padding:5px 8px;border-radius:6px;font-size:12.4px;color:var(--muted);line-height:1.45}
+.side a:hover{background:var(--soft);color:var(--blue);text-decoration:none}
+.side .jp{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.side .jp a{font-size:11.8px}
+.content{min-width:0}
+.content section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px 26px;margin-bottom:18px;box-shadow:var(--shadow)}
+.content section>h2{margin:0 0 14px;font-size:19px;color:var(--blue);padding-bottom:10px;border-bottom:2px solid var(--gsoft)}
+.content section>h2 .no{color:var(--green);font-size:13px;margin-right:8px}
+h3.sub{font-size:14.5px;color:var(--blue);margin:18px 0 8px;padding-left:9px;border-left:3px solid var(--green)}
+h3.sub:first-of-type{margin-top:4px}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:5px 0}
+b,strong{color:var(--blue)}
+.small{font-size:12.8px;color:var(--muted)}
+
+/* ---------- blocks ---------- */
+.quote{background:var(--soft2);border-left:4px solid var(--blue3);border-radius:0 8px 8px 0;padding:12px 16px;margin:10px 0;font-size:13.6px}
+.quote .src{display:block;font-size:11.8px;color:var(--faint);margin-top:6px}
+.think{border:1px solid var(--line);border-radius:10px;padding:13px 16px;background:#fbfdff;margin:12px 0}
+.think .q{font-weight:700;color:var(--green);font-size:14px;margin-bottom:5px}
+.level{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:6px;vertical-align:1px}
+.lv1{background:var(--soft);color:var(--blue)}
+.lv2{background:var(--gsoft);color:var(--green)}
+.lv3{background:var(--asoft);color:var(--amber)}
+.callout{border-left:4px solid var(--blue2);background:var(--soft);border-radius:0 8px 8px 0;padding:11px 15px;margin:12px 0;font-size:13.4px}
+.callout.green{border-left-color:var(--green);background:var(--gsoft)}
+.callout.risk{border-left-color:var(--red);background:var(--rsoft);border:1px solid var(--rline);border-left-width:4px;color:#7b2020}
+.callout.amber{border-left-color:var(--amber);background:var(--asoft)}
+
+/* ---------- setup cards ---------- */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:12px 0}
+.infocard{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--soft2)}
+.infocard h4{margin:0 0 6px;font-size:12.6px;color:var(--blue);letter-spacing:.3px}
+.infocard .big{font-size:19px;font-weight:700;color:var(--green);line-height:1.3}
+.infocard p,.infocard ul{font-size:12.9px;margin:4px 0}
+.infocard ul{padding-left:18px}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;margin:12px 0}
+table.tb{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+table.tb th{background:var(--blue);color:#fff;text-align:left;padding:8px 10px;font-weight:600;font-size:12.5px}
+table.tb td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+table.tb tbody tr:nth-child(even){background:#f8fafc}
+table.tb.compact{font-size:12.5px}
+table.tb.compact th,table.tb.compact td{padding:6px 8px}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill.b{background:var(--soft);color:var(--blue)}
+.pill.g{background:var(--gsoft);color:var(--green)}
+.pill.r{background:var(--rsoft);color:var(--red)}
+
+/* ---------- flow ---------- */
+ol.flow{margin:10px 0;padding:0;list-style:none;counter-reset:flow}
+ol.flow>li{position:relative;padding:12px 14px 12px 52px;margin:10px 0;border:1px solid var(--line);border-radius:9px;background:#fbfdff;counter-increment:flow}
+ol.flow>li:before{content:counter(flow);position:absolute;left:13px;top:12px;width:27px;height:27px;border-radius:8px;
+  background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+ol.flow>li .ft{font-weight:700;color:var(--blue);font-size:14px}
+ol.flow>li .tm{float:right;background:var(--gsoft);color:var(--green);font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px}
+ol.flow>li .say{background:var(--asoft);border-left:3px solid var(--amber);padding:7px 11px;margin-top:8px;font-size:12.8px;color:#6b4f1d;border-radius:0 6px 6px 0}
+ol.flow>li p{font-size:13.2px;margin:5px 0}
+
+/* ---------- printable materials ---------- */
+.pm{border:2px dashed #b9c9da;border-radius:11px;padding:15px 17px;margin:16px 0;background:#fff;page-break-inside:avoid}
+.pm-h{margin:0 0 3px;font-size:14.5px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.pm-h .tagp{background:var(--green);color:#fff;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.pm-note{font-size:12.3px;color:var(--muted);margin:0 0 12px;background:var(--soft2);padding:6px 10px;border-radius:6px}
+.pgrid{display:grid;gap:12px}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+.pcard{border:1.5px solid #94a9be;border-radius:8px;padding:11px 12px;min-height:118px;background:#fcfdff;display:flex;flex-direction:column}
+.pcard .plab{font-size:10.8px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--blue);border-radius:4px;padding:2px 7px;display:inline-block;align-self:flex-start;margin-bottom:7px}
+.pcard.g .plab{background:var(--green)}
+.pcard.r .plab{background:var(--red)}
+.pcard.a .plab{background:var(--amber)}
+.pcard .pbody{font-size:12.6px;line-height:1.62;flex:1}
+.pcard .pbody p{margin:3px 0}
+.pcard .pcut{margin-top:9px;border-top:1px dashed #b9c9da;padding-top:5px;font-size:9.5px;color:var(--faint);text-align:center}
+.wsheet{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fcfdff;font-size:12.8px}
+.wsheet .wh{font-weight:700;color:var(--blue);margin:10px 0 5px;font-size:13px}
+.wsheet .wh:first-child{margin-top:0}
+.pline{border-bottom:1px solid #c3cfdb;height:26px;margin:5px 0}
+.pline.short{width:55%}
+.wsheet table.mm{width:100%;border-collapse:collapse;font-size:12px}
+.wsheet table.mm th,.wsheet table.mm td{border:1px solid #c3cfdb;padding:6px 7px;text-align:left;vertical-align:top}
+.wsheet table.mm th{background:var(--soft);color:var(--blue);font-size:11.5px}
+.wsheet table.mm td.empty{height:34px}
+.scorebox{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
+.scorebox table{width:100%;border-collapse:collapse;font-size:12.5px}
+.scorebox th{background:var(--green);color:#fff;padding:7px 9px;text-align:left}
+.scorebox td{border-bottom:1px solid var(--line);padding:6px 9px}
+.scorebox td.b{background:#fbfdff}
+
+/* ---------- debrief / tips ---------- */
+ol.debrief{margin:10px 0;padding-left:0;list-style:none;counter-reset:db}
+ol.debrief li{position:relative;padding:9px 12px 9px 42px;margin:7px 0;border-left:3px solid var(--gsoft);background:#fbfdff;border-radius:0 8px 8px 0;font-size:13.3px;counter-increment:db}
+ol.debrief li:before{content:counter(db);position:absolute;left:11px;top:9px;color:var(--green);font-weight:800;font-size:13px}
+details{margin:12px 0;border:1px solid var(--line);border-radius:9px;background:var(--soft2);padding:10px 14px}
+details summary{cursor:pointer;color:var(--blue);font-size:13.2px;font-weight:700}
+details[open] summary{margin-bottom:8px}
+details ul,details p{font-size:13px}
+
+/* ---------- bottom nav ---------- */
+.bottom-nav{max-width:1240px;margin:0 auto 40px;padding:0 22px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bottom-nav a{flex:1;min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow);font-size:13px}
+.bottom-nav a:hover{border-color:var(--blue2);text-decoration:none}
+.bottom-nav a small{display:block;color:var(--faint);font-size:11px}
+.bottom-nav a.next{text-align:right}
+.footer{text-align:center;color:var(--faint);font-size:11.8px;padding:0 20px 34px}
+
+/* ---------- responsive ---------- */
+@media(max-width:920px){
+  .doc{grid-template-columns:1fr;padding:18px 14px}
+  .side{position:static;max-height:none}
+  .content section{padding:19px 17px}
+  .hero h1{font-size:24px}
+  .cols-3,.cols-4{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+
+/* ---------- print ---------- */
+@media print{
+  body{background:#fff;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .topbar,.side,.bottom-nav,.footer{display:none!important}
+  .doc{display:block;padding:0;max-width:none}
+  .content section{border:none;box-shadow:none;padding:0 0 14px;margin:0 0 14px;page-break-inside:auto;border-bottom:1px solid #ddd;border-radius:0}
+  .hero{background:#1f4e79!important;padding:14px 0;color:#fff}
+  .hero h1{font-size:20pt}
+  .hero .lead,.stats .st span{font-size:9pt}
+  .pm{page-break-before:auto;page-break-inside:avoid;border:2px dashed #777}
+  .pcard{min-height:105px}
+  details{display:block;border:none;background:none;padding:0}
+  details>summary{display:none}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap"><div class="brand">《数据科学与数字人文》· 思想实验课堂游戏<small>第 01 / 13 场 · 40–45 人班级版</small></div><nav><a href="thought-experiment-games.html">返回总览</a><a href="game02.html">下一场 →</a><button onclick="window.print()">打印素材</button></nav></div></header>
+<div class="hero"><div class="wrap"><p class="kicker">THOUGHT EXPERIMENT → CLASSROOM GAME · 01 / 13</p><span class="tag">对接 第1章 导论</span><h1>庄周梦蝶<span class="en">Zhuangzi's Butterfly Dream</span></h1><p class="game-name">课堂游戏：数据身份盲盒——你是庄周，还是那只蝶？</p><p class="lead">把《齐物论》最著名的一问搬进课堂：同一份材料，在不同身份的观察者手里会长出两套完全不同的'真实'。这场游戏不是要学生选边站，而是让他们亲身体会——视角不是偏见，视角是条件；承认条件，才是学术诚信的起点。</p><div class="stats"><div class="st"><b>35 分钟</b><span>建议时长</span></div><div class="st"><b>40–45 人</b><span>适用班级</span></div><div class="st"><b>10 组 × 4–5 人</b><span>分组方式</span></div><div class="st"><b>★★☆☆☆</b><span>难度</span></div></div></div></div>
+<div class="doc"><aside class="side"><h4>本场目录</h4><a href="#origin">一、思想实验原典与展开</a><a href="#mapping">二、与教材的对接</a><a href="#setup">三、班级组织（40–45 人）</a><a href="#objectives">四、学习目标</a><a href="#materials">五、材料清单与准备</a><a href="#flow">六、游戏流程</a><a href="#assets">七、游戏素材（可打印）</a><a href="#debrief">八、讨论引导（分层）</a><a href="#assessment">九、评价与计分</a><a href="#redline">十、伦理与安全红线</a><a href="#tips">十一、教师提示与变体</a><div class="jp"><a href="game02.html">→ 02 忒修斯之船</a></div></aside>
+<main class="content">
+<section id="origin"><h2><span class="no">01</span>一、思想实验原典与展开</h2>
+<h3 class="sub">原典原文</h3>
+<div class="quote">昔者庄周梦为胡蝶，栩栩然胡蝶也，自喻适志与！不知周也。俄然觉，则蘧蘧然周也。不知周之梦为胡蝶与，胡蝶之梦为周与？周与胡蝶，则必有分矣，此之谓物化。
+<span class="src">——《庄子·齐物论》，郭象注、成玄英疏本</span></div>
+<div class="quote">白话：从前庄周梦见自己变成蝴蝶，翩翩飞舞，惬意极了，全然忘了自己是庄周。忽然醒来，分明又是庄周。究竟是庄周梦见了蝴蝶，还是蝴蝶梦见了庄周？庄周与蝴蝶必定有别，这就叫"物化"。</div>
+
+<h3 class="sub">提出者与时代</h3>
+<p>庄子（约公元前 369—前 286），名周，战国宋国蒙人。《齐物论》是《庄子》内篇的核心，主旨是消解是非、彼此、物我的固定界限。"梦蝶"是全书最短、也最被反复引用的一段寓言——它不论证，而是让人<em>经历</em>一次判断的失效。</p>
+
+<h3 class="sub">思想实验的三层展开</h3>
+<ol>
+<li><b>第一层：判据失效。</b>醒着时我们确信"这是真的"，梦中同样确信。两段时间里的确信感毫无差别，于是"我感觉真实"不能再作为真实性的判据。</li>
+<li><b>第二层：主体边界的松动。</b>不是"蝴蝶是假的"，而是在梦的那一刻，"庄周"这个主体根本不在场。观察者本身也是被呈现出来的。</li>
+<li><b>第三层：物化。</b>"周与胡蝶必有分"——差别确实存在，但差别是在某一次呈现内部才成立的。庄子的答案不是虚无，而是<b>视角的不可通约</b>。</li>
+</ol>
+
+<h3 class="sub">后续变体与思想回响</h3>
+<ul>
+<li><b>笛卡尔的"恶魔"（17 世纪）：</b>用一个全能欺骗者把"梦蝶"变成方法论怀疑，最终逼出"我思故我在"。庄子停在怀疑本身，笛卡尔要找地基。</li>
+<li><b>普特南的"缸中之脑"（1981）：</b>梦蝶的技术版本——感官信号全部由计算机提供时，"我如何知道我不是缸中之脑"？（本手册游戏 08 展开）</li>
+<li><b>当代 AI 版本：</b>大模型生成的"世界描述"句句通顺、有据可查，但它从未"在场"。当一个模型描述某段历史时，它是庄周还是蝶？谁在梦谁？（与游戏 04、11 呼应）</li>
+</ul>
+
+<h3 class="sub">常见误解</h3>
+<div class="callout amber"><b>误解：</b>"庄周梦蝶是说一切都是幻觉，所以什么都不用认真。"<br><b>正解：</b>庄子的落点是"物化"——视角转换本身是真实的事件。承认视角，不等于否定事实；恰恰相反，它要求我们<b>说明自己站在哪个视角上</b>。这正是教材 1.4 "伦理在场"的古典版本。</div>
+</section>
+<section id="mapping"><h2><span class="no">02</span>二、与教材的对接</h2>
+<p>本游戏把第 1 章三个抽象命题变成可感的经验：</p>
+<div class="tbl-wrap"><table class="tb"><thead><tr><th>教材节点</th><th>游戏中的对应物</th><th>学生将获得的直觉</th></tr></thead><tbody><tr><td>1.2 两个主角：数据科学与数字人文</td><td>身份卡「蝴蝶」＝数据科学视角，「庄周」＝人文视角</td><td>两种视角各自看见什么、各自漏掉什么</td></tr><tr><td>1.3.1 方法下沉（技术赋能人文）</td><td>蝴蝶卡对统计表的第一写作</td><td>规模与模式是技术能带来的增量</td></tr><tr><td>1.3.2 问题牵引（人文重塑技术）</td><td>庄周卡追问「这张表为什么这样分类」</td><td>人文问题决定技术该算什么</td></tr><tr><td>1.3.3 反思升维（人文超越技术）</td><td>冲突点对读与投票</td><td>视角冲突不能被算法自动裁决</td></tr><tr><td>1.4 可复现、案例真实、伦理在场</td><td>同一证据卡 + 双视角声明</td><td>可复现约束方法，不取消视角</td></tr></tbody></table></div>
+<div class="callout green"><b>一句话锚点：</b>数据给的是"蝶的视角"，人文给的是"庄周的视角"；<b>可复现约束的是方法，不是视角</b>。这句话建议板书，并在第 13 章结课时重访。</div>
+</section>
+<section id="setup"><h2><span class="no">03</span>三、班级组织（40–45 人）</h2>
+<div class="grid3">
+<div class="infocard"><h4>班级规模</h4><div class="big">40–45 人</div><p>按 10 组编排：8 组 4 人 + 2 组 4～5 人；余数并入人数较少的组。</p></div>
+<div class="infocard"><h4>组内角色</h4><div class="big">4 人 / 组</div><ul><li>庄周视角 ×2</li><li>蝴蝶视角 ×2</li><li>记录员 ×1（由其中一人兼任）</li></ul></div>
+<div class="infocard"><h4>全班角色</h4><div class="big">5 人</div><ul><li>总记录员 1（黑板写冲突点）</li><li>计时员 2（分段提醒）</li><li>投票管理员 2（发票、计票）</li></ul></div>
+</div>
+<div class="tbl-wrap"><table class="tb"><thead><tr><th>环节</th><th>时长</th><th>组织形态</th><th>教师动作</th></tr></thead><tbody><tr><td>发身份与规则说明</td><td>4′</td><td>全班</td><td>强调：身份保密，不得互相提示</td></tr><tr><td>第一写作（本身份）</td><td>7′</td><td>组内各自独立</td><td>巡视，制止「用对方口吻写」</td></tr><tr><td>交换身份、第二写作</td><td>7′</td><td>组内互换卡</td><td>提醒材料完全相同</td></tr><tr><td>组内对读、标冲突点</td><td>8′</td><td>4 人围桌</td><td>提示：冲突点至少 3 条</td></tr><tr><td>上台陈述与全班投票</td><td>9′</td><td>抽 3 组陈述，全班表决</td><td>总记录员板书冲突点</td></tr></tbody></table></div>
+<div class="callout">大班关键：<b>不必 10 组都上台</b>。抽签选 3 组陈述（每组 90 秒），其余组的冲突点由总记录员汇总念出；投票用举手或贴纸，30 秒完成，避免流程拖沓。</div>
+</section>
+<section id="objectives"><h2><span class="no">04</span>四、学习目标</h2>完成本场游戏后，学生应能：<ul><li><b>辨识</b>同一份材料在「人文视角」与「数据视角」下的不同呈现方式（识记层）。</li><li><b>拆解</b>一次观察中「看到了什么」与「用什么身份看」两件事如何纠缠（分析层）。</li><li><b>说明</b>为什么视角多元不等于事实相对主义，并给出「标注视角」的具体做法（反思层）。</li><li><b>迁移</b>到本课程：用一句话说清自己将来的研究站在哪个视角、漏掉了什么（迁移层）。</li></ul></section>
+<section id="materials"><h2><span class="no">05</span>五、材料清单与准备</h2><div class="tbl-wrap"><table class="tb"><thead><tr><th>品名</th><th>数量（按 45 人上限）</th><th>规格与准备要点</th></tr></thead><tbody><tr><td>身份卡（庄周 / 蝴蝶）</td><td>庄周 23 张 + 蝴蝶 22 张</td><td>A5 卡纸，正反面打印；本手册素材页可复印</td></tr><tr><td>证据卡 E1 统计表</td><td>10 套（每套 1 张）</td><td>A4 单面；建议塑封反复使用</td></tr><tr><td>证据卡 E2 档案图说明</td><td>10 套</td><td>A4；配一张真实志书书影更佳（须注明来源）</td></tr><tr><td>证据卡 E3 学者释读</td><td>10 套</td><td>A4；文本见素材页</td></tr><tr><td>双视角观察表</td><td>45 份</td><td>A4 单面；每人 1 份</td></tr><tr><td>冲突点汇总表</td><td>10 份</td><td>A4；每组 1 份</td></tr><tr><td>表决贴纸</td><td>45 枚（三色）</td><td>红＝真实 / 蓝＝存疑 / 黄＝需补证，圆形小贴</td></tr><tr><td>计时器与黑板</td><td>各 1</td><td>教师自备</td></tr></tbody></table></div>
+<div class="callout amber"><b>课前 10 分钟准备：</b>①复印并裁切身份卡（45 张）；②把三张证据卡按组装袋；③在黑板画好"冲突点"三栏。全部素材均在本页下方，可直接打印。</div>
+</section>
+<section id="flow"><h2><span class="no">06</span>六、游戏流程</h2><ol class="flow"><li><div class="ft">抽身份、宣布规则</div><span class="tm">4′</span><p>每人 盲抽 一张身份卡。教师说明：庄周卡只能谈意义、语境、价值；蝴蝶卡只能谈可得、可测、可数。两组词汇表写在黑板上，越界即扣分。</p><div class="say"><b>教师引导语：</b>「现在你不是学生，你是这只身份。接下来 15 分钟，你不许说对方身份允许说的话。」</div></li><li><div class="ft">第一写作：以我之名</div><span class="tm">7′</span><p>各组拿到同一套证据卡 E1–E3。每人独立填写观察表左栏：「我看到了什么？这是什么？」庄周卡不少于 80 字，蝴蝶卡须含至少 3 个具体数字。</p></li><li><div class="ft">交换身份、第二写作</div><span class="tm">7′</span><p>组内互换身份卡，面对同一套证据再填右栏。教师提醒：不许回头看自己第一版。</p><div class="say"><b>教师引导语：</b>「材料一个字都没变，变的是你。请记住这种别扭——这就是视角。」</div></li><li><div class="ft">组内对读、标冲突点</div><span class="tm">8′</span><p>两人交换观察表，用红笔圈出「只有某个视角才看得到」和「两版直接打架」的地方；每组汇总至少 3 条到冲突点表。</p></li><li><div class="ft">抽组陈述、全班表决</div><span class="tm">9′</span><p>抽 3 组各 90 秒陈述。全班用三色贴纸投票：「哪一版更接近真实 / 是否需补证」。总记录员把冲突点写上黑板。</p></li><li><div class="ft">收束：回到 1.4</div><span class="tm">3′</span><p>教师指出：冲突无法由算法裁决；可复现约束的是方法，视角必须由研究者自己声明。布置 300 字「观察声明」作业。</p></li></ol></section>
+<section id="assets"><h2><span class="no">07</span>七、游戏素材（可打印）</h2>
+<h3 class="sub">素材 A · 身份卡（共 45 张，按标签份数复印）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>身份卡：庄周（人文视角）</h4><p class="pm-note">复印 23 份，沿虚线裁切。发给持「庄周卡」的学生。</p><div class="pgrid cols-2"><div class="pcard g"><span class="plab">庄周卡 · 人文视角</span><div class="pbody"><p><b>你的身份：</b>一位人文学者，关心意义、语境与价值。</p><p><b>你必须说：</b>这份材料在说什么？它为何被这样记录？谁的声音在其中、谁缺席？</p><p><b>你不许说：</b>纯数字统计（「共 37 条」这类话留给对方）。</p><p><b>交卷：</b>一段不少于 80 字的观察。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">庄周卡 · 备用版</span><div class="pbody"><p>同上。备用版用于 45 人班的多余席位，内容与左卡完全一致。</p><p><b>关键词提示：</b>语境、意图、缺席、语境化、解释、价值。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">素材 B · 证据卡（每组一套，共 10 套）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>证据卡 E1–E3</h4><p class="pm-note">每套装入一个文件袋。E2 建议配一张真实志书书影（须注明来源）。</p><div class="pgrid cols-3"><div class="pcard "><span class="plab">E1 · 统计表</span><div class="pbody"><p>某县志「人物志」1850—1900 年条目分类计数：</p><p>忠义 41 / 孝友 28 / 列女 63 / 艺文 19 / 隐逸 12 / 流寓 7。合计 170 条。</p><p>其中「列女」占比 37.1%，为最大类。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">E2 · 档案图说明</span><div class="pbody"><p>一页清代地方志书影：竖排刻本，卷端题「人物志·列女」；板心有刻工姓名；页边有后人朱笔圈点；末行缺字以空格留出。</p><p>（教学时可替换为本校馆藏真实书影。）</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard a"><span class="plab">E3 · 学者释读</span><div class="pbody"><p>某研究称：该志「列女」条目激增，反映晚清地方社会对女性节孝的推崇，也与地方官修志的教化职能有关。但由于条目多匿名、无生卒，难以做社会流动分析。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">素材 C · 蝴蝶卡与观察表</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>身份卡：蝴蝶（数据视角）</h4><p class="pm-note">复印 22 份，沿虚线裁切。</p><div class="pgrid cols-2"><div class="pcard "><span class="plab">蝴蝶卡 · 数据视角</span><div class="pbody"><p><b>你的身份：</b>一名数据分析者，只关心可得、可测、可复现。</p><p><b>你必须说：</b>样本量、比例、分布、缺失、可核查性；至少 3 个具体数字。</p><p><b>你不许说：</b>「意义」「价值」「精神」等解释性词汇。</p><p><b>交卷：</b>一段含至少 3 个数字的观察。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard a"><span class="plab">投票卡（三色）</span><div class="pbody"><p>红＝「这一版更接近真实」<br>蓝＝「两版都需补证」<br>黄＝「我无法判断」</p><p>每人 1 枚，投入票箱或贴于黑板对应栏。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>双视角观察表（每人 1 份）</h4><p class="pm-note">左栏用自己抽到的身份写；右栏在交换身份后写。两栏不得互相参照。</p><div class="wsheet">
+<div class="wh">左栏 · 我的第一身份：【　　庄周　／　蝴蝶　】（请圈选）</div>
+<p>我看到了什么？这是什么？（不少于 80 字 / 至少 3 个数字）</p><div class="pline"></div><div class="pline"></div><div class="pline"></div><div class="pline"></div>
+<div class="wh">右栏 · 交换后的第二身份：【　　庄周　／　蝴蝶　】（请圈选）</div>
+<p>同一套材料，在这一身份下我看到了什么？</p><div class="pline"></div><div class="pline"></div><div class="pline"></div><div class="pline"></div>
+<div class="wh">对照（组内完成）</div>
+<table class="mm"><tr><th style="width:30%">类型</th><th>具体内容</th></tr><tr><td>只有第一身份看得到</td><td></td></tr><tr><td>只有第二身份看得到</td><td></td></tr><tr><td>两版直接冲突</td><td></td></tr></table>
+</div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>冲突点汇总表（每组 1 份）</h4><p class="pm-note">组内讨论后填写，至少 3 条；抽中陈述的组用到此表。</p><div class="wsheet">
+<div class="wh">本组认定的三个关键冲突点</div>
+<table class="mm"><tr><th style="width:8%">#</th><th style="width:34%">冲突描述</th><th style="width:29%">庄周视角会怎么说</th><th style="width:29%">蝴蝶视角会怎么说</th></tr>
+<tr><td>1</td><td></td><td></td><td></td></tr><tr><td>2</td><td></td><td></td><td></td></tr><tr><td>3</td><td></td><td></td><td></td></tr></table>
+<div class="wh">投票结果（本组）</div><p>红 ____ 枚　蓝 ____ 枚　黄 ____ 枚</p>
+<div class="wh">一句话结论</div><div class="pline"></div>
+</div></div></section>
+<section id="debrief"><h2><span class="no">08</span>八、讨论引导（分层）</h2><ol class="debrief"><li><span class="level lv1">识记</span>用一句话复述「梦蝶」的三层展开，并说出「物化」的字面意思。</li><li><span class="level lv2">分析</span>两版观察表中，哪一处冲突是「数据没变、结论变了」造成的？请举出本组的具体例子。</li><li><span class="level lv2">分析</span>1.3 的三种相遇方式（方法下沉 / 问题牵引 / 反思升维），分别偏向庄周还是蝴蝶？为什么？</li><li><span class="level lv3">反思</span>庄周梦蝶是不是相对主义？如果不是，「承认视角」与「坚持事实」如何同时成立？</li><li><span class="level lv3">反思</span>教材承诺「可复现、案例真实、伦理在场」——可复现能约束视角吗？如果不能，靠什么约束？</li><li><span class="level lv3">反思</span>写 300 字「我的观察声明」：说明你在本课程中的研究将站在哪个视角、系统性漏掉什么。</li></ol></section>
+<section id="assessment"><h2><span class="no">09</span>九、评价与计分</h2>
+<p>本场采用小组计分，满分 100 分，可直接记入课程过程性评价。</p>
+<div class="scorebox"><table><thead><tr><th>维度</th><th>分值</th><th>达标描述</th><th>扣分点</th></tr></thead><tbody><tr><td class="b">证据覆盖</td><td>20</td><td>两版观察均使用材料中的具体信息（≥3 处）</td><td>空泛表态每处扣 5 分</td></tr><tr><td class="b">角色忠实</td><td>20</td><td>严格守住本身份的「必须说 / 不许说」清单</td><td>越界 1 次扣 5 分</td></tr><tr><td class="b">冲突点质量</td><td>25</td><td>找出 ≥3 条真实冲突，且能说明为何冲突</td><td>少于 3 条每项扣 8 分</td></tr><tr><td class="b">讨论参与</td><td>15</td><td>组内人人发言，陈述时每人有分工</td><td>一人未发言扣 5 分</td></tr><tr><td class="b">反思深度</td><td>20</td><td>能回答「承认视角 ≠ 相对主义」</td><td>停留在「公说公有理」扣 10 分</td></tr></tbody></table></div>
+<div class="callout green"><b>个人加分（+5）：</b>主动指出自己第一身份" + "「系统性漏掉了什么」——这是本场最重要的学术品质。</div>
+</section>
+<section id="redline"><h2><span class="no">10</span>十、伦理与安全红线</h2>
+<div class="callout risk"><b>教学红线：</b>①身份卡只是视角工具，不得被用来贴" + "「人文＝感性 / 数据＝机械」的刻板标签；②投票结束后必须明确宣布：视角冲突不靠多数表决裁决，表决只用于显露分歧；③使用的志书书影须注明馆藏与许可，不得截取来源不明的图像。</div>
+<div class="callout amber"><b>大班控场：</b>45 人同时写作时，若出现" + "「用对方口吻写」的投机行为，计时员直接提示该组重做。角色忠实是本场唯一的硬规则。</div>
+</section>
+<section id="tips"><h2><span class="no">11</span>十一、教师提示与变体</h2>
+<details><summary>提示 1 · 课前准备与差异化</summary><ul>
+<li><b>快组加码：</b>提前完成的组加做" + "「第三视角」——用「数据使用者」（如地方文旅开发者）的身份再写一遍。</li>
+<li><b>慢组支架：</b>提供" + "「词汇 bank」：庄周卡可用——语境、意图、缺席、解释、价值；蝴蝶卡可用——计数、比例、缺失、可核查、分布。</li>
+<li><b>无黑板教室：</b>用一张大白纸贴墙代替" + "「冲突点三栏」。</li>
+</ul></details>
+<details><summary>提示 2 · 变体与跨章联动</summary><ul>
+<li><b>变体 A：</b>把身份卡换成 1.3 的" + "「方法下沉 / 问题牵引 / 反思升维」三卡，答案直接对应课程知识点。</li>
+<li><b>变体 B（线上）：</b>用腾讯文档开两个分栏，两人同时编辑同一份证据，冲突处自动高亮。</li>
+<li><b>联动：</b>本场与游戏 08（缸中之脑）构成" + "「古典怀疑 → 技术怀疑」的呼应；与游戏 11（图灵测试）构成" + "「谁在判断真实」的三连问。</li>
+</ul></details>
+<details><summary>提示 3 · 结课回收</summary><p>把学生的" + "「观察声明」收齐，在第 13 章模拟答辩时发还——让他们对照学期初的自己，是否真的说清了" + "「我站在哪、我漏了什么」。这是全册最短、也最有效的前后测。</p></details>
+</section>
+</main></div>
+<div class="bottom-nav"><a href="thought-experiment-games.html"><small>← 返回</small>总览手册</a><a class="next" href="game02.html"><small>下一场 · 02 →</small>忒修斯之船</a></div><div class="footer">《数据科学与数字人文》教学配套资源 · 思想实验课堂游戏 · 素材仅限教学使用 · 真实史料请注明来源与许可</div>
+</body>
+</html>

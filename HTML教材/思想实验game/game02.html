@@ -1,0 +1,296 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏 02｜忒修斯之船 · 数据科学与数字人文</title>
+<style>
+:root{
+  --blue:#1f4e79; --blue2:#2b6cb0; --blue3:#3b82c4;
+  --soft:#eaf2fa; --soft2:#f5f9fd;
+  --green:#2f855a; --gsoft:#e9f6ef;
+  --ink:#1a202c; --muted:#4a5568; --faint:#718096;
+  --line:#d9e2ec; --line2:#edf1f6;
+  --bg:#f4f7fb; --card:#ffffff;
+  --red:#c53030; --rsoft:#fff5f5; --rline:#feb2b2;
+  --amber:#b7791f; --asoft:#fffaf0;
+  --shadow:0 2px 12px rgba(31,78,121,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  line-height:1.78;font-size:15px}
+a{color:var(--blue2);text-decoration:none}
+a:hover{text-decoration:underline}
+code{background:var(--soft);padding:1px 5px;border-radius:4px;font-family:Consolas,"Courier New",monospace;font-size:.9em;color:var(--blue)}
+
+/* ---------- top bar ---------- */
+.topbar{background:var(--blue);color:#fff;padding:11px 0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.topbar .wrap{max-width:1240px;margin:0 auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{font-size:15.5px;font-weight:700}
+.brand small{display:block;font-size:11px;font-weight:400;opacity:.8;letter-spacing:.3px}
+.topbar nav{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.topbar nav a,.topbar nav button{color:#fff;border:1px solid rgba(255,255,255,.42);background:transparent;
+  padding:5px 11px;border-radius:6px;font-size:12.5px;cursor:pointer;font-family:inherit;line-height:1.4}
+.topbar nav a:hover,.topbar nav button:hover{background:rgba(255,255,255,.16);text-decoration:none}
+.topbar nav .current{background:rgba(255,255,255,.2);border-color:#fff}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(120deg,#1f4e79 0%,#2b6cb0 52%,#2f855a 140%);color:#fff;padding:34px 22px 30px}
+.hero .wrap{max-width:1240px;margin:0 auto}
+.hero .kicker{font-size:11.5px;letter-spacing:2px;opacity:.85;margin:0 0 8px}
+.hero .tag{border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 10px;display:inline-block;font-size:11px;margin-bottom:10px}
+.hero h1{margin:0 0 6px;font-size:29px;line-height:1.3}
+.hero .en{font-size:13px;font-weight:400;opacity:.8;margin-left:8px}
+.hero .game-name{font-size:16px;font-weight:600;opacity:.96;margin:0 0 10px}
+.hero .lead{max-width:930px;margin:0;opacity:.93;font-size:13.8px}
+.stats{display:flex;gap:0;flex-wrap:wrap;margin-top:22px;border-top:1px solid rgba(255,255,255,.28);padding-top:16px}
+.stats .st{padding:0 20px;border-left:2px solid rgba(255,255,255,.4);min-width:120px}
+.stats .st:first-child{padding-left:0;border-left:none}
+.stats .st b{display:block;font-size:17px;line-height:1.3}
+.stats .st span{font-size:11px;opacity:.82}
+
+/* ---------- layout ---------- */
+.doc{max-width:1240px;margin:0 auto;padding:24px 22px 56px;display:grid;grid-template-columns:248px 1fr;gap:26px;align-items:start}
+.side{position:sticky;top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:15px;box-shadow:var(--shadow);max-height:calc(100vh - 28px);overflow:auto}
+.side h4{margin:2px 0 10px;font-size:12.5px;color:var(--blue);letter-spacing:.5px}
+.side a{display:block;padding:5px 8px;border-radius:6px;font-size:12.4px;color:var(--muted);line-height:1.45}
+.side a:hover{background:var(--soft);color:var(--blue);text-decoration:none}
+.side .jp{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.side .jp a{font-size:11.8px}
+.content{min-width:0}
+.content section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px 26px;margin-bottom:18px;box-shadow:var(--shadow)}
+.content section>h2{margin:0 0 14px;font-size:19px;color:var(--blue);padding-bottom:10px;border-bottom:2px solid var(--gsoft)}
+.content section>h2 .no{color:var(--green);font-size:13px;margin-right:8px}
+h3.sub{font-size:14.5px;color:var(--blue);margin:18px 0 8px;padding-left:9px;border-left:3px solid var(--green)}
+h3.sub:first-of-type{margin-top:4px}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:5px 0}
+b,strong{color:var(--blue)}
+.small{font-size:12.8px;color:var(--muted)}
+
+/* ---------- blocks ---------- */
+.quote{background:var(--soft2);border-left:4px solid var(--blue3);border-radius:0 8px 8px 0;padding:12px 16px;margin:10px 0;font-size:13.6px}
+.quote .src{display:block;font-size:11.8px;color:var(--faint);margin-top:6px}
+.think{border:1px solid var(--line);border-radius:10px;padding:13px 16px;background:#fbfdff;margin:12px 0}
+.think .q{font-weight:700;color:var(--green);font-size:14px;margin-bottom:5px}
+.level{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:6px;vertical-align:1px}
+.lv1{background:var(--soft);color:var(--blue)}
+.lv2{background:var(--gsoft);color:var(--green)}
+.lv3{background:var(--asoft);color:var(--amber)}
+.callout{border-left:4px solid var(--blue2);background:var(--soft);border-radius:0 8px 8px 0;padding:11px 15px;margin:12px 0;font-size:13.4px}
+.callout.green{border-left-color:var(--green);background:var(--gsoft)}
+.callout.risk{border-left-color:var(--red);background:var(--rsoft);border:1px solid var(--rline);border-left-width:4px;color:#7b2020}
+.callout.amber{border-left-color:var(--amber);background:var(--asoft)}
+
+/* ---------- setup cards ---------- */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:12px 0}
+.infocard{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--soft2)}
+.infocard h4{margin:0 0 6px;font-size:12.6px;color:var(--blue);letter-spacing:.3px}
+.infocard .big{font-size:19px;font-weight:700;color:var(--green);line-height:1.3}
+.infocard p,.infocard ul{font-size:12.9px;margin:4px 0}
+.infocard ul{padding-left:18px}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;margin:12px 0}
+table.tb{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+table.tb th{background:var(--blue);color:#fff;text-align:left;padding:8px 10px;font-weight:600;font-size:12.5px}
+table.tb td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+table.tb tbody tr:nth-child(even){background:#f8fafc}
+table.tb.compact{font-size:12.5px}
+table.tb.compact th,table.tb.compact td{padding:6px 8px}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill.b{background:var(--soft);color:var(--blue)}
+.pill.g{background:var(--gsoft);color:var(--green)}
+.pill.r{background:var(--rsoft);color:var(--red)}
+
+/* ---------- flow ---------- */
+ol.flow{margin:10px 0;padding:0;list-style:none;counter-reset:flow}
+ol.flow>li{position:relative;padding:12px 14px 12px 52px;margin:10px 0;border:1px solid var(--line);border-radius:9px;background:#fbfdff;counter-increment:flow}
+ol.flow>li:before{content:counter(flow);position:absolute;left:13px;top:12px;width:27px;height:27px;border-radius:8px;
+  background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+ol.flow>li .ft{font-weight:700;color:var(--blue);font-size:14px}
+ol.flow>li .tm{float:right;background:var(--gsoft);color:var(--green);font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px}
+ol.flow>li .say{background:var(--asoft);border-left:3px solid var(--amber);padding:7px 11px;margin-top:8px;font-size:12.8px;color:#6b4f1d;border-radius:0 6px 6px 0}
+ol.flow>li p{font-size:13.2px;margin:5px 0}
+
+/* ---------- printable materials ---------- */
+.pm{border:2px dashed #b9c9da;border-radius:11px;padding:15px 17px;margin:16px 0;background:#fff;page-break-inside:avoid}
+.pm-h{margin:0 0 3px;font-size:14.5px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.pm-h .tagp{background:var(--green);color:#fff;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.pm-note{font-size:12.3px;color:var(--muted);margin:0 0 12px;background:var(--soft2);padding:6px 10px;border-radius:6px}
+.pgrid{display:grid;gap:12px}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+.pcard{border:1.5px solid #94a9be;border-radius:8px;padding:11px 12px;min-height:118px;background:#fcfdff;display:flex;flex-direction:column}
+.pcard .plab{font-size:10.8px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--blue);border-radius:4px;padding:2px 7px;display:inline-block;align-self:flex-start;margin-bottom:7px}
+.pcard.g .plab{background:var(--green)}
+.pcard.r .plab{background:var(--red)}
+.pcard.a .plab{background:var(--amber)}
+.pcard .pbody{font-size:12.6px;line-height:1.62;flex:1}
+.pcard .pbody p{margin:3px 0}
+.pcard .pcut{margin-top:9px;border-top:1px dashed #b9c9da;padding-top:5px;font-size:9.5px;color:var(--faint);text-align:center}
+.wsheet{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fcfdff;font-size:12.8px}
+.wsheet .wh{font-weight:700;color:var(--blue);margin:10px 0 5px;font-size:13px}
+.wsheet .wh:first-child{margin-top:0}
+.pline{border-bottom:1px solid #c3cfdb;height:26px;margin:5px 0}
+.pline.short{width:55%}
+.wsheet table.mm{width:100%;border-collapse:collapse;font-size:12px}
+.wsheet table.mm th,.wsheet table.mm td{border:1px solid #c3cfdb;padding:6px 7px;text-align:left;vertical-align:top}
+.wsheet table.mm th{background:var(--soft);color:var(--blue);font-size:11.5px}
+.wsheet table.mm td.empty{height:34px}
+.scorebox{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
+.scorebox table{width:100%;border-collapse:collapse;font-size:12.5px}
+.scorebox th{background:var(--green);color:#fff;padding:7px 9px;text-align:left}
+.scorebox td{border-bottom:1px solid var(--line);padding:6px 9px}
+.scorebox td.b{background:#fbfdff}
+
+/* ---------- debrief / tips ---------- */
+ol.debrief{margin:10px 0;padding-left:0;list-style:none;counter-reset:db}
+ol.debrief li{position:relative;padding:9px 12px 9px 42px;margin:7px 0;border-left:3px solid var(--gsoft);background:#fbfdff;border-radius:0 8px 8px 0;font-size:13.3px;counter-increment:db}
+ol.debrief li:before{content:counter(db);position:absolute;left:11px;top:9px;color:var(--green);font-weight:800;font-size:13px}
+details{margin:12px 0;border:1px solid var(--line);border-radius:9px;background:var(--soft2);padding:10px 14px}
+details summary{cursor:pointer;color:var(--blue);font-size:13.2px;font-weight:700}
+details[open] summary{margin-bottom:8px}
+details ul,details p{font-size:13px}
+
+/* ---------- bottom nav ---------- */
+.bottom-nav{max-width:1240px;margin:0 auto 40px;padding:0 22px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bottom-nav a{flex:1;min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow);font-size:13px}
+.bottom-nav a:hover{border-color:var(--blue2);text-decoration:none}
+.bottom-nav a small{display:block;color:var(--faint);font-size:11px}
+.bottom-nav a.next{text-align:right}
+.footer{text-align:center;color:var(--faint);font-size:11.8px;padding:0 20px 34px}
+
+/* ---------- responsive ---------- */
+@media(max-width:920px){
+  .doc{grid-template-columns:1fr;padding:18px 14px}
+  .side{position:static;max-height:none}
+  .content section{padding:19px 17px}
+  .hero h1{font-size:24px}
+  .cols-3,.cols-4{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+
+/* ---------- print ---------- */
+@media print{
+  body{background:#fff;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .topbar,.side,.bottom-nav,.footer{display:none!important}
+  .doc{display:block;padding:0;max-width:none}
+  .content section{border:none;box-shadow:none;padding:0 0 14px;margin:0 0 14px;page-break-inside:auto;border-bottom:1px solid #ddd;border-radius:0}
+  .hero{background:#1f4e79!important;padding:14px 0;color:#fff}
+  .hero h1{font-size:20pt}
+  .hero .lead,.stats .st span{font-size:9pt}
+  .pm{page-break-before:auto;page-break-inside:avoid;border:2px dashed #777}
+  .pcard{min-height:105px}
+  details{display:block;border:none;background:none;padding:0}
+  details>summary{display:none}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap"><div class="brand">《数据科学与数字人文》· 思想实验课堂游戏<small>第 02 / 13 场 · 40–45 人班级版</small></div><nav><a href="thought-experiment-games.html">返回总览</a><a href="game01.html">← 上一场</a><a href="game03.html">下一场 →</a><button onclick="window.print()">打印素材</button></nav></div></header>
+<div class="hero"><div class="wrap"><p class="kicker">THOUGHT EXPERIMENT → CLASSROOM GAME · 02 / 13</p><span class="tag">对接 第2章 人文数据的类型与获取</span><h1>忒修斯之船<span class="en">Ship of Theseus · Plutarch</span></h1><p class="game-name">课堂游戏：数据海关——给忒修斯之船签发护照</p><p class="lead">一艘船的木板被逐块换掉，它还是原来那艘吗？把它换成一份地方志——扫描件、OCR 文本、清洗版、模型标注版——学生必须亲手为每一版签发「数据护照」，并在海关红线前决定放行还是扣留。这场游戏把抽象的「来源谱系」变成可触摸的行政动作。</p><div class="stats"><div class="st"><b>40 分钟</b><span>建议时长</span></div><div class="st"><b>40–45 人</b><span>适用班级</span></div><div class="st"><b>11 组 × 4 人</b><span>分组方式</span></div><div class="st"><b>★★☆☆☆</b><span>难度</span></div></div></div></div>
+<div class="doc"><aside class="side"><h4>本场目录</h4><a href="#origin">一、思想实验原典与展开</a><a href="#mapping">二、与教材的对接</a><a href="#setup">三、班级组织（40–45 人）</a><a href="#objectives">四、学习目标</a><a href="#materials">五、材料清单与准备</a><a href="#flow">六、游戏流程</a><a href="#assets">七、游戏素材（可打印）</a><a href="#debrief">八、讨论引导（分层）</a><a href="#assessment">九、评价与计分</a><a href="#redline">十、伦理与安全红线</a><a href="#tips">十一、教师提示与变体</a><div class="jp"><a href="game01.html">← 01 庄周梦蝶</a><a href="game03.html">→ 03 麦克斯韦妖</a></div></aside>
+<main class="content">
+<section id="origin"><h2><span class="no">01</span>一、思想实验原典与展开</h2>
+<h3 class="sub">原典原文（大意）</h3>
+<div class="quote">忒修斯返回的船，后来被雅典人一代代保存：朽坏的木板被新木替换，旧的被拿走。久而久之，船的所有部件都换过一遍。于是哲学家争论：这还是原来那艘忒修斯之船吗？有人说仍是，有人说已不是。
+<span class="src">——普鲁塔克《希腊罗马名人传·忒修斯传》第 23 节</span></div>
+
+<h3 class="sub">提出者与流传</h3>
+<p>普鲁塔克（约 46—120 年），罗马时代的希腊史家。他记录这则传说时，它已是学园派争论的旧题；后来经霍布斯、洛克、休谟反复讨论，成为" + "「同一性」（identity）最经典的思想实验。洛克用它区分" + "「同一的人」与「同一的物质」，霍布斯则把它推到极端：若旧木板被别人捡去拼成另一艘船，哪一艘才是真的？</p>
+
+<h3 class="sub">思想实验的展开</h3>
+<ol>
+<li><b>逐步替换：</b>每次只换一块板，任何一步看起来都" + "「还是那艘船」——但累积起来，全部都换了。这是典型的" + "「谷堆式」连续变化（见游戏 13）。</li>
+<li><b>判据之争：</b>同一性来自<b>物质</b>（木板）、<b>形式</b>（船的结构），还是<b>历史</b>（连续的传承链）？三套判据给出三种答案。</li>
+<li><b>霍布斯难题：</b>旧木板被组装成第二艘船，两艘都声称自己是原船——同一性不再唯一。</li>
+</ol>
+
+<h3 class="sub">后续变体</h3>
+<ul>
+<li><b>祖父的斧头：</b>换了三次柄、两次刃，还是祖父那把斧头吗？（日常版本）</li>
+<li><b>企业并购：</b>一家公司的资产、员工、名称、办公地全部更替后，还是同一家公司吗？（法人身份）</li>
+<li><b>数据集版本（本课程版本）：</b>原始扫描 → OCR → 去重 → 模型标注 → 人工复核，每一轮都在" + "「换板」。第 v5 版数据还是第 v1 版吗？<b>答案不在内容，而在版本链。</b></li>
+</ul>
+
+<h3 class="sub">常见误解</h3>
+<div class="callout amber"><b>误解：</b>" + "「内容一样就是同一份数据」。<br><b>正解：</b>内容相同但来源、许可、处理方式不同的两份数据，在法律与学术意义上是<b>不同的数据</b>。教材 2.4 的来源谱系与 2.7 的数据护照，正是对" + "「历史判据」的制度化回答。</div>
+</section>
+<section id="mapping"><h2><span class="no">02</span>二、与教材的对接</h2>
+<p>本游戏把第 2 章的数据来源谱系与合规要求做成一套" + "「海关流程」：</p>
+<div class="tbl-wrap"><table class="tb"><thead><tr><th>教材节点</th><th>游戏中的对应物</th><th>形成的判断力</th></tr></thead><tbody><tr><td>2.2 五种类型 / 2.3 结构化程度</td><td>判断手上的「船」属于文本、图像还是衍生数据</td><td>给数据分类的语言</td></tr><tr><td>2.4 来源谱系</td><td>D1→D4 四轮换板</td><td>区分原生数字 / 数字化副本 / 衍生数据</td></tr><tr><td>2.5 合规获取与红线</td><td>红线卡与海关裁决</td><td>知道什么情况下必须扣留</td></tr><tr><td>2.7 数据护照</td><td>每轮填写一份护照</td><td>用字段而非直觉记录改动链</td></tr></tbody></table></div>
+<div class="callout green"><b>一句话锚点：</b>同一性不来自内容，来自<b>可追溯的改动链</b>。数据护照不是行政表格——它是忒修斯之船的答案。</div>
+</section>
+<section id="setup"><h2><span class="no">03</span>三、班级组织（40–45 人）</h2>
+<div class="grid3">
+<div class="infocard"><h4>班级规模</h4><div class="big">40–45 人</div><p>11 组 × 4 人（44 人）；若 40 人，设 10 组，余下 2 人并入海关署。</p></div>
+<div class="infocard"><h4>组内角色（轮换）</h4><div class="big">4 人 / 组</div><ul><li>关员：填护照主字段</li><li>复核员：核对上一轮护照</li><li>记录员：写改动理由</li><li>观察员：准备投票发言</li></ul></div>
+<div class="infocard"><h4>全班角色</h4><div class="big">海关总署 3 人</div><p>由 3 名学生担任，每轮听 1 组申诉并作出" + "「放行 / 扣留」裁决；教师任关长保留复议权。</p></div>
+</div>
+<div class="tbl-wrap"><table class="tb"><thead><tr><th>环节</th><th>时长</th><th>说明</th></tr></thead><tbody><tr><td>初始登记 + 四轮换板</td><td>各 6′，共 24′</td><td>每轮换一份文档版本，填一份护照</td></tr><tr><td>红线卡裁决</td><td>10′</td><td>海关总署逐组裁决；每组申诉 30 秒</td></tr><tr><td>全班复盘</td><td>6′</td><td>画出「同一性判定曲线」，回答 2.4 的判据问题</td></tr></tbody></table></div>
+<div class="callout">大班提速：四轮护照采用<b>传送带式</b>——教师投影倒计时，时间到即停笔、传卷。海关总署只听 3 组申诉（抽签），其余组书面裁决。</div>
+</section>
+<section id="objectives"><h2><span class="no">04</span>四、学习目标</h2>完成本场游戏后，学生应能：<ul><li><b>区分</b>原生数字、数字化副本与衍生数据三类来源（识记层）。</li><li><b>填写</b>一份包含来源、许可、改动方式、复核状态的数据护照（应用层）。</li><li><b>判断</b>何种情况下衍生数据必须重新取得授权或扣留使用（分析层）。</li><li><b>论证</b>「同一性来自改动链而非内容」这一判断，并用本轮护照作证（反思层）。</li></ul></section>
+<section id="materials"><h2><span class="no">05</span>五、材料清单与准备</h2><div class="tbl-wrap"><table class="tb"><thead><tr><th>品名</th><th>数量（45 人上限）</th><th>说明</th></tr></thead><tbody><tr><td>文档版本卡 D1–D4</td><td>11 套 × 4 张 = 44 张</td><td>D1 扫描 / D2 OCR / D3 清洗 / D4 模型标注</td></tr><tr><td>数据护照表</td><td>44 份（每组每轮 1 份）</td><td>A4；素材页可复印；建议每组装订成册</td></tr><tr><td>红线卡</td><td>33 张（3 类 × 11）</td><td>R1 许可不明 / R2 衍生未标注 / R3 未经复核</td></tr><tr><td>同一性投票卡</td><td>44 张</td><td>每轮投「仍是原船 / 已非原船 / 无法判定」</td></tr><tr><td>海关裁决牌</td><td>3 套</td><td>放行 / 扣留 / 复议，海关总署使用</td></tr><tr><td>文件袋</td><td>11 个</td><td>每组一袋，装四轮护照</td></tr></tbody></table></div>
+<div class="callout amber"><b>课前准备：</b>把 D1–D4 按组序装袋，D2–D4 可按" + "「先发 D1，再逐轮发下一张」的方式控制节奏。红线卡在第四轮才发，制造压力。</div>
+</section>
+<section id="flow"><h2><span class="no">06</span>六、游戏流程</h2><ol class="flow"><li><div class="ft">初始登记：给原船办护照</div><span class="tm">6′</span><p>发 D1（某县志扫描件说明）。各组填写第一份护照：来源、年代、许可、格式、责任人。海关总署抽查 2 组。</p><div class="say"><b>教师引导语：</b>「先别想后面。假设这就是你手上唯一的资料，你敢在论文里用它吗？凭什么敢？」</div></li><li><div class="ft">第一轮换板：扫描 → OCR</div><span class="tm">6′</span><p>发 D2（OCR 文本）。各组对比 D1 更新护照，新增「转换方式」与「信息损失」字段，投票是否仍是原船。</p></li><li><div class="ft">第二轮换板：清洗与规范化</div><span class="tm">6′</span><p>发 D3（删除页码、规范异体字、合并字段）。护照须新增「删除项清单」。教师追问：页码不是内容，删掉它算不算改动？</p></li><li><div class="ft">第三轮换板：模型标注</div><span class="tm">6′</span><p>发 D4（含 2 处故意标错的人物标注）。护照须新增「衍生方式」和「人工复核状态」。</p><div class="say"><b>教师引导语：</b>「模型替你读了这份志书。你打算在论文里怎么交代这件事？」</div></li><li><div class="ft">红线卡裁决</div><span class="tm">10′</span><p>发三张红线卡。海关总署逐组检查四份护照，判定「放行 / 扣留 / 复议」。抽 3 组申诉，每组 30 秒。</p></li><li><div class="ft">画同一性曲线、收束</div><span class="tm">6′</span><p>各组在白纸上画出四轮的「仍是原船」信心值折线。教师揭示：曲线人人不同，但护照字段应该人人相同——这就是可复现。</p></li></ol></section>
+<section id="assets"><h2><span class="no">07</span>七、游戏素材（可打印）</h2>
+<h3 class="sub">素材 A · 文档版本卡 D1–D4（每组一套）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>忒修斯之船：四个版本</h4><p class="pm-note">每套打印 4 张（11 套共 44 张）。按轮次发放，不要一次给全。</p><div class="pgrid cols-4"><div class="pcard "><span class="plab">D1 · 原始扫描</span><div class="pbody"><p>某县志「人物志」卷三，清光绪刻本，馆藏扫描件。含版心刻工名、后人朱笔圈点、页边虫蛀。许可：馆藏公开、署名引用。</p><p><b>字段：</b>图像 / 原生数字化副本 / 有许可。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">D2 · OCR 文本</span><div class="pbody"><p>对 D1 做 OCR 后的纯文本，共 6,842 字。保留段落，丢失版式、圈点与虫蛀信息；识别错误率约 3%，「栏」处误识 5 例。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">D3 · 清洗版</span><div class="pbody"><p>删除页码与版心；异体字统一；合并 3 个重复字段；补 12 处缺失年份为「不详」。字数降至 6,517。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard a"><span class="plab">D4 · 模型标注版</span><div class="pbody"><p>用大模型抽取人物 173 位、地名 41 处、时间 88 个。其中 2 处人物标注错误（把「妻某氏」当作独立人物）。未经人工复核。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">素材 B · 数据护照（每轮 1 份，共 4 份 / 组）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>数据护照 · 第 ____ 轮</h4><p class="pm-note">每组每轮填一份，四份装订成册。带 ★ 的字段在红线裁决中逐项核对。</p><div class="wsheet">
+<table class="mm">
+<tr><th style="width:22%">字段</th><th>本轮填写内容</th></tr>
+<tr><td>★ 数据名称与版本</td><td></td></tr>
+<tr><td>★ 来源（原生 / 副本 / 衍生）</td><td></td></tr>
+<tr><td>★ 许可与授权依据</td><td></td></tr>
+<tr><td>格式与规模</td><td></td></tr>
+<tr><td>★ 本轮改动方式</td><td></td></tr>
+<tr><td>本轮新增 / 丢失的信息</td><td></td></tr>
+<tr><td>删除项清单（如有）</td><td></td></tr>
+<tr><td>★ 衍生方式（规则 / 模型 / 人工）</td><td></td></tr>
+<tr><td>★ 人工复核状态</td><td>□ 未复核　□ 部分复核　□ 已复核</td></tr>
+<tr><td>责任人</td><td></td></tr>
+</table>
+<p style="margin-top:10px"><b>本轮判定：</b>□ 仍是原船　□ 已非原船　□ 无法判定　　<b>理由：</b><span class="pline short" style="display:inline-block"></span></p>
+</div></div>
+<h3 class="sub">素材 C · 红线卡与裁决表</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>海关红线卡（3 类 × 11 套）</h4><p class="pm-note">第四轮发放。海关总署持一套，各组持一套自查。</p><div class="pgrid cols-3"><div class="pcard r"><span class="plab">R1 · 许可不明</span><div class="pbody"><p>若任一版本无法说明授权依据 → <b>扣留</b>。追问：「转换格式是否自动继承原许可？」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard r"><span class="plab">R2 · 衍生未标注</span><div class="pbody"><p>若模型标注版未写明「衍生方式」→ 扣留。追问：「不写，读者会以为是谁做的？」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard r"><span class="plab">R3 · 未经复核</span><div class="pbody"><p>若含模型输出但人工复核状态为「未复核」→ 扣留。追问：「错标 2 处的责任在谁？」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>海关裁决表（总署 3 人共用 1 份）</h4><p class="pm-note">每组申诉 30 秒，总署合议后划记。</p><div class="wsheet">
+<table class="mm"><tr><th style="width:10%">组号</th><th style="width:24%">放行 / 扣留 / 复议</th><th>依据的红线条款与理由</th></tr>
+<tr><td>　</td><td>□放行 □扣留 □复议</td><td></td></tr><tr><td>　</td><td>□放行 □扣留 □复议</td><td></td></tr><tr><td>　</td><td>□放行 □扣留 □复议</td><td></td></tr><tr><td>　</td><td>□放行 □扣留 □复议</td><td></td></tr><tr><td>　</td><td>□放行 □扣留 □复议</td><td></td></tr><tr><td>　</td><td>□放行 □扣留 □复议</td><td></td></tr></table>
+<div class="wh">全票通过的一条规则</div><div class="pline"></div>
+</div></div></section>
+<section id="debrief"><h2><span class="no">08</span>八、讨论引导（分层）</h2><ol class="debrief"><li><span class="level lv1">识记</span>说出原生数字、数字化副本、衍生数据三者的区别，各举本游戏中的一个版本。</li><li><span class="level lv2">分析</span>四轮中护照的哪个字段最关键？为什么「许可」不会因内容相同而自动继承？</li><li><span class="level lv2">分析</span>霍布斯难题里两艘船都声称自己是原船——在数据世界里，对应的情形是什么？</li><li><span class="level lv3">反思</span>什么时候衍生数据必须重新授权？「我只是转了个格式」能成为理由吗？</li><li><span class="level lv3">反思</span>数字人文里是否存在合理的「原件崇拜」？当原件已佚，副本的合法性从何而来？</li><li><span class="level lv3">反思</span>你的四轮信心曲线形状如何？为什么曲线可以不同，而护照字段应当相同？</li></ol></section>
+<section id="assessment"><h2><span class="no">09</span>九、评价与计分</h2>
+<p>小组计分，满分 100 分。</p>
+<div class="scorebox"><table><thead><tr><th>维度</th><th>分值</th><th>达标描述</th><th>扣分点</th></tr></thead><tbody><tr><td class="b">护照完整性</td><td>30</td><td>四轮护照字段齐全，★ 字段无空缺</td><td>每缺 1 个 ★ 字段扣 5 分</td></tr><tr><td class="b">改动链清晰度</td><td>25</td><td>每轮「改动方式」具体到操作层面</td><td>写「处理了一下」扣 8 分</td></tr><tr><td class="b">红线判断</td><td>25</td><td>裁决依据准确引用 R1/R2/R3</td><td>依据错误每次扣 8 分</td></tr><tr><td class="b">参与与申诉</td><td>20</td><td>人人有角色，申诉陈述有据</td><td>角色空转扣 5 分</td></tr></tbody></table></div>
+<div class="callout green"><b>个人加分（+5）：</b>指出自己某一轮护照中" + "「最该补而没补」的字段。</div>
+</section>
+<section id="redline"><h2><span class="no">10</span>十、伦理与安全红线</h2>
+<div class="callout risk"><b>教学红线：</b>①D4 中的 2 处错标必须明确标注为" + "「教学用合成样例」，课后收回，严禁带入真实研究；②不得使用来源不明或许可不清的志书图像作为 D1；③海关裁决模拟的是合规判断流程，不构成法律意见，教师须在结束时说明。</div>
+</section>
+<section id="tips"><h2><span class="no">11</span>十一、教师提示与变体</h2>
+<details><summary>提示 1 · 差异化与控场</summary><ul>
+<li><b>快组加码：</b>追加" + "「霍布斯卡」——把 D1 的旧木板（被删的页码与圈点）交给另一组，请他们论证自己那艘才是原船。</li>
+<li><b>慢组支架：</b>护照表可先发" + "「填写示例」半页，标明「来源」一栏怎么写。</li>
+<li><b>计时：</b>每轮 6 分钟用投影倒计时，时间到统一停笔，避免组间进度差拉大。</li>
+</ul></details>
+<details><summary>提示 2 · 变体</summary><ul>
+<li><b>生活版：</b>把" + "「船」换成自己的手机相册——原图、压缩图、加滤镜、AI 修图，同一性追问会立刻变得切身。</li>
+<li><b>进阶版：</b>引入真实版本控制概念（git / DOI / 数据引用），说明学术出版界的" + "「数据护照」长什么样。</li>
+<li><b>联动：</b>与游戏 13（谷堆悖论）共享" + "「连续变化何时质变」的结构，可在期末复盘时并置。</li>
+</ul></details>
+</section>
+</main></div>
+<div class="bottom-nav"><a href="game01.html"><small>← 上一场 · 01</small>庄周梦蝶</a><a class="next" href="game03.html"><small>下一场 · 03 →</small>麦克斯韦妖</a></div><div class="footer">《数据科学与数字人文》教学配套资源 · 思想实验课堂游戏 · 素材仅限教学使用 · 真实史料请注明来源与许可</div>
+</body>
+</html>

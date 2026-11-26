@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏 10｜拉普拉斯妖 · 数据科学与数字人文</title>
+<style>
+:root{
+  --blue:#1f4e79; --blue2:#2b6cb0; --blue3:#3b82c4;
+  --soft:#eaf2fa; --soft2:#f5f9fd;
+  --green:#2f855a; --gsoft:#e9f6ef;
+  --ink:#1a202c; --muted:#4a5568; --faint:#718096;
+  --line:#d9e2ec; --line2:#edf1f6;
+  --bg:#f4f7fb; --card:#ffffff;
+  --red:#c53030; --rsoft:#fff5f5; --rline:#feb2b2;
+  --amber:#b7791f; --asoft:#fffaf0;
+  --shadow:0 2px 12px rgba(31,78,121,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  line-height:1.78;font-size:15px}
+a{color:var(--blue2);text-decoration:none}
+a:hover{text-decoration:underline}
+code{background:var(--soft);padding:1px 5px;border-radius:4px;font-family:Consolas,"Courier New",monospace;font-size:.9em;color:var(--blue)}
+
+/* ---------- top bar ---------- */
+.topbar{background:var(--blue);color:#fff;padding:11px 0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.topbar .wrap{max-width:1240px;margin:0 auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{font-size:15.5px;font-weight:700}
+.brand small{display:block;font-size:11px;font-weight:400;opacity:.8;letter-spacing:.3px}
+.topbar nav{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.topbar nav a,.topbar nav button{color:#fff;border:1px solid rgba(255,255,255,.42);background:transparent;
+  padding:5px 11px;border-radius:6px;font-size:12.5px;cursor:pointer;font-family:inherit;line-height:1.4}
+.topbar nav a:hover,.topbar nav button:hover{background:rgba(255,255,255,.16);text-decoration:none}
+.topbar nav .current{background:rgba(255,255,255,.2);border-color:#fff}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(120deg,#1f4e79 0%,#2b6cb0 52%,#2f855a 140%);color:#fff;padding:34px 22px 30px}
+.hero .wrap{max-width:1240px;margin:0 auto}
+.hero .kicker{font-size:11.5px;letter-spacing:2px;opacity:.85;margin:0 0 8px}
+.hero .tag{border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 10px;display:inline-block;font-size:11px;margin-bottom:10px}
+.hero h1{margin:0 0 6px;font-size:29px;line-height:1.3}
+.hero .en{font-size:13px;font-weight:400;opacity:.8;margin-left:8px}
+.hero .game-name{font-size:16px;font-weight:600;opacity:.96;margin:0 0 10px}
+.hero .lead{max-width:930px;margin:0;opacity:.93;font-size:13.8px}
+.stats{display:flex;gap:0;flex-wrap:wrap;margin-top:22px;border-top:1px solid rgba(255,255,255,.28);padding-top:16px}
+.stats .st{padding:0 20px;border-left:2px solid rgba(255,255,255,.4);min-width:120px}
+.stats .st:first-child{padding-left:0;border-left:none}
+.stats .st b{display:block;font-size:17px;line-height:1.3}
+.stats .st span{font-size:11px;opacity:.82}
+
+/* ---------- layout ---------- */
+.doc{max-width:1240px;margin:0 auto;padding:24px 22px 56px;display:grid;grid-template-columns:248px 1fr;gap:26px;align-items:start}
+.side{position:sticky;top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:15px;box-shadow:var(--shadow);max-height:calc(100vh - 28px);overflow:auto}
+.side h4{margin:2px 0 10px;font-size:12.5px;color:var(--blue);letter-spacing:.5px}
+.side a{display:block;padding:5px 8px;border-radius:6px;font-size:12.4px;color:var(--muted);line-height:1.45}
+.side a:hover{background:var(--soft);color:var(--blue);text-decoration:none}
+.side .jp{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.side .jp a{font-size:11.8px}
+.content{min-width:0}
+.content section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px 26px;margin-bottom:18px;box-shadow:var(--shadow)}
+.content section>h2{margin:0 0 14px;font-size:19px;color:var(--blue);padding-bottom:10px;border-bottom:2px solid var(--gsoft)}
+.content section>h2 .no{color:var(--green);font-size:13px;margin-right:8px}
+h3.sub{font-size:14.5px;color:var(--blue);margin:18px 0 8px;padding-left:9px;border-left:3px solid var(--green)}
+h3.sub:first-of-type{margin-top:4px}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:5px 0}
+b,strong{color:var(--blue)}
+.small{font-size:12.8px;color:var(--muted)}
+
+/* ---------- blocks ---------- */
+.quote{background:var(--soft2);border-left:4px solid var(--blue3);border-radius:0 8px 8px 0;padding:12px 16px;margin:10px 0;font-size:13.6px}
+.quote .src{display:block;font-size:11.8px;color:var(--faint);margin-top:6px}
+.think{border:1px solid var(--line);border-radius:10px;padding:13px 16px;background:#fbfdff;margin:12px 0}
+.think .q{font-weight:700;color:var(--green);font-size:14px;margin-bottom:5px}
+.level{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:6px;vertical-align:1px}
+.lv1{background:var(--soft);color:var(--blue)}
+.lv2{background:var(--gsoft);color:var(--green)}
+.lv3{background:var(--asoft);color:var(--amber)}
+.callout{border-left:4px solid var(--blue2);background:var(--soft);border-radius:0 8px 8px 0;padding:11px 15px;margin:12px 0;font-size:13.4px}
+.callout.green{border-left-color:var(--green);background:var(--gsoft)}
+.callout.risk{border-left-color:var(--red);background:var(--rsoft);border:1px solid var(--rline);border-left-width:4px;color:#7b2020}
+.callout.amber{border-left-color:var(--amber);background:var(--asoft)}
+
+/* ---------- setup cards ---------- */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:12px 0}
+.infocard{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--soft2)}
+.infocard h4{margin:0 0 6px;font-size:12.6px;color:var(--blue);letter-spacing:.3px}
+.infocard .big{font-size:19px;font-weight:700;color:var(--green);line-height:1.3}
+.infocard p,.infocard ul{font-size:12.9px;margin:4px 0}
+.infocard ul{padding-left:18px}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;margin:12px 0}
+table.tb{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+table.tb th{background:var(--blue);color:#fff;text-align:left;padding:8px 10px;font-weight:600;font-size:12.5px}
+table.tb td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+table.tb tbody tr:nth-child(even){background:#f8fafc}
+table.tb.compact{font-size:12.5px}
+table.tb.compact th,table.tb.compact td{padding:6px 8px}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill.b{background:var(--soft);color:var(--blue)}
+.pill.g{background:var(--gsoft);color:var(--green)}
+.pill.r{background:var(--rsoft);color:var(--red)}
+
+/* ---------- flow ---------- */
+ol.flow{margin:10px 0;padding:0;list-style:none;counter-reset:flow}
+ol.flow>li{position:relative;padding:12px 14px 12px 52px;margin:10px 0;border:1px solid var(--line);border-radius:9px;background:#fbfdff;counter-increment:flow}
+ol.flow>li:before{content:counter(flow);position:absolute;left:13px;top:12px;width:27px;height:27px;border-radius:8px;
+  background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+ol.flow>li .ft{font-weight:700;color:var(--blue);font-size:14px}
+ol.flow>li .tm{float:right;background:var(--gsoft);color:var(--green);font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px}
+ol.flow>li .say{background:var(--asoft);border-left:3px solid var(--amber);padding:7px 11px;margin-top:8px;font-size:12.8px;color:#6b4f1d;border-radius:0 6px 6px 0}
+ol.flow>li p{font-size:13.2px;margin:5px 0}
+
+/* ---------- printable materials ---------- */
+.pm{border:2px dashed #b9c9da;border-radius:11px;padding:15px 17px;margin:16px 0;background:#fff;page-break-inside:avoid}
+.pm-h{margin:0 0 3px;font-size:14.5px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.pm-h .tagp{background:var(--green);color:#fff;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.pm-note{font-size:12.3px;color:var(--muted);margin:0 0 12px;background:var(--soft2);padding:6px 10px;border-radius:6px}
+.pgrid{display:grid;gap:12px}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+.pcard{border:1.5px solid #94a9be;border-radius:8px;padding:11px 12px;min-height:118px;background:#fcfdff;display:flex;flex-direction:column}
+.pcard .plab{font-size:10.8px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--blue);border-radius:4px;padding:2px 7px;display:inline-block;align-self:flex-start;margin-bottom:7px}
+.pcard.g .plab{background:var(--green)}
+.pcard.r .plab{background:var(--red)}
+.pcard.a .plab{background:var(--amber)}
+.pcard .pbody{font-size:12.6px;line-height:1.62;flex:1}
+.pcard .pbody p{margin:3px 0}
+.pcard .pcut{margin-top:9px;border-top:1px dashed #b9c9da;padding-top:5px;font-size:9.5px;color:var(--faint);text-align:center}
+.wsheet{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fcfdff;font-size:12.8px}
+.wsheet .wh{font-weight:700;color:var(--blue);margin:10px 0 5px;font-size:13px}
+.wsheet .wh:first-child{margin-top:0}
+.pline{border-bottom:1px solid #c3cfdb;height:26px;margin:5px 0}
+.pline.short{width:55%}
+.wsheet table.mm{width:100%;border-collapse:collapse;font-size:12px}
+.wsheet table.mm th,.wsheet table.mm td{border:1px solid #c3cfdb;padding:6px 7px;text-align:left;vertical-align:top}
+.wsheet table.mm th{background:var(--soft);color:var(--blue);font-size:11.5px}
+.wsheet table.mm td.empty{height:34px}
+.scorebox{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
+.scorebox table{width:100%;border-collapse:collapse;font-size:12.5px}
+.scorebox th{background:var(--green);color:#fff;padding:7px 9px;text-align:left}
+.scorebox td{border-bottom:1px solid var(--line);padding:6px 9px}
+.scorebox td.b{background:#fbfdff}
+
+/* ---------- debrief / tips ---------- */
+ol.debrief{margin:10px 0;padding-left:0;list-style:none;counter-reset:db}
+ol.debrief li{position:relative;padding:9px 12px 9px 42px;margin:7px 0;border-left:3px solid var(--gsoft);background:#fbfdff;border-radius:0 8px 8px 0;font-size:13.3px;counter-increment:db}
+ol.debrief li:before{content:counter(db);position:absolute;left:11px;top:9px;color:var(--green);font-weight:800;font-size:13px}
+details{margin:12px 0;border:1px solid var(--line);border-radius:9px;background:var(--soft2);padding:10px 14px}
+details summary{cursor:pointer;color:var(--blue);font-size:13.2px;font-weight:700}
+details[open] summary{margin-bottom:8px}
+details ul,details p{font-size:13px}
+
+/* ---------- bottom nav ---------- */
+.bottom-nav{max-width:1240px;margin:0 auto 40px;padding:0 22px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bottom-nav a{flex:1;min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow);font-size:13px}
+.bottom-nav a:hover{border-color:var(--blue2);text-decoration:none}
+.bottom-nav a small{display:block;color:var(--faint);font-size:11px}
+.bottom-nav a.next{text-align:right}
+.footer{text-align:center;color:var(--faint);font-size:11.8px;padding:0 20px 34px}
+
+/* ---------- responsive ---------- */
+@media(max-width:920px){
+  .doc{grid-template-columns:1fr;padding:18px 14px}
+  .side{position:static;max-height:none}
+  .content section{padding:19px 17px}
+  .hero h1{font-size:24px}
+  .cols-3,.cols-4{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+
+/* ---------- print ---------- */
+@media print{
+  body{background:#fff;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .topbar,.side,.bottom-nav,.footer{display:none!important}
+  .doc{display:block;padding:0;max-width:none}
+  .content section{border:none;box-shadow:none;padding:0 0 14px;margin:0 0 14px;page-break-inside:auto;border-bottom:1px solid #ddd;border-radius:0}
+  .hero{background:#1f4e79!important;padding:14px 0;color:#fff}
+  .hero h1{font-size:20pt}
+  .hero .lead,.stats .st span{font-size:9pt}
+  .pm{page-break-before:auto;page-break-inside:avoid;border:2px dashed #777}
+  .pcard{min-height:105px}
+  details{display:block;border:none;background:none;padding:0}
+  details>summary{display:none}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap"><div class="brand">《数据科学与数字人文》· 思想实验课堂游戏<small>第 10 / 13 场 · 40–45 人班级版</small></div><nav><a href="thought-experiment-games.html">返回总览</a><a href="game09.html">← 上一场</a><a href="game11.html">下一场 →</a><button onclick="window.print()">打印素材</button></nav></div></header>
+<div class="hero"><div class="wrap"><p class="kicker">THOUGHT EXPERIMENT → CLASSROOM GAME · 10 / 13</p><span class="tag">对接 第10章 机器学习与深度学习基础</span><h1>拉普拉斯妖<span class="en">Laplace's Demon · Laplace</span></h1><p class="game-name">课堂游戏：全知妖的考试——评估卡反转</p><p class="lead">学生扮演「拉普拉斯妖」，拿到 20 条科举数据，宣布自己能预测谁会中举——并用 95% 准确率证明自己。然后教师连发三张评估卡：「类别极不平衡」「时间穿越」「结果泄露」。95% 的神话逐层崩塌，SHAP 卡再揭示模型其实学的是历史偏见。</p><div class="stats"><div class="st"><b>45 分钟</b><span>建议时长</span></div><div class="st"><b>40–45 人</b><span>适用班级</span></div><div class="st"><b>11 组 × 4 人</b><span>分组方式</span></div><div class="st"><b>★★★★☆</b><span>难度</span></div></div></div></div>
+<div class="doc"><aside class="side"><h4>本场目录</h4><a href="#origin">一、思想实验原典与展开</a><a href="#mapping">二、与教材的对接</a><a href="#setup">三、班级组织（40–45 人）</a><a href="#objectives">四、学习目标</a><a href="#materials">五、材料清单与准备</a><a href="#flow">六、游戏流程</a><a href="#assets">七、游戏素材（可打印）</a><a href="#debrief">八、讨论引导（分层）</a><a href="#assessment">九、评价与计分</a><a href="#redline">十、伦理与安全红线</a><a href="#tips">十一、教师提示与变体</a><div class="jp"><a href="game09.html">← 09 罗素悖论</a><a href="game11.html">→ 11 图灵测试</a></div></aside>
+<main class="content">
+<section id="origin"><h2><span class="no">01</span>一、思想实验原典与展开</h2>
+<h3 class="sub">原典原文（节译）</h3>
+<div class="quote">如果一个智能在某一时刻知道所有驱动自然的力，以及构成宇宙的每一个物体的位置，并且它有足够的能力对这些数据进行分析，那么它就能用一个公式概括宇宙中从最巨大的天体到最微小的原子的全部运动；对它而言，未来与过去一样确定地呈现在眼前。
+<span class="src">——拉普拉斯《概率论的哲学论文》（Essai philosophique sur les probabilités），1814</span></div>
+
+<h3 class="sub">提出者与背景</h3>
+<p>皮埃尔-西蒙·拉普拉斯（Pierre-Simon Laplace，1749—1827），法国数学家、天文学家，经典力学与概率论的奠基者之一。这段话是<b>决定论</b>最著名的表述：如果规律已知、初始条件完备，未来原则上完全可推演。注意：它与数学上的" + "「拉普拉斯变换」无关，后者是另一位数学家的工具。</p>
+
+<h3 class="sub">思想实验的展开</h3>
+<ol>
+<li><b>全知的条件：</b>需要" + "「所有力 + 所有位置 + 无限算力」三个条件同时满足——任何一个不满足，妖就不全知。</li>
+<li><b>统计力学的反驳：</b>麦克斯韦与玻尔兹曼说明：即使规律已知，面对 10²³ 个分子也只能谈概率，" + "「确定性」在操作层面无效。</li>
+<li><b>量子力学的反驳：</b>海森堡测不准原理表明，位置与动量无法同时精确获知——<b>拉普拉斯妖所需的初始条件原则上不可得</b>。</li>
+<li><b>混沌理论：</b>即使规律确定，初始条件的微小误差也会被指数放大（蝴蝶效应），长期预测不可能。</li>
+</ol>
+
+<h3 class="sub">后续变体</h3>
+<ul>
+<li><b>可计算性限制：</b>图灵的停机问题说明，即使给定完整规则，某些问题也无法由算法判定。</li>
+<li><b>机器学习版本（本游戏）：</b>一个模型" + "「知道」所有历史数据，却仍可能因为类别不平衡、时间穿越、结果泄露而给出毫无价值的" + "「高准确率」。<b>全知不等于可靠。</b></li>
+</ul>
+
+<h3 class="sub">常见误解</h3>
+<div class="callout amber"><b>误解：</b>" + "「拉普拉斯妖是机器学习的理想：数据够多就能预测一切。」<br><b>正解：</b>它是<b>决定论的可行性检验</b>。本游戏借它的" + "「全知幻觉」做教学工具——让学生亲历：数据完备性的错觉，比数据不足更危险。</div>
+</section>
+<section id="mapping"><h2><span class="no">02</span>二、与教材的对接</h2>
+<div class="tbl-wrap"><table class="tb"><thead><tr><th>教材节点</th><th>游戏对应机制</th><th>习得的判断</th></tr></thead><tbody><tr><td>10.2 监督学习</td><td>预测中举任务</td><td>标签与特征的关系</td></tr><tr><td>10.4 评估：准确率之外</td><td>评估卡 1：95% 陷阱 + 混淆矩阵</td><td>准确率在类别不平衡下失效</td></tr><tr><td>10.4 评估</td><td>评估卡 2：时间穿越</td><td>训练/测试的时间边界</td></tr><tr><td>10.5 可解释性</td><td>SHAP 卡与归因打脸</td><td>解释是发现偏见的手段</td></tr><tr><td>10.6 历史偏见</td><td>偏见特征：籍贯与父辈任职</td><td>模型会复制历史的不平等</td></tr></tbody></table></div>
+<div class="callout green"><b>一句话锚点：</b>高准确率不等于有用，更不等于正当。<b>缺的往往不是数据，而是对不确定性的敬畏。</b></div>
+</section>
+<section id="setup"><h2><span class="no">03</span>三、班级组织（40–45 人）</h2>
+<div class="grid3">
+<div class="infocard"><h4>班级规模</h4><div class="big">40–45 人</div><p>11 组 × 4 人 = 44；余 1 人任" + "「评估官」，专职发放评估卡。</p></div>
+<div class="infocard"><h4>组内角色</h4><div class="big">4 人 / 组</div><ul><li>全知妖 ×2（宣布预测与准确率）</li><li>评估员 ×1（算混淆矩阵）</li><li>解释员 ×1（读 SHAP 卡）</li></ul></div>
+<div class="infocard"><h4>全班角色</h4><div class="big">评估官 1 人</div><p>按教师指令逐张发评估卡，制造" + "「逐层反转」的节奏。</p></div>
+</div>
+<div class="callout">大班关键：<b>三张评估卡必须逐张发</b>。每组先宣布" + "「95% 准确，预测成功」，再被打脸一次——三次反转是本游戏的全部戏剧张力。</div>
+</section>
+<section id="objectives"><h2><span class="no">04</span>四、学习目标</h2>完成本场游戏后，学生应能：<ul><li><b>计算</b>混淆矩阵、精确率、召回率与 F1，说明准确率在类别不平衡下的失效（应用层）。</li><li><b>识别</b>时间穿越与结果泄露两类评估陷阱（分析层）。</li><li><b>解读</b>特征归因结果，指出模型所学的历史偏见（分析层）。</li><li><b>论证</b>可解释性是负责任研究的必需品而非装饰（反思层）。</li></ul></section>
+<section id="materials"><h2><span class="no">05</span>五、材料清单与准备</h2><div class="tbl-wrap"><table class="tb"><thead><tr><th>品名</th><th>数量（45 人上限）</th><th>说明</th></tr></thead><tbody><tr><td>科举数据集（20 条）</td><td>11 套</td><td>素材页提供完整数据，含 1 个正例、2 个偏见特征、1 个泄露特征</td></tr><tr><td>评估卡 E1–E3</td><td>11 套 × 3 张</td><td>逐张发放：类别不平衡 / 时间穿越 / 结果泄露</td></tr><tr><td>混淆矩阵模板</td><td>45 份</td><td>每人 1 份，手算</td></tr><tr><td>SHAP 归因卡</td><td>11 张</td><td>给出「特征重要性排序」示意</td></tr><tr><td>妖之判决书表</td><td>11 份</td><td>每组 1 份</td></tr></tbody></table></div>
+<div class="callout amber"><b>课前准备：</b>数据集与评估卡按套装袋。E2 的" + "「时间穿越」需在数据中隐含线索（试卷评定为阅卷后给出），教师先自己推演一遍，确保能讲解清楚。</div>
+</section>
+<section id="flow"><h2><span class="no">06</span>六、游戏流程</h2><ol class="flow"><li><div class="ft">全知宣言：我能预测中举</div><span class="tm">5′</span><p>发数据集。各组扮演拉普拉斯妖，用 5 分钟「建模」——实际只需发现：全预测「不中」即可达 19/20 = 95% 准确率。宣布「预测成功」。</p><div class="say"><b>教师引导语：</b>「你是全知妖。给我一个准确率，证明你值得被信任。」</div></li><li><div class="ft">评估卡 E1：95% 陷阱</div><span class="tm">8′</span><p>揭示：20 条中仅 1 条「中举」。各组手算混淆矩阵、精确率、召回率、F1。看「成功」如何蒸发：召回率 = 0。</p><div class="say"><b>教师引导语：</b>「95% 的准确率，一个正例都没找出来。这个模型「优秀」在哪里？」</div></li><li><div class="ft">评估卡 E2：时间穿越</div><span class="tm">8′</span><p>揭示「试卷评定」是阅卷后给出的——它来自结果之后。用它做特征等于偷看答案。讨论：训练/测试的时间边界应如何划分？</p></li><li><div class="ft">评估卡 E3 + SHAP 卡</div><span class="tm">12′</span><p>发归因卡：最重要的特征竟然是「籍贯＝北」与「父辈任职」。解读：模型复制了历史的不平等，并把偶然相关当作规律。</p></li><li><div class="ft">给妖定罪</div><span class="tm">8′</span><p>对照 10.4/10.6，各组写「拉普拉斯妖判决书」：这个模型缺的是数据、方法，还是对不确定性的敬畏？</p></li><li><div class="ft">收束</div><span class="tm">4′</span><p>教师点题：拉普拉斯妖所需的初始条件原则上不可得；更重要的是，「全知」本身不构成正当性。为第 12 章的电车难题埋伏笔。</p></li></ol></section>
+<section id="assets"><h2><span class="no">07</span>七、游戏素材（可打印）</h2>
+<h3 class="sub">素材 A · 科举数据集（每组一套 20 条）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>某科应试者特征表（教学合成样例）</h4><p class="pm-note">字段：籍贯 / 父辈任职 / 治经年数 / 试卷评定 / 是否中举。注意「试卷评定」是阅卷后给出的，属结果泄露。</p><div class="wsheet">
+<table class="mm"><tr><th style="width:10%">编号</th><th style="width:16%">籍贯</th><th style="width:20%">父辈任职</th><th style="width:18%">治经年数</th><th style="width:18%">试卷评定</th><th style="width:18%">是否中举</th></tr>
+<tr><td>01</td><td>南</td><td>无</td><td>6</td><td>中</td><td>否</td></tr><tr><td>02</td><td>北</td><td>无</td><td>8</td><td>中</td><td>否</td></tr><tr><td>03</td><td>南</td><td>无</td><td>5</td><td>下</td><td>否</td></tr><tr><td>04</td><td>北</td><td>无</td><td>7</td><td>中</td><td>否</td></tr><tr><td>05</td><td>南</td><td>无</td><td>9</td><td>中</td><td>否</td></tr><tr><td>06</td><td>北</td><td>有</td><td>11</td><td>中</td><td>否</td></tr><tr><td>07</td><td>北</td><td>有</td><td>14</td><td>优</td><td>是</td></tr><tr><td>08</td><td>南</td><td>无</td><td>6</td><td>中</td><td>否</td></tr><tr><td>09</td><td>北</td><td>无</td><td>8</td><td>中</td><td>否</td></tr><tr><td>10</td><td>南</td><td>无</td><td>4</td><td>下</td><td>否</td></tr><tr><td>11</td><td>北</td><td>无</td><td>10</td><td>中</td><td>否</td></tr><tr><td>12</td><td>南</td><td>有</td><td>9</td><td>中</td><td>否</td></tr><tr><td>13</td><td>北</td><td>无</td><td>7</td><td>中</td><td>否</td></tr><tr><td>14</td><td>南</td><td>无</td><td>5</td><td>下</td><td>否</td></tr><tr><td>15</td><td>北</td><td>无</td><td>12</td><td>中</td><td>否</td></tr><tr><td>16</td><td>南</td><td>无</td><td>6</td><td>中</td><td>否</td></tr><tr><td>17</td><td>北</td><td>无</td><td>8</td><td>中</td><td>否</td></tr><tr><td>18</td><td>南</td><td>有</td><td>10</td><td>中</td><td>否</td></tr><tr><td>19</td><td>北</td><td>无</td><td>9</td><td>中</td><td>否</td></tr><tr><td>20</td><td>南</td><td>无</td><td>7</td><td>下</td><td>否</td></tr>
+</table>
+<p style="margin-top:6px"><b>统计提示：</b>20 条中仅 07 号中举（1 例正例）。全预测" + "「否」→ 准确率 19/20 = 95%，但召回率 = 0。</p>
+</div></div>
+<h3 class="sub">素材 B · 评估卡（逐张发放）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>评估卡 E1 / E2 / E3</h4><p class="pm-note">三张卡逐张发，每发一张就要求学生重算或重写结论。</p><div class="pgrid cols-3"><div class="pcard r"><span class="plab">E1 · 类别不平衡</span><div class="pbody"><p>本数据仅 1 例正例。「全预测不中」准确率 95%，但召回率 0。请计算混淆矩阵、精确率、召回率、F1。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard r"><span class="plab">E2 · 时间穿越</span><div class="pbody"><p>「试卷评定」是在阅卷之后给出的。用结果之后才存在的信息做特征，叫什么？如果去掉它，你的模型还准吗？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard r"><span class="plab">E3 · 偏见特征</span><div class="pbody"><p>「籍贯＝北」「父辈任职＝有」与中举高度相关。这是规律，还是历史特权的复制？哪些特征应当被禁用？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>SHAP 归因卡（教师揭示用）</h4><p class="pm-note">展示「模型认为最重要的特征」，制造归因打脸效果。</p><div class="pgrid cols-1"><div class="pcard a"><span class="plab">特征重要性排序</span><div class="pbody"><p>1. 试卷评定（泄露）<br>2. 籍贯＝北（偏见）<br>3. 父辈任职＝有（偏见）<br>4. 治经年数（表面合理）</p><p><b>追问：</b>如果只看前 3 项，你会认为这是个「好模型」吗？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">素材 C · 计算与判决表</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>混淆矩阵与指标计算表（每人 1 份）</h4><p class="pm-note">先填全「否」的基线模型，再填你「改进后」的模型。</p><div class="wsheet">
+<table class="mm"><tr><th style="width:34%">指标</th><th style="width:33%">基线：全预测" + "「否」</th><th style="width:33%">你的模型</th></tr>
+<tr><td>Accuracy 准确率</td><td></td><td></td></tr><tr><td>Precision 精确率</td><td></td><td></td></tr><tr><td>Recall 召回率</td><td></td><td></td></tr><tr><td>F1</td><td></td><td></td></tr><tr><td>TP / FP / TN / FN</td><td></td><td></td></tr></table>
+<div class="wh">哪一次评估卡让你的判断改变最大？</div><div class="pline"></div>
+</div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>拉普拉斯妖判决书（每组 1 份）</h4><p class="pm-note">参照 10.4 与 10.6，给出有据的判决。</p><div class="wsheet">
+<p><b>罪名：</b>□ 用准确率掩盖无能　□ 时间穿越　□ 复制历史偏见　□ 不可解释</p>
+<div class="wh">判决理由（至少两条，须引用指标或特征）</div><div class="pline"></div><div class="pline"></div>
+<div class="wh">这个模型缺的是什么？</div><p>□ 数据　□ 方法　□ 对不确定性的敬畏</p>
+<div class="wh">如果要重来，你会禁用哪些特征？</div><div class="pline"></div>
+</div></div></section>
+<section id="debrief"><h2><span class="no">08</span>八、讨论引导（分层）</h2><ol class="debrief"><li><span class="level lv1">识记</span>写出混淆矩阵四格的含义，并说明精确率与召回率的区别。</li><li><span class="level lv2">分析</span>为什么 95% 准确率可能毫无价值？用本数据的具体数字说明。</li><li><span class="level lv2">分析</span>结果泄露与时间穿越有什么不同？各自的检测方法是什么？</li><li><span class="level lv2">分析</span>10.6 「从历史数据学历史偏见」在本游戏中如何发生？哪些特征应当被禁用？</li><li><span class="level lv3">反思</span>可解释性是装饰还是必需品？如果不发 SHAP 卡，你们会发现偏见吗？</li><li><span class="level lv3">反思</span>拉普拉斯妖所需的三个条件（所有力 / 所有位置 / 无限算力）在现实中各缺什么？「全知」本身是否构成正当性？</li></ol></section>
+<section id="assessment"><h2><span class="no">09</span>九、评价与计分</h2>
+<div class="scorebox"><table><thead><tr><th>维度</th><th>分值</th><th>达标描述</th><th>扣分点</th></tr></thead><tbody><tr><td class="b">指标计算</td><td>30</td><td>混淆矩阵与四项指标全部正确</td><td>每错 1 项扣 6 分</td></tr><tr><td class="b">陷阱识别</td><td>25</td><td>准确指出三类评估陷阱</td><td>漏 1 类扣 8 分</td></tr><tr><td class="b">偏见分析</td><td>25</td><td>说明偏见特征为何有害、应否禁用</td><td>只说「不公平」扣 10 分</td></tr><tr><td class="b">判决论证</td><td>20</td><td>判决有指标与特征支撑</td><td>无证据扣 10 分</td></tr></tbody></table></div>
+<div class="callout green"><b>个人加分（+5）：</b>指出自己过去曾" + "「只看准确率」就相信的一个模型或结论。</div>
+</section>
+<section id="redline"><h2><span class="no">10</span>十、伦理与安全红线</h2>
+<div class="callout risk"><b>教学红线：</b>①籍贯、父辈任职等偏见特征只用于揭示模型机制，须明确标注为教学样例；②讨论中禁止把任何真实地域、群体与" + "「能力 / 品行」挂钩；③不得暗示" + "「某籍贯考生更优秀」这类结论，教师须在揭晓偏见特征时立即澄清其统计偶然性。</div>
+</section>
+<section id="tips"><h2><span class="no">11</span>十一、教师提示与变体</h2>
+<details><summary>提示 1 · 教学节奏</summary><ul>
+<li><b>全知宣言要真：</b>给 5 分钟让各组" + "「认真建模」，他们才会对 95% 产生真实自豪感——反转才有力量。</li>
+<li><b>指标可手算：</b>20 条数据手算完全可行，不必用电脑。若用 sklearn 现场跑一遍，效果更强。</li>
+<li><b>时间紧：</b>可只发 E1 与 E3 两张卡，保留" + "「准确率陷阱」与「偏见归因」两个核心点。</li>
+</ul></details>
+<details><summary>提示 2 · 变体与联动</summary><ul>
+<li><b>本地化：</b>把" + "「科举中举」换成「论文是否被引」「档案是否被数字化」，学生会更关心结论的公平性。</li>
+<li><b>进阶：</b>引入葛梯尔问题——" + "「得到证成的真信念仍可能不是知识」，与评估陷阱形成哲学呼应。</li>
+<li><b>联动：</b>本场是游戏 12（电车难题）的前置——当模型" + "「全知但不正当」时，伦理决策才真正出现。</li>
+</ul></details>
+</section>
+</main></div>
+<div class="bottom-nav"><a href="game09.html"><small>← 上一场 · 09</small>罗素悖论</a><a class="next" href="game11.html"><small>下一场 · 11 →</small>图灵测试</a></div><div class="footer">《数据科学与数字人文》教学配套资源 · 思想实验课堂游戏 · 素材仅限教学使用 · 真实史料请注明来源与许可</div>
+</body>
+</html>

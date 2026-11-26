@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏 13｜谷堆悖论 · 数据科学与数字人文</title>
+<style>
+:root{
+  --blue:#1f4e79; --blue2:#2b6cb0; --blue3:#3b82c4;
+  --soft:#eaf2fa; --soft2:#f5f9fd;
+  --green:#2f855a; --gsoft:#e9f6ef;
+  --ink:#1a202c; --muted:#4a5568; --faint:#718096;
+  --line:#d9e2ec; --line2:#edf1f6;
+  --bg:#f4f7fb; --card:#ffffff;
+  --red:#c53030; --rsoft:#fff5f5; --rline:#feb2b2;
+  --amber:#b7791f; --asoft:#fffaf0;
+  --shadow:0 2px 12px rgba(31,78,121,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  line-height:1.78;font-size:15px}
+a{color:var(--blue2);text-decoration:none}
+a:hover{text-decoration:underline}
+code{background:var(--soft);padding:1px 5px;border-radius:4px;font-family:Consolas,"Courier New",monospace;font-size:.9em;color:var(--blue)}
+
+/* ---------- top bar ---------- */
+.topbar{background:var(--blue);color:#fff;padding:11px 0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.topbar .wrap{max-width:1240px;margin:0 auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{font-size:15.5px;font-weight:700}
+.brand small{display:block;font-size:11px;font-weight:400;opacity:.8;letter-spacing:.3px}
+.topbar nav{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.topbar nav a,.topbar nav button{color:#fff;border:1px solid rgba(255,255,255,.42);background:transparent;
+  padding:5px 11px;border-radius:6px;font-size:12.5px;cursor:pointer;font-family:inherit;line-height:1.4}
+.topbar nav a:hover,.topbar nav button:hover{background:rgba(255,255,255,.16);text-decoration:none}
+.topbar nav .current{background:rgba(255,255,255,.2);border-color:#fff}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(120deg,#1f4e79 0%,#2b6cb0 52%,#2f855a 140%);color:#fff;padding:34px 22px 30px}
+.hero .wrap{max-width:1240px;margin:0 auto}
+.hero .kicker{font-size:11.5px;letter-spacing:2px;opacity:.85;margin:0 0 8px}
+.hero .tag{border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 10px;display:inline-block;font-size:11px;margin-bottom:10px}
+.hero h1{margin:0 0 6px;font-size:29px;line-height:1.3}
+.hero .en{font-size:13px;font-weight:400;opacity:.8;margin-left:8px}
+.hero .game-name{font-size:16px;font-weight:600;opacity:.96;margin:0 0 10px}
+.hero .lead{max-width:930px;margin:0;opacity:.93;font-size:13.8px}
+.stats{display:flex;gap:0;flex-wrap:wrap;margin-top:22px;border-top:1px solid rgba(255,255,255,.28);padding-top:16px}
+.stats .st{padding:0 20px;border-left:2px solid rgba(255,255,255,.4);min-width:120px}
+.stats .st:first-child{padding-left:0;border-left:none}
+.stats .st b{display:block;font-size:17px;line-height:1.3}
+.stats .st span{font-size:11px;opacity:.82}
+
+/* ---------- layout ---------- */
+.doc{max-width:1240px;margin:0 auto;padding:24px 22px 56px;display:grid;grid-template-columns:248px 1fr;gap:26px;align-items:start}
+.side{position:sticky;top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:15px;box-shadow:var(--shadow);max-height:calc(100vh - 28px);overflow:auto}
+.side h4{margin:2px 0 10px;font-size:12.5px;color:var(--blue);letter-spacing:.5px}
+.side a{display:block;padding:5px 8px;border-radius:6px;font-size:12.4px;color:var(--muted);line-height:1.45}
+.side a:hover{background:var(--soft);color:var(--blue);text-decoration:none}
+.side .jp{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.side .jp a{font-size:11.8px}
+.content{min-width:0}
+.content section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px 26px;margin-bottom:18px;box-shadow:var(--shadow)}
+.content section>h2{margin:0 0 14px;font-size:19px;color:var(--blue);padding-bottom:10px;border-bottom:2px solid var(--gsoft)}
+.content section>h2 .no{color:var(--green);font-size:13px;margin-right:8px}
+h3.sub{font-size:14.5px;color:var(--blue);margin:18px 0 8px;padding-left:9px;border-left:3px solid var(--green)}
+h3.sub:first-of-type{margin-top:4px}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:5px 0}
+b,strong{color:var(--blue)}
+.small{font-size:12.8px;color:var(--muted)}
+
+/* ---------- blocks ---------- */
+.quote{background:var(--soft2);border-left:4px solid var(--blue3);border-radius:0 8px 8px 0;padding:12px 16px;margin:10px 0;font-size:13.6px}
+.quote .src{display:block;font-size:11.8px;color:var(--faint);margin-top:6px}
+.think{border:1px solid var(--line);border-radius:10px;padding:13px 16px;background:#fbfdff;margin:12px 0}
+.think .q{font-weight:700;color:var(--green);font-size:14px;margin-bottom:5px}
+.level{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:6px;vertical-align:1px}
+.lv1{background:var(--soft);color:var(--blue)}
+.lv2{background:var(--gsoft);color:var(--green)}
+.lv3{background:var(--asoft);color:var(--amber)}
+.callout{border-left:4px solid var(--blue2);background:var(--soft);border-radius:0 8px 8px 0;padding:11px 15px;margin:12px 0;font-size:13.4px}
+.callout.green{border-left-color:var(--green);background:var(--gsoft)}
+.callout.risk{border-left-color:var(--red);background:var(--rsoft);border:1px solid var(--rline);border-left-width:4px;color:#7b2020}
+.callout.amber{border-left-color:var(--amber);background:var(--asoft)}
+
+/* ---------- setup cards ---------- */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:12px 0}
+.infocard{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--soft2)}
+.infocard h4{margin:0 0 6px;font-size:12.6px;color:var(--blue);letter-spacing:.3px}
+.infocard .big{font-size:19px;font-weight:700;color:var(--green);line-height:1.3}
+.infocard p,.infocard ul{font-size:12.9px;margin:4px 0}
+.infocard ul{padding-left:18px}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;margin:12px 0}
+table.tb{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+table.tb th{background:var(--blue);color:#fff;text-align:left;padding:8px 10px;font-weight:600;font-size:12.5px}
+table.tb td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+table.tb tbody tr:nth-child(even){background:#f8fafc}
+table.tb.compact{font-size:12.5px}
+table.tb.compact th,table.tb.compact td{padding:6px 8px}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill.b{background:var(--soft);color:var(--blue)}
+.pill.g{background:var(--gsoft);color:var(--green)}
+.pill.r{background:var(--rsoft);color:var(--red)}
+
+/* ---------- flow ---------- */
+ol.flow{margin:10px 0;padding:0;list-style:none;counter-reset:flow}
+ol.flow>li{position:relative;padding:12px 14px 12px 52px;margin:10px 0;border:1px solid var(--line);border-radius:9px;background:#fbfdff;counter-increment:flow}
+ol.flow>li:before{content:counter(flow);position:absolute;left:13px;top:12px;width:27px;height:27px;border-radius:8px;
+  background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+ol.flow>li .ft{font-weight:700;color:var(--blue);font-size:14px}
+ol.flow>li .tm{float:right;background:var(--gsoft);color:var(--green);font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px}
+ol.flow>li .say{background:var(--asoft);border-left:3px solid var(--amber);padding:7px 11px;margin-top:8px;font-size:12.8px;color:#6b4f1d;border-radius:0 6px 6px 0}
+ol.flow>li p{font-size:13.2px;margin:5px 0}
+
+/* ---------- printable materials ---------- */
+.pm{border:2px dashed #b9c9da;border-radius:11px;padding:15px 17px;margin:16px 0;background:#fff;page-break-inside:avoid}
+.pm-h{margin:0 0 3px;font-size:14.5px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.pm-h .tagp{background:var(--green);color:#fff;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.pm-note{font-size:12.3px;color:var(--muted);margin:0 0 12px;background:var(--soft2);padding:6px 10px;border-radius:6px}
+.pgrid{display:grid;gap:12px}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+.pcard{border:1.5px solid #94a9be;border-radius:8px;padding:11px 12px;min-height:118px;background:#fcfdff;display:flex;flex-direction:column}
+.pcard .plab{font-size:10.8px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--blue);border-radius:4px;padding:2px 7px;display:inline-block;align-self:flex-start;margin-bottom:7px}
+.pcard.g .plab{background:var(--green)}
+.pcard.r .plab{background:var(--red)}
+.pcard.a .plab{background:var(--amber)}
+.pcard .pbody{font-size:12.6px;line-height:1.62;flex:1}
+.pcard .pbody p{margin:3px 0}
+.pcard .pcut{margin-top:9px;border-top:1px dashed #b9c9da;padding-top:5px;font-size:9.5px;color:var(--faint);text-align:center}
+.wsheet{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fcfdff;font-size:12.8px}
+.wsheet .wh{font-weight:700;color:var(--blue);margin:10px 0 5px;font-size:13px}
+.wsheet .wh:first-child{margin-top:0}
+.pline{border-bottom:1px solid #c3cfdb;height:26px;margin:5px 0}
+.pline.short{width:55%}
+.wsheet table.mm{width:100%;border-collapse:collapse;font-size:12px}
+.wsheet table.mm th,.wsheet table.mm td{border:1px solid #c3cfdb;padding:6px 7px;text-align:left;vertical-align:top}
+.wsheet table.mm th{background:var(--soft);color:var(--blue);font-size:11.5px}
+.wsheet table.mm td.empty{height:34px}
+.scorebox{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
+.scorebox table{width:100%;border-collapse:collapse;font-size:12.5px}
+.scorebox th{background:var(--green);color:#fff;padding:7px 9px;text-align:left}
+.scorebox td{border-bottom:1px solid var(--line);padding:6px 9px}
+.scorebox td.b{background:#fbfdff}
+
+/* ---------- debrief / tips ---------- */
+ol.debrief{margin:10px 0;padding-left:0;list-style:none;counter-reset:db}
+ol.debrief li{position:relative;padding:9px 12px 9px 42px;margin:7px 0;border-left:3px solid var(--gsoft);background:#fbfdff;border-radius:0 8px 8px 0;font-size:13.3px;counter-increment:db}
+ol.debrief li:before{content:counter(db);position:absolute;left:11px;top:9px;color:var(--green);font-weight:800;font-size:13px}
+details{margin:12px 0;border:1px solid var(--line);border-radius:9px;background:var(--soft2);padding:10px 14px}
+details summary{cursor:pointer;color:var(--blue);font-size:13.2px;font-weight:700}
+details[open] summary{margin-bottom:8px}
+details ul,details p{font-size:13px}
+
+/* ---------- bottom nav ---------- */
+.bottom-nav{max-width:1240px;margin:0 auto 40px;padding:0 22px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bottom-nav a{flex:1;min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow);font-size:13px}
+.bottom-nav a:hover{border-color:var(--blue2);text-decoration:none}
+.bottom-nav a small{display:block;color:var(--faint);font-size:11px}
+.bottom-nav a.next{text-align:right}
+.footer{text-align:center;color:var(--faint);font-size:11.8px;padding:0 20px 34px}
+
+/* ---------- responsive ---------- */
+@media(max-width:920px){
+  .doc{grid-template-columns:1fr;padding:18px 14px}
+  .side{position:static;max-height:none}
+  .content section{padding:19px 17px}
+  .hero h1{font-size:24px}
+  .cols-3,.cols-4{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+
+/* ---------- print ---------- */
+@media print{
+  body{background:#fff;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .topbar,.side,.bottom-nav,.footer{display:none!important}
+  .doc{display:block;padding:0;max-width:none}
+  .content section{border:none;box-shadow:none;padding:0 0 14px;margin:0 0 14px;page-break-inside:auto;border-bottom:1px solid #ddd;border-radius:0}
+  .hero{background:#1f4e79!important;padding:14px 0;color:#fff}
+  .hero h1{font-size:20pt}
+  .hero .lead,.stats .st span{font-size:9pt}
+  .pm{page-break-before:auto;page-break-inside:avoid;border:2px dashed #777}
+  .pcard{min-height:105px}
+  details{display:block;border:none;background:none;padding:0}
+  details>summary{display:none}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap"><div class="brand">《数据科学与数字人文》· 思想实验课堂游戏<small>第 13 / 13 场 · 40–45 人班级版</small></div><nav><a href="thought-experiment-games.html">返回总览</a><a href="game12.html">← 上一场</a><button onclick="window.print()">打印素材</button></nav></div></header>
+<div class="hero"><div class="wrap"><p class="kicker">THOUGHT EXPERIMENT → CLASSROOM GAME · 13 / 13</p><span class="tag">对接 第13章 综合项目与课程反思</span><h1>谷堆悖论<span class="en">Sorites Paradox · Eubulides</span></h1><p class="game-name">课堂游戏：第几粒沙算研究？——结题答辩模拟法庭</p><p class="lead">一粒沙不成堆，再加一粒也不成堆——那从哪一粒开始算「堆」？学生抽到从「跑通一段代码」到「经得起答辩的研究」共十级进度卡，分别为自己辩护。评委依教材 13.4 量规逐维追问。最后全班共同把百分比量规改写成可观测的达标证据。</p><div class="stats"><div class="st"><b>50 分钟</b><span>建议时长</span></div><div class="st"><b>40–45 人</b><span>适用班级</span></div><div class="st"><b>10 答辩组 + 评委组</b><span>分组方式</span></div><div class="st"><b>★★★☆☆</b><span>难度</span></div></div></div></div>
+<div class="doc"><aside class="side"><h4>本场目录</h4><a href="#origin">一、思想实验原典与展开</a><a href="#mapping">二、与教材的对接</a><a href="#setup">三、班级组织（40–45 人）</a><a href="#objectives">四、学习目标</a><a href="#materials">五、材料清单与准备</a><a href="#flow">六、游戏流程</a><a href="#assets">七、游戏素材（可打印）</a><a href="#debrief">八、讨论引导（分层）</a><a href="#assessment">九、评价与计分</a><a href="#redline">十、伦理与安全红线</a><a href="#tips">十一、教师提示与变体</a><div class="jp"><a href="game12.html">← 12 电车难题</a></div></aside>
+<main class="content">
+<section id="origin"><h2><span class="no">01</span>一、思想实验原典与展开</h2>
+<h3 class="sub">原典原文</h3>
+<div class="quote">一粒沙不能构成一堆。如果 n 粒沙不构成一堆，那么 n+1 粒也不构成一堆。因此，无论多少粒沙都不构成一堆。
+<span class="src">——欧布里德（Eubulides of Miletus，公元前 4 世纪），麦加拉学派，归于" + "「谷堆论证」（Sorites）</span></div>
+
+<h3 class="sub">提出者与学派</h3>
+<p>欧布里德是麦加拉学派的逻辑学家，与苏格拉底学派有渊源。他还提出了" + "「说谎者悖论」「秃头悖论」「有角者悖论」等一系列悖论，专门用来挑战当时对定义与谓词的朴素理解。" + "「Sorites」一词源自希腊语 soros（堆），原意是" + "「累积式论证」。</p>
+
+<h3 class="sub">思想实验的展开</h3>
+<ol>
+<li><b>前提都合理：</b>" + "「一粒不成堆」显然真；" + "「n 粒不成堆则 n+1 粒也不成堆」似乎也真。</li>
+<li><b>结论荒谬：</b>但结论" + "「多少粒都不成堆」明显假。问题出在哪？</li>
+<li><b>三条主要回应：</b>①<b>模糊逻辑</b>——" + "「堆」是程度概念，没有精确边界，真值可以是 0.7；②<b>认知主义</b>——存在客观边界，只是我们不知道在哪；③<b>约定论</b>——边界由使用者约定，约定必须公开且可辩护。</li>
+</ol>
+
+<h3 class="sub">后续变体</h3>
+<ul>
+<li><b>秃头悖论：</b>掉一根头发不会让人变秃，那什么时候变秃？</li>
+<li><b>法律中的" + "「合理怀疑」：</b>证据达到什么程度才" + "「充分」？法律用程序（举证规则、法官裁量）而非数值来约定边界。</li>
+<li><b>学术评价（本游戏）：</b>" + "「做到什么程度算研究？」——评价量规就是那条被约定的线，它的合法性来自程序透明，而非阈值精确。</li>
+</ul>
+
+<h3 class="sub">常见误解</h3>
+<div class="callout amber"><b>误解：</b>" + "「谷堆悖论只是抬杠，现实中大家一眼就能看出是不是一堆。」<br><b>正解：</b>它揭示的是<b>所有连续性概念的形式难题</b>。学术评价中的" + "「合格」「优秀」「有创新性」全部是这类谓词——我们无法找到那" + "「一粒沙」，但必须给出一条可辩护、可复查的线。</div>
+</section>
+<section id="mapping"><h2><span class="no">02</span>二、与教材的对接</h2>
+<div class="tbl-wrap"><table class="tb"><thead><tr><th>教材节点</th><th>游戏对应机制</th><th>习得的判断</th></tr></thead><tbody><tr><td>13.1 从「做实验」到「做研究」</td><td>十级进度卡</td><td>质变点需要被论证</td></tr><tr><td>13.2 好选题三要素</td><td>评委第一问：真问题？可得数据？适配方法？</td><td>题选对了才有后续</td></tr><tr><td>13.3 四要素闭环</td><td>质询按数据/方法/产出/反思四维</td><td>缺一环就只是演示</td></tr><tr><td>13.4 评价量规</td><td>量规改写</td><td>百分比要转成可观测证据</td></tr><tr><td>13.5 答辩与结课寄语</td><td>5 分钟答辩模拟</td><td>能讲清局限才算研究</td></tr></tbody></table></div>
+<div class="callout green"><b>一句话锚点：</b>实用答案不是" + "「找到那一粒」，而是<b>约定一条线并公开说明理由</b>。评价的合法性来自程序透明，而非阈值精确。</div>
+</section>
+<section id="setup"><h2><span class="no">03</span>三、班级组织（40–45 人）</h2>
+<div class="grid3">
+<div class="infocard"><h4>班级规模</h4><div class="big">40–45 人</div><p>10 答辩组 × 4 人 = 40；另设 1 评委组 4 人（中途轮换），余 1 人任书记员。</p></div>
+<div class="infocard"><h4>组内角色</h4><div class="big">4 人 / 组</div><ul><li>主述 1（5 分钟答辩）</li><li>数据官 1</li><li>方法官 1</li><li>反思官 1（主动说局限）</li></ul></div>
+<div class="infocard"><h4>评委组</h4><div class="big">4 人 + 教师</div><p>依 13.4 五维质询。每 3 组轮换一次评委，让更多人体验质询视角。</p></div>
+</div>
+<div class="callout">大班关键：<b>不是每组都要完整答辩</b>。抽 5 组各 3 分钟，其余组用" + "「书面质询」交换完成。评委轮换保证 45 人都有质询机会。</div>
+</section>
+<section id="objectives"><h2><span class="no">04</span>四、学习目标</h2>完成本场游戏后，学生应能：<ul><li><b>描述</b>从「做实验」到「做研究」的四个必备要素（识记层）。</li><li><b>辩护</b>自己项目的阶段性成果，并说明还差「哪粒沙」（应用层）。</li><li><b>质询</b>他组项目在量规五维上的证据缺口（分析层）。</li><li><b>改写</b>评价量规为可观测的达标证据，并说明约定理由（反思层）。</li></ul></section>
+<section id="materials"><h2><span class="no">05</span>五、材料清单与准备</h2><div class="tbl-wrap"><table class="tb"><thead><tr><th>品名</th><th>数量（45 人上限）</th><th>说明</th></tr></thead><tbody><tr><td>十级进度卡 L1–L10</td><td>10 组各 1 张（可重复）</td><td>素材页提供完整文本，按组抽签发放</td></tr><tr><td>教材 13.4 量规投影</td><td>1 套</td><td>教师准备</td></tr><tr><td>五维质询卡</td><td>11 套 × 5 张</td><td>评委组使用</td></tr><tr><td>量规改写表</td><td>45 份</td><td>每人 1 份</td></tr><tr><td>结课卡</td><td>45 张</td><td>每人 1 张，写「我缺的那粒沙」</td></tr></tbody></table></div>
+<div class="callout amber"><b>课前准备：</b>进度卡 L1–L10 按组抽签发放（可重复，制造" + "「同一级不同命运」的讨论）；质询卡交评委组。若用学生真实项目，把进度卡换成他们自己的阶段说明，效果最好。</div>
+</section>
+<section id="flow"><h2><span class="no">06</span>六、游戏流程</h2><ol class="flow"><li><div class="ft">发进度卡、宣布 claimed</div><span class="tm">5′</span><p>每组抽一张进度卡，声称「我的项目已经是一项研究」。组长签名。教师说明：评委的任务是找出「还差哪粒沙」。</p></li><li><div class="ft">模拟答辩（抽 5 组）</div><span class="tm">15′</span><p>每组 3 分钟：主述 90 秒 → 数据官/方法官各 45 秒 → 评委质询 1 轮。反思官须主动说一条局限，否则扣分。</p></li><li><div class="ft">阈值辩论</div><span class="tm">12′</span><p>关键一问：「从演示到研究，那条线画在第几粒？」各组陈述标准并给出理由。教师引导：是数据量？可复现性？还是反思深度？</p></li><li><div class="ft">共建量规</div><span class="tm">12′</span><p>全班把教材 13.4 的五个百分比维度改写成「可观测的达标证据」，例如「数据合规 15%」→「能出示许可文件＋数据护照＋引用格式」。</p></li><li><div class="ft">结课寄语与回收</div><span class="tm">6′</span><p>回到 13.5。每人在结课卡背面写下一句「我缺的那粒沙」。教师收齐，作为第 1 章「观察声明」的后测对照。</p></li></ol></section>
+<section id="assets"><h2><span class="no">07</span>七、游戏素材（可打印）</h2>
+<h3 class="sub">素材 A · 十级进度卡（按组抽签发放）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>进度卡 L1–L5</h4><p class="pm-note">每卡描述一个阶段。抽到低级别的组也能辩护——这正是悖论的课堂体验。</p><div class="pgrid cols-3"><div class="pcard a"><span class="plab">L1 · 跑通了一段代码</span><div class="pbody"><p>你在 Jupyter 里成功读入了一份 CSV，打印出前五行。</p><p><b>当前状态：</b>这只是一个操作演示。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard a"><span class="plab">L2 · 有了一个问题</span><div class="pbody"><p>你写下'某流派诗人的交游与主题是否相关'这个问题。</p><p><b>当前状态：</b>问题尚未与手头数据对齐。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard a"><span class="plab">L3 · 拿到了数据</span><div class="pbody"><p>你下载了一份数据，能说出它从哪来。</p><p><b>当前状态：</b>许可、字段、规模尚未审计。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">L4 · 做了清洗和 EDA</span><div class="pbody"><p>你处理了缺失值、重复记录，画了分布图。</p><p><b>当前状态：</b>清洗规则未记录，无法复现。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">L5 · 跑了两种方法</span><div class="pbody"><p>你做了词频统计和社会网络分析，得到两张图。</p><p><b>当前状态：</b>方法为何选这两种，没有依据。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>进度卡 L6–L10</h4><p class="pm-note">高级别卡的「还缺」越来越细——逼近真实评价的模糊地带。</p><div class="pgrid cols-3"><div class="pcard "><span class="plab">L6 · 图有标注、可解释</span><div class="pbody"><p>两张图都有标题、来源、图例，结论不过界。</p><p><b>当前状态：</b>尚未回看证据链，无法核查。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">L7 · 写了初稿</span><div class="pbody"><p>你写完了 3000 字，含问题、方法、结果。</p><p><b>当前状态：</b>结论的边界与局限尚未说明。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">L8 · 声明了 AI 使用</span><div class="pbody"><p>你在附注中写明了哪些环节用了大模型、如何核查。</p><p><b>当前状态：</b>伦理反思仍停留在声明层面。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">L9 · 可复现、可解释、能说明局限</span><div class="pbody"><p>同学习得你的数据与代码，能复现主要结论；你列出三条局限。</p><p><b>当前状态：</b>尚未经过外部质询。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">L10 · 经得起答辩的研究</span><div class="pbody"><p>你能在 5 分钟内讲清'问题—数据—方法—结论—局限'，并回应评委对边界的追问。</p><p><b>当前状态：</b>——</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">素材 B · 五维质询卡（评委组使用）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>质询卡：按教材 13.4 五维追问</h4><p class="pm-note">每张卡列出该维度的三问。评委任选一问，被询方须出示证据。</p><div class="pgrid cols-3"><div class="pcard "><span class="plab">问题真实性 20%</span><div class="pbody"><p>① 你关心的是什么真问题？<br>② 为什么不是「为方法找数据」？<br>③ 这个问题现有数据真能回答吗？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">数据合规 15%</span><div class="pbody"><p>① 许可文件在哪？<br>② 敏感数据是否授权？<br>③ 数据护照填了吗？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">方法适配 25%</span><div class="pbody"><p>① 为何选这两种方法？<br>② 参数依据是什么？<br>③ 步骤能否复现？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">产出与解释 25%</span><div class="pbody"><p>① 图/网/图谱有标注吗？<br>② 结论有没有过界？<br>③ 证据能回溯到哪里？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard a"><span class="plab">反思与诚信 15%</span><div class="pbody"><p>① 三条局限是什么？<br>② AI 使用声明了吗？<br>③ 什么没做，为什么？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">素材 C · 量规改写与结课卡</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>量规改写表（每人 1 份）</h4><p class="pm-note">把百分比改写成「可观测的达标证据」——这是全班共同完成的产物。</p><div class="wsheet">
+<table class="mm"><tr><th style="width:24%">原维度与权重</th><th style="width:38%">原来的达标描述</th><th style="width:38%">改写后：可观测的达标证据</th></tr>
+<tr><td>问题真实性 20%</td><td></td><td></td></tr><tr><td>数据合规 15%</td><td></td><td></td></tr><tr><td>方法适配 25%</td><td></td><td></td></tr><tr><td>产出与解释 25%</td><td></td><td></td></tr><tr><td>反思与诚信 15%</td><td></td><td></td></tr></table>
+<div class="wh">我们约定的那条线，画在第几粒？</div><div class="pline"></div>
+<div class="wh">为什么是这里，而不是前一粒？</div><div class="pline"></div>
+</div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>结课卡（每人 1 张）</h4><p class="pm-note">正面写「我缺的那粒沙」，背面留给第 13 章后测。</p><div class="wsheet">
+<div class="wh">我缺的那粒沙</div><div class="pline"></div>
+<div class="wh">本学期我最接近" + "「研究」的一次尝试</div><div class="pline"></div>
+<div class="wh">我打算如何补上它</div><div class="pline"></div>
+<p style="margin-top:10px" class="small">背面（教师收齐，第 1 章" + "「观察声明」后测对照用）：</p><div class="pline"></div>
+</div></div></section>
+<section id="debrief"><h2><span class="no">08</span>八、讨论引导（分层）</h2><ol class="debrief"><li><span class="level lv1">识记</span>说出教材 13.4 评价量规的五个维度及其权重。</li><li><span class="level lv2">分析</span>你抽到的进度卡是第几级？评质疑询中，你最答不上来的是哪一问？</li><li><span class="level lv2">分析</span>从「演示」到「研究」，那条线应该画在第几粒？请给出你的判据。</li><li><span class="level lv3">反思</span>量规里的百分比是精确的吗？它的作用是什么——测量，还是约定？</li><li><span class="level lv3">反思</span>13.3 的四要素闭环，如何把模糊的「堆」变成可核查的证据链？</li><li><span class="level lv3">反思</span>回看第 1 章的「观察声明」：这学期你真的说清了「我站在哪、我漏了什么」吗？</li></ol></section>
+<section id="assessment"><h2><span class="no">09</span>九、评价与计分</h2>
+<div class="scorebox"><table><thead><tr><th>维度</th><th>分值</th><th>达标描述</th><th>扣分点</th></tr></thead><tbody><tr><td class="b">答辩陈述</td><td>25</td><td>5 分钟内讲清问题—数据—方法—结论—局限</td><td>缺一环扣 5 分</td></tr><tr><td class="b">证据回应</td><td>25</td><td>质询时能出示具体证据</td><td>只辩解无证据扣 12 分</td></tr><tr><td class="b">量规改写</td><td>30</td><td>五维全部转成可观测证据</td><td>留空一项扣 6 分</td></tr><tr><td class="b">阈值论证</td><td>20</td><td>能说明「为什么是这条线」</td><td>只给结论无论证扣 10 分</td></tr></tbody></table></div>
+<div class="callout green"><b>个人加分（+5）：</b>主动承认自己项目" + "「还没到那粒沙」，并说清还差什么。</div>
+</section>
+<section id="redline"><h2><span class="no">10</span>十、伦理与安全红线</h2>
+<div class="callout risk"><b>教学红线：</b>①质询必须" + "「对事不对人」——只评项目证据，不评学生能力；②不得用进度卡给学生贴" + "「水平高低」标签，卡片是抽签所得；③若使用学生真实项目，须征得同意且只用于课堂；④阈值辩论不得演变成互相贬低，主持人须在出现人身指向时立即中止。</div>
+</section>
+<section id="tips"><h2><span class="no">11</span>十一、教师提示与变体</h2>
+<details><summary>提示 1 · 大班控场</summary><ul>
+<li><b>抽签制：</b>进度卡随机发放，低级别组也能" + "「辩护成功」——这个反差正是悖论体验，务必保留。</li>
+<li><b>评委轮换：</b>每 3 组换一次评委，让更多人体验质询视角。</li>
+<li><b>时间紧：</b>只做" + "「抽卡 → 1 分钟辩护 → 量规改写」三个环节，25 分钟可完成。</li>
+</ul></details>
+<details><summary>提示 2 · 真实版与联动</summary><ul>
+<li><b>真实版：</b>直接用学生本学期的小组项目作为进度卡素材，代入感最强；但要注意脱敏与同意。</li>
+<li><b>制度遗产：</b>把全班修订的量规保留为下一届课程的评分依据，让学生体验" + "「规则由被评价者共同制定」的治理感。</li>
+<li><b>全书收束：</b>本场与游戏 01（庄周梦蝶）首尾呼应——第 1 场问" + "「谁在看」，第 13 场问「做到什么程度算知道」。把" + "「观察声明」与「结课卡」对照发还，是最简洁的全册前后测。</li>
+</ul></details>
+</section>
+</main></div>
+<div class="bottom-nav"><a href="game12.html"><small>← 上一场 · 12</small>电车难题</a><a class="next" href="thought-experiment-games.html"><small>返回 →</small>总览手册</a></div><div class="footer">《数据科学与数字人文》教学配套资源 · 思想实验课堂游戏 · 素材仅限教学使用 · 真实史料请注明来源与许可</div>
+</body>
+</html>

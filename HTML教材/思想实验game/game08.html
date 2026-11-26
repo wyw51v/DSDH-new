@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏 08｜缸中之脑 · 数据科学与数字人文</title>
+<style>
+:root{
+  --blue:#1f4e79; --blue2:#2b6cb0; --blue3:#3b82c4;
+  --soft:#eaf2fa; --soft2:#f5f9fd;
+  --green:#2f855a; --gsoft:#e9f6ef;
+  --ink:#1a202c; --muted:#4a5568; --faint:#718096;
+  --line:#d9e2ec; --line2:#edf1f6;
+  --bg:#f4f7fb; --card:#ffffff;
+  --red:#c53030; --rsoft:#fff5f5; --rline:#feb2b2;
+  --amber:#b7791f; --asoft:#fffaf0;
+  --shadow:0 2px 12px rgba(31,78,121,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  line-height:1.78;font-size:15px}
+a{color:var(--blue2);text-decoration:none}
+a:hover{text-decoration:underline}
+code{background:var(--soft);padding:1px 5px;border-radius:4px;font-family:Consolas,"Courier New",monospace;font-size:.9em;color:var(--blue)}
+
+/* ---------- top bar ---------- */
+.topbar{background:var(--blue);color:#fff;padding:11px 0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.topbar .wrap{max-width:1240px;margin:0 auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{font-size:15.5px;font-weight:700}
+.brand small{display:block;font-size:11px;font-weight:400;opacity:.8;letter-spacing:.3px}
+.topbar nav{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.topbar nav a,.topbar nav button{color:#fff;border:1px solid rgba(255,255,255,.42);background:transparent;
+  padding:5px 11px;border-radius:6px;font-size:12.5px;cursor:pointer;font-family:inherit;line-height:1.4}
+.topbar nav a:hover,.topbar nav button:hover{background:rgba(255,255,255,.16);text-decoration:none}
+.topbar nav .current{background:rgba(255,255,255,.2);border-color:#fff}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(120deg,#1f4e79 0%,#2b6cb0 52%,#2f855a 140%);color:#fff;padding:34px 22px 30px}
+.hero .wrap{max-width:1240px;margin:0 auto}
+.hero .kicker{font-size:11.5px;letter-spacing:2px;opacity:.85;margin:0 0 8px}
+.hero .tag{border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 10px;display:inline-block;font-size:11px;margin-bottom:10px}
+.hero h1{margin:0 0 6px;font-size:29px;line-height:1.3}
+.hero .en{font-size:13px;font-weight:400;opacity:.8;margin-left:8px}
+.hero .game-name{font-size:16px;font-weight:600;opacity:.96;margin:0 0 10px}
+.hero .lead{max-width:930px;margin:0;opacity:.93;font-size:13.8px}
+.stats{display:flex;gap:0;flex-wrap:wrap;margin-top:22px;border-top:1px solid rgba(255,255,255,.28);padding-top:16px}
+.stats .st{padding:0 20px;border-left:2px solid rgba(255,255,255,.4);min-width:120px}
+.stats .st:first-child{padding-left:0;border-left:none}
+.stats .st b{display:block;font-size:17px;line-height:1.3}
+.stats .st span{font-size:11px;opacity:.82}
+
+/* ---------- layout ---------- */
+.doc{max-width:1240px;margin:0 auto;padding:24px 22px 56px;display:grid;grid-template-columns:248px 1fr;gap:26px;align-items:start}
+.side{position:sticky;top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:15px;box-shadow:var(--shadow);max-height:calc(100vh - 28px);overflow:auto}
+.side h4{margin:2px 0 10px;font-size:12.5px;color:var(--blue);letter-spacing:.5px}
+.side a{display:block;padding:5px 8px;border-radius:6px;font-size:12.4px;color:var(--muted);line-height:1.45}
+.side a:hover{background:var(--soft);color:var(--blue);text-decoration:none}
+.side .jp{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.side .jp a{font-size:11.8px}
+.content{min-width:0}
+.content section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px 26px;margin-bottom:18px;box-shadow:var(--shadow)}
+.content section>h2{margin:0 0 14px;font-size:19px;color:var(--blue);padding-bottom:10px;border-bottom:2px solid var(--gsoft)}
+.content section>h2 .no{color:var(--green);font-size:13px;margin-right:8px}
+h3.sub{font-size:14.5px;color:var(--blue);margin:18px 0 8px;padding-left:9px;border-left:3px solid var(--green)}
+h3.sub:first-of-type{margin-top:4px}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:5px 0}
+b,strong{color:var(--blue)}
+.small{font-size:12.8px;color:var(--muted)}
+
+/* ---------- blocks ---------- */
+.quote{background:var(--soft2);border-left:4px solid var(--blue3);border-radius:0 8px 8px 0;padding:12px 16px;margin:10px 0;font-size:13.6px}
+.quote .src{display:block;font-size:11.8px;color:var(--faint);margin-top:6px}
+.think{border:1px solid var(--line);border-radius:10px;padding:13px 16px;background:#fbfdff;margin:12px 0}
+.think .q{font-weight:700;color:var(--green);font-size:14px;margin-bottom:5px}
+.level{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:6px;vertical-align:1px}
+.lv1{background:var(--soft);color:var(--blue)}
+.lv2{background:var(--gsoft);color:var(--green)}
+.lv3{background:var(--asoft);color:var(--amber)}
+.callout{border-left:4px solid var(--blue2);background:var(--soft);border-radius:0 8px 8px 0;padding:11px 15px;margin:12px 0;font-size:13.4px}
+.callout.green{border-left-color:var(--green);background:var(--gsoft)}
+.callout.risk{border-left-color:var(--red);background:var(--rsoft);border:1px solid var(--rline);border-left-width:4px;color:#7b2020}
+.callout.amber{border-left-color:var(--amber);background:var(--asoft)}
+
+/* ---------- setup cards ---------- */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:12px 0}
+.infocard{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--soft2)}
+.infocard h4{margin:0 0 6px;font-size:12.6px;color:var(--blue);letter-spacing:.3px}
+.infocard .big{font-size:19px;font-weight:700;color:var(--green);line-height:1.3}
+.infocard p,.infocard ul{font-size:12.9px;margin:4px 0}
+.infocard ul{padding-left:18px}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;margin:12px 0}
+table.tb{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+table.tb th{background:var(--blue);color:#fff;text-align:left;padding:8px 10px;font-weight:600;font-size:12.5px}
+table.tb td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+table.tb tbody tr:nth-child(even){background:#f8fafc}
+table.tb.compact{font-size:12.5px}
+table.tb.compact th,table.tb.compact td{padding:6px 8px}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill.b{background:var(--soft);color:var(--blue)}
+.pill.g{background:var(--gsoft);color:var(--green)}
+.pill.r{background:var(--rsoft);color:var(--red)}
+
+/* ---------- flow ---------- */
+ol.flow{margin:10px 0;padding:0;list-style:none;counter-reset:flow}
+ol.flow>li{position:relative;padding:12px 14px 12px 52px;margin:10px 0;border:1px solid var(--line);border-radius:9px;background:#fbfdff;counter-increment:flow}
+ol.flow>li:before{content:counter(flow);position:absolute;left:13px;top:12px;width:27px;height:27px;border-radius:8px;
+  background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+ol.flow>li .ft{font-weight:700;color:var(--blue);font-size:14px}
+ol.flow>li .tm{float:right;background:var(--gsoft);color:var(--green);font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px}
+ol.flow>li .say{background:var(--asoft);border-left:3px solid var(--amber);padding:7px 11px;margin-top:8px;font-size:12.8px;color:#6b4f1d;border-radius:0 6px 6px 0}
+ol.flow>li p{font-size:13.2px;margin:5px 0}
+
+/* ---------- printable materials ---------- */
+.pm{border:2px dashed #b9c9da;border-radius:11px;padding:15px 17px;margin:16px 0;background:#fff;page-break-inside:avoid}
+.pm-h{margin:0 0 3px;font-size:14.5px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.pm-h .tagp{background:var(--green);color:#fff;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.pm-note{font-size:12.3px;color:var(--muted);margin:0 0 12px;background:var(--soft2);padding:6px 10px;border-radius:6px}
+.pgrid{display:grid;gap:12px}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+.pcard{border:1.5px solid #94a9be;border-radius:8px;padding:11px 12px;min-height:118px;background:#fcfdff;display:flex;flex-direction:column}
+.pcard .plab{font-size:10.8px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--blue);border-radius:4px;padding:2px 7px;display:inline-block;align-self:flex-start;margin-bottom:7px}
+.pcard.g .plab{background:var(--green)}
+.pcard.r .plab{background:var(--red)}
+.pcard.a .plab{background:var(--amber)}
+.pcard .pbody{font-size:12.6px;line-height:1.62;flex:1}
+.pcard .pbody p{margin:3px 0}
+.pcard .pcut{margin-top:9px;border-top:1px dashed #b9c9da;padding-top:5px;font-size:9.5px;color:var(--faint);text-align:center}
+.wsheet{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fcfdff;font-size:12.8px}
+.wsheet .wh{font-weight:700;color:var(--blue);margin:10px 0 5px;font-size:13px}
+.wsheet .wh:first-child{margin-top:0}
+.pline{border-bottom:1px solid #c3cfdb;height:26px;margin:5px 0}
+.pline.short{width:55%}
+.wsheet table.mm{width:100%;border-collapse:collapse;font-size:12px}
+.wsheet table.mm th,.wsheet table.mm td{border:1px solid #c3cfdb;padding:6px 7px;text-align:left;vertical-align:top}
+.wsheet table.mm th{background:var(--soft);color:var(--blue);font-size:11.5px}
+.wsheet table.mm td.empty{height:34px}
+.scorebox{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
+.scorebox table{width:100%;border-collapse:collapse;font-size:12.5px}
+.scorebox th{background:var(--green);color:#fff;padding:7px 9px;text-align:left}
+.scorebox td{border-bottom:1px solid var(--line);padding:6px 9px}
+.scorebox td.b{background:#fbfdff}
+
+/* ---------- debrief / tips ---------- */
+ol.debrief{margin:10px 0;padding-left:0;list-style:none;counter-reset:db}
+ol.debrief li{position:relative;padding:9px 12px 9px 42px;margin:7px 0;border-left:3px solid var(--gsoft);background:#fbfdff;border-radius:0 8px 8px 0;font-size:13.3px;counter-increment:db}
+ol.debrief li:before{content:counter(db);position:absolute;left:11px;top:9px;color:var(--green);font-weight:800;font-size:13px}
+details{margin:12px 0;border:1px solid var(--line);border-radius:9px;background:var(--soft2);padding:10px 14px}
+details summary{cursor:pointer;color:var(--blue);font-size:13.2px;font-weight:700}
+details[open] summary{margin-bottom:8px}
+details ul,details p{font-size:13px}
+
+/* ---------- bottom nav ---------- */
+.bottom-nav{max-width:1240px;margin:0 auto 40px;padding:0 22px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bottom-nav a{flex:1;min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow);font-size:13px}
+.bottom-nav a:hover{border-color:var(--blue2);text-decoration:none}
+.bottom-nav a small{display:block;color:var(--faint);font-size:11px}
+.bottom-nav a.next{text-align:right}
+.footer{text-align:center;color:var(--faint);font-size:11.8px;padding:0 20px 34px}
+
+/* ---------- responsive ---------- */
+@media(max-width:920px){
+  .doc{grid-template-columns:1fr;padding:18px 14px}
+  .side{position:static;max-height:none}
+  .content section{padding:19px 17px}
+  .hero h1{font-size:24px}
+  .cols-3,.cols-4{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+
+/* ---------- print ---------- */
+@media print{
+  body{background:#fff;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .topbar,.side,.bottom-nav,.footer{display:none!important}
+  .doc{display:block;padding:0;max-width:none}
+  .content section{border:none;box-shadow:none;padding:0 0 14px;margin:0 0 14px;page-break-inside:auto;border-bottom:1px solid #ddd;border-radius:0}
+  .hero{background:#1f4e79!important;padding:14px 0;color:#fff}
+  .hero h1{font-size:20pt}
+  .hero .lead,.stats .st span{font-size:9pt}
+  .pm{page-break-before:auto;page-break-inside:avoid;border:2px dashed #777}
+  .pcard{min-height:105px}
+  details{display:block;border:none;background:none;padding:0}
+  details>summary{display:none}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap"><div class="brand">《数据科学与数字人文》· 思想实验课堂游戏<small>第 08 / 13 场 · 40–45 人班级版</small></div><nav><a href="thought-experiment-games.html">返回总览</a><a href="game07.html">← 上一场</a><a href="game09.html">下一场 →</a><button onclick="window.print()">打印素材</button></nav></div></header>
+<div class="hero"><div class="wrap"><p class="kicker">THOUGHT EXPERIMENT → CLASSROOM GAME · 08 / 13</p><span class="tag">对接 第8章 图像处理与计算机视觉</span><h1>缸中之脑<span class="en">Brain in a Vat · Putnam</span></h1><p class="game-name">课堂游戏：缸中之脑影像馆——盲注打分与核验</p><p class="lead">如果大脑收到的全是计算机喂给它的信号，它如何知道眼前不是真的？学生扮演「缸中的影像分析师」，只看 6 张图写图注、打可信度分。揭晓来源后再发核验工具卡重判一轮——误信率如何下降，就是证据意识的成长曲线。</p><div class="stats"><div class="st"><b>45 分钟</b><span>建议时长</span></div><div class="st"><b>40–45 人</b><span>适用班级</span></div><div class="st"><b>11 组 × 4 人</b><span>分组方式</span></div><div class="st"><b>★★★★☆</b><span>难度</span></div></div></div></div>
+<div class="doc"><aside class="side"><h4>本场目录</h4><a href="#origin">一、思想实验原典与展开</a><a href="#mapping">二、与教材的对接</a><a href="#setup">三、班级组织（40–45 人）</a><a href="#objectives">四、学习目标</a><a href="#materials">五、材料清单与准备</a><a href="#flow">六、游戏流程</a><a href="#assets">七、游戏素材（可打印）</a><a href="#debrief">八、讨论引导（分层）</a><a href="#assessment">九、评价与计分</a><a href="#redline">十、伦理与安全红线</a><a href="#tips">十一、教师提示与变体</a><div class="jp"><a href="game07.html">← 07 平面国</a><a href="game09.html">→ 09 罗素悖论</a></div></aside>
+<main class="content">
+<section id="origin"><h2><span class="no">01</span>一、思想实验原典与展开</h2>
+<h3 class="sub">原典原文（节译）</h3>
+<div class="quote">设想一个被切断神经、放进装满营养液的大缸中的人。他的神经末梢连接到一台超级计算机，计算机按程序向他传送一切感官信号……他于是体验到完全正常的生活。他怎么能知道自己不是这样一个" + "「缸中之脑」？
+<span class="src">——普特南《理性、真理与历史》（Reason, Truth and History），1981，第一章</span></div>
+
+<h3 class="sub">提出者与论证目的</h3>
+<p>希拉里·普特南（Hilary Putnam，1926—2016），美国哲学家。他提出这个场景不是为了鼓吹怀疑论，而是为了<b>反驳</b>它。借助" + "「语义外部主义」，普特南论证：如果我们是缸中之脑，" + "「脑」「缸」这些词的指称就不会是我们以为的东西——所以" + "「我们是缸中之脑」这句话要么为假，要么根本无法被有意义地说出。<b>怀疑论在语义上自我瓦解。</b></p>
+
+<h3 class="sub">思想实验的展开</h3>
+<ol>
+<li><b>笛卡尔前身：</b>17 世纪的" + "「恶魔」设想——一个全能欺骗者系统性地制造我的全部经验。</li>
+<li><b>感知的不可穿透性：</b>从第一人称看，" + "「真实的知觉」与「被完美模拟的知觉」没有任何可分辨的差别。</li>
+<li><b>普特南的反转：</b>知识依赖与外部世界的因果联系；切断这层联系，连" + "「模拟」这个概念都失去指称对象。</li>
+</ol>
+
+<h3 class="sub">后续变体</h3>
+<ul>
+<li><b>《黑客帝国》（1999）：</b>缸中之脑的流行文化版本，" + "「红药丸 / 蓝药丸」成为选择真实与否的隐喻。</li>
+<li><b>模拟假说（Bostrom, 2003）：</b>用概率论证" + "「我们很可能生活在计算机模拟中」。</li>
+<li><b>影像版本（本游戏）：</b>我们看到的不是世界，而是像素。<b>模型只接收像素，它没有能力判断真伪——能力在人也。</b></li>
+</ul>
+
+<h3 class="sub">常见误解</h3>
+<div class="callout amber"><b>误解：</b>" + "「缸中之脑证明我们无法分辨真假，所以什么都不能信。」<br><b>正解：</b>普特南的结论恰恰相反：怀疑论自我瓦解。用于影像课堂时，我们保留的是<b>操作层面的教训</b>——仅凭感官信号不足以判断真伪，必须引入外部证据链。</div>
+</section>
+<section id="mapping"><h2><span class="no">02</span>二、与教材的对接</h2>
+<div class="tbl-wrap"><table class="tb"><thead><tr><th>教材节点</th><th>游戏对应机制</th><th>习得的判断</th></tr></thead><tbody><tr><td>8.2 二值化 / 去噪 / 校正</td><td>篡改图 B1/B2 的处理手法</td><td>图像处理既能修复也能伪造</td></tr><tr><td>8.3 OCR</td><td>图注中的文字转录环节</td><td>OCR 结果须与图像复核</td></tr><tr><td>8.4 图像检索与分类</td><td>盲注时的「这是哪类图」判断</td><td>分类模型的置信度不等于真实性</td></tr><tr><td>8.5 视觉语言模型（VLM）</td><td>VLM 生成描述对照</td><td>描述中混入的幻觉如何识别</td></tr><tr><td>8.6 真实、残缺与伪造</td><td>6 张图的三类设计</td><td>建立真伪的直觉</td></tr><tr><td>8.7 影像核验综合实践</td><td>核验工具卡与图注复核</td><td>证据链而非第一印象</td></tr></tbody></table></div>
+<div class="callout green"><b>一句话锚点：</b>模型只接收像素，它没有能力判断真伪——<b>辨别真伪的能力在人，责任也在人</b>。</div>
+</section>
+<section id="setup"><h2><span class="no">03</span>三、班级组织（40–45 人）</h2>
+<div class="grid3">
+<div class="infocard"><h4>班级规模</h4><div class="big">40–45 人</div><p>11 组 × 4 人 = 44；余 1 人任" + "「揭晓官」，专职公布来源。</p></div>
+<div class="infocard"><h4>组内角色</h4><div class="big">4 人 / 组</div><ul><li>盲注分析师 ×2（写图注、打分）</li><li>核验员 ×1（第二轮用工具卡）</li><li>记录员 ×1（填对照表）</li></ul></div>
+<div class="infocard"><h4>全班角色</h4><div class="big">揭晓官 1 人</div><p>保管 6 张图的真实来源，在指定时刻揭晓；不得提前泄露。</p></div>
+</div>
+<div class="callout">大班关键：<b>投影统一展示 6 张图</b>，不要每组发图片文件（容易造成进度差和源码泄露）。各组只在纸上作答。</div>
+</section>
+<section id="objectives"><h2><span class="no">04</span>四、学习目标</h2>完成本场游戏后，学生应能：<ul><li><b>描述</b>历史影像的图注应包含哪些要素（时间、地点、人物、事件、来源）（识记层）。</li><li><b>执行</b>反向搜图、来源交叉比对、OCR 校勘等基本核验动作（应用层）。</li><li><b>分析</b>盲注阶段的系统性误判模式——哪类图最容易被误信（分析层）。</li><li><b>说明</b>为什么 VLM 生成的图注必须人工复核，并写出一份影像使用守则（反思层）。</li></ul></section>
+<section id="materials"><h2><span class="no">05</span>五、材料清单与准备</h2><div class="tbl-wrap"><table class="tb"><thead><tr><th>品名</th><th>数量（45 人上限）</th><th>说明</th></tr></thead><tbody><tr><td>6 张影像（投影）</td><td>1 套</td><td>真实 2 / 篡改 2 / AI 生成 2；素材页给出规格与建议</td></tr><tr><td>盲注表</td><td>45 份</td><td>每人 1 份，含图注栏与可信度 0–10 分</td></tr><tr><td>核验工具卡</td><td>33 张（3 类 × 11）</td><td>反向搜图 / EXIF / 来源比对 / OCR 校勘合为一卡组</td></tr><tr><td>VLM 描述样例</td><td>11 份</td><td>教师课前准备一段真实 VLM 输出，含 1–2 处幻觉</td></tr><tr><td>核验前后对照表</td><td>11 份</td><td>每组 1 份</td></tr><tr><td>影像使用守则表</td><td>11 份</td><td>每组 1 份</td></tr></tbody></table></div>
+<div class="callout amber"><b>课前 20 分钟：</b>按素材页规格准备 6 张图（真实 2 张从合规馆藏取，篡改 2 张自行处理，AI 生成 2 张保存提示词）。所有合成图在揭晓环节必须明示。若无法生成图，可只用素材页的" + "「文字版影像卡」——同样能完成盲注与核验训练。</div>
+</section>
+<section id="flow"><h2><span class="no">06</span>六、游戏流程</h2><ol class="flow"><li><div class="ft">盲注：只看像素</div><span class="tm">12′</span><p>投影 6 张图，不给来源。各组像「缸中的分析师」一样写图注（时间/地点/人物/事件）并打可信度 0–10 分。禁止使用手机反搜。</p><div class="say"><b>教师引导语：</b>「你现在只能相信眼睛。请记住你最有把握的那一秒——待会儿我们要回头看它。」</div></li><li><div class="ft">揭晓与对账</div><span class="tm">8′</span><p>揭晓官公布每张图的来源与生成方式。各组算「误信率」「错认率」，圈出最自信却错得最离谱的一张。</p></li><li><div class="ft">核验工具卡：再判一轮</div><span class="tm">15′</span><p>发核验工具卡。同样 6 张图，用反搜、EXIF、来源交叉、OCR 校勘、已知档案比对再判一次，记录分数变化。</p><div class="say"><b>教师引导语：</b>「注意：核验不是「再看仔细一点」，而是引入图像之外的证据。没有外部证据，你看不到缸壁。」</div></li><li><div class="ft">VLM 幻觉对照</div><span class="tm">6′</span><p>展示一段 VLM 对其中一张图的描述。学生逐句标注：「看见的」还是「猜出来的」。</p></li><li><div class="ft">守门人裁定</div><span class="tm">4′</span><p>对照 8.6/8.7，各组写一条「历史影像使用守则」，并说明它如何可核查。</p></li></ol></section>
+<section id="assets"><h2><span class="no">07</span>七、游戏素材（可打印）</h2>
+<h3 class="sub">素材 A · 6 张影像卡规格（教师备课用）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>影像卡规格与制作说明</h4><p class="pm-note">真实 2 / 篡改 2 / AI 生成 2。AI 生成图须保存提示词并在揭晓时展示。</p><div class="pgrid cols-3"><div class="pcard g"><span class="plab">A1 · 真实</span><div class="pbody"><p><b>真实·清代志书书影</b></p><p>某馆藏光绪刻本《××县志·人物志》卷端，竖排，有版心刻工名。</p><p class='small'>准备：建议从本校馆藏或公开数字资源截取，注明来源与许可。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">A2 · 真实</span><div class="pbody"><p><b>真实·民国档案照片</b></p><p>1948 年某机构档案照片，含手写题签与印章。</p><p class='small'>准备：建议用教材第 2 章合规获取的样例，注明来源。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard a"><span class="plab">B1 · 篡改</span><div class="pbody"><p><b>篡改·裁剪去语境</b></p><p>把 A1 的书影裁去卷端题名，只留正文，看似「无名古籍」。</p><p class='small'>准备：用 A1 的副本裁切即可；揭晓时并排展示原图。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard a"><span class="plab">B2 · 篡改</span><div class="pbody"><p><b>篡改·调色与拼接</b></p><p>把 A2 照片调成泛黄 sepia，并拼接另一张印章，制造「更早年代」错觉。</p><p class='small'>准备：用图像软件简单处理；须在揭晓时明确说明为教学合成。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard r"><span class="plab">C1 · AI 生成</span><div class="pbody"><p><b>生成·AI 伪造志书页</b></p><p>提示词：「清代地方志人物志书影，竖排刻本，有朱笔圈点」。生成图字体结构错误、栏线不连续。</p><p class='small'>准备：课前用任一 VLM/图像工具生成；保存提示词以便揭晓。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard r"><span class="plab">C2 · AI 生成</span><div class="pbody"><p><b>生成·AI 伪造历史照片</b></p><p>提示词：「1940 年代中国县城街景黑白照片」。生成图招牌文字为乱码、人物手指异常。</p><p class='small'>准备：同上；保存提示词。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">素材 B · 文字版影像卡（无图片时的替代方案）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>文字版影像卡（同样可盲注）</h4><p class="pm-note">若无法准备图片，把下列描述投影即可。仍要求各组写图注与打分——训练的是核验逻辑。</p><div class="pgrid cols-3"><div class="pcard "><span class="plab">W1 · 卷端</span><div class="pbody"><p>「某县志卷三人物志，光绪刻本，版心有刻工姓名，卷端题名清晰，朱笔圈点三处。」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">W2 · 档案照</span><div class="pbody"><p>「黑白照片，一群人站在一栋砖房前，右侧手持写有字的纸牌，字迹可辨。」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">W3 · 去语境</span><div class="pbody"><p>「同一志书的内页，无卷端题名，仅见正文与栏线，页边有虫蛀。」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">W4 · 拼接</span><div class="pbody"><p>「泛黄照片，同一群人站在砖房前，右下多出一枚印章，色调明显偏黄。」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">W5 · AI 志书</span><div class="pbody"><p>「竖排刻本样式，但同一页中字体结构不一致，栏线在中部断开，朱笔圈点无规律。」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">W6 · AI 街景</span><div class="pbody"><p>「1940 年代县城街景，招牌文字为不可辨的乱码，人物手指数量异常，阴影方向不一致。」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">素材 C · 盲注表与核验工具卡</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>盲注表（每人 1 份）</h4><p class="pm-note">第一轮禁止使用任何外部工具；只凭投影图像作答。</p><div class="wsheet">
+<table class="mm"><tr><th style="width:10%">图号</th><th style="width:20%">时间</th><th style="width:20%">地点</th><th style="width:20%">人物/事件</th><th style="width:15%">可信度 0–10</th><th style="width:15%">判断依据</th></tr>
+<tr><td>A1</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>A2</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>B1</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>B2</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>C1</td><td></td><td></td><td></td><td></td><td></td></tr><tr><td>C2</td><td></td><td></td><td></td><td></td><td></td></tr>
+</table>
+<p style="margin-top:8px"><b>我最有把握的一张：</b>____　<b>理由：</b><span class="pline short" style="display:inline-block"></span></p>
+</div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>核验工具卡（每组一套 4 张）</h4><p class="pm-note">第二轮发放。强调：核验必须引入图像之外的证据。</p><div class="pgrid cols-4"><div class="pcard g"><span class="plab">反搜</span><div class="pbody"><p>把图像（或描述）反向搜索，看是否已有公开出处。注意：反搜结果本身也可能被污染。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">EXIF / 元数据</span><div class="pbody"><p>检查文件的拍摄时间、设备、GPS。注意：截图和转存会丢失元数据，「没有元数据」不等于「伪造」。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">来源交叉</span><div class="pbody"><p>与已知档案、地方志、权威数据库比对。问：「这件事在别处有记录吗？」</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">OCR 校勘</span><div class="pbody"><p>对图中文字做 OCR 并人工校对。乱码、错字、时代不符的用词都是破绽。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>核验前后对照表（每组 1 份）</h4><p class="pm-note">统计误信率变化，并说明哪一件工具最有效。</p><div class="wsheet">
+<table class="mm"><tr><th style="width:14%">图号</th><th style="width:18%">真实类别</th><th style="width:17%">首轮可信度</th><th style="width:17%">复核后可信度</th><th style="width:34%">导致改变的关键证据</th></tr>
+<tr><td>A1</td><td></td><td></td><td></td><td></td></tr><tr><td>A2</td><td></td><td></td><td></td><td></td></tr><tr><td>B1</td><td></td><td></td><td></td><td></td></tr><tr><td>B2</td><td></td><td></td><td></td><td></td></tr><tr><td>C1</td><td></td><td></td><td></td><td></td></tr><tr><td>C2</td><td></td><td></td><td></td><td></td></tr>
+</table>
+<div class="wh">首轮误信率</div><p>____ / 6　→　复核后误信率　____ / 6</p>
+<div class="wh">最有效的核验工具</div><div class="pline"></div>
+</div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>历史影像使用守则（每组 1 份）</h4><p class="pm-note">参照 8.6/8.7，写出可核查的条款。</p><div class="wsheet">
+<ol><li>每一张影像须记录：来源、年代、许可、处理方式。</li><li></li><li></li><li></li></ol>
+<div class="wh">本组认为最难守的一条</div><div class="pline"></div>
+</div></div></section>
+<section id="debrief"><h2><span class="no">08</span>八、讨论引导（分层）</h2><ol class="debrief"><li><span class="level lv1">识记</span>说出历史影像图注应包含的五个要素，并解释为何「来源」是其中不可替代的一项。</li><li><span class="level lv2">分析</span>六张图中你误信率最高的是哪一类？真实、篡改、AI 生成，哪一类最容易骗过第一眼？</li><li><span class="level lv2">分析</span>VLM 描述里哪些句子是「看见的」，哪些是「猜出来的」？幻觉有什么共同特征？</li><li><span class="level lv3">反思</span>8.7 任务二要求「生成影像图注并人工复核」——为什么人工复核不可替代？</li><li><span class="level lv3">反思</span>如果一张伪造影像在教学中被当作真实使用了十年，责任链该怎么追溯？</li><li><span class="level lv3">反思</span>普特南说怀疑论自我瓦解。但「操作层面」我们仍必须核验——这两句话如何同时成立？</li></ol></section>
+<section id="assessment"><h2><span class="no">09</span>九、评价与计分</h2>
+<div class="scorebox"><table><thead><tr><th>维度</th><th>分值</th><th>达标描述</th><th>扣分点</th></tr></thead><tbody><tr><td class="b">盲注完整性</td><td>20</td><td>6 张图注五要素齐全、均有打分</td><td>缺 1 项扣 3 分</td></tr><tr><td class="b">误信率下降</td><td>30</td><td>复核后误信率明显下降且有证据支撑</td><td>无下降扣 15 分</td></tr><tr><td class="b">工具使用</td><td>25</td><td>至少使用 3 种核验工具并说明局限</td><td>只写工具名扣 10 分</td></tr><tr><td class="b">守则质量</td><td>25</td><td>守则具体、可核查，含 AI 使用声明</td><td>空泛扣 10 分</td></tr></tbody></table></div>
+<div class="callout green"><b>个人加分（+5）：</b>主动指出自己首轮最自信的判断其实错了。</div>
+</section>
+<section id="redline"><h2><span class="no">10</span>十、伦理与安全红线</h2>
+<div class="callout risk"><b>教学红线：</b>①所有 AI 生成与篡改影像必须在揭晓环节明确标注为教学样例；②不得使用真实人物的敏感影像做篡改演示；③真实历史影像须注明来源与许可（回扣第 2 章）；④若使用文字版影像卡，须说明描述本身已经是" + "「二次表征」，不能替代原图核验。</div>
+</section>
+<section id="tips"><h2><span class="no">11</span>十一、教师提示与变体</h2>
+<details><summary>提示 1 · 备课与控场</summary><ul>
+<li><b>图片准备：</b>真实图优先用本校馆藏或教材第 2 章的合规样例；AI 图生成后保存提示词，揭晓时一并展示，冲击力更强。</li>
+<li><b>无图方案：</b>直接用素材 B 的文字版影像卡——训练目标（核验逻辑）不受影响，且更适合低带宽环境。</li>
+<li><b>揭晓官：</b>由学生担任，可增强仪式感；但须提前交底，防止提前泄露。</li>
+</ul></details>
+<details><summary>提示 2 · 变体与联动</summary><ul>
+<li><b>技术版：</b>现场用 VLM 对同一张图跑两组不同提示词，对比幻觉差异。</li>
+<li><b>OCR 版：</b>把" + "「图」换成「OCR 输出结果」，判断识别文字是否可信，直接对接 8.3。</li>
+<li><b>联动：</b>与游戏 11（图灵测试）构成" + "「视觉幻觉 / 语言幻觉」对称双实验；与游戏 01（庄周梦蝶）构成" + "「古典怀疑 → 技术怀疑」的呼应。</li>
+</ul></details>
+</section>
+</main></div>
+<div class="bottom-nav"><a href="game07.html"><small>← 上一场 · 07</small>平面国</a><a class="next" href="game09.html"><small>下一场 · 09 →</small>罗素悖论</a></div><div class="footer">《数据科学与数字人文》教学配套资源 · 思想实验课堂游戏 · 素材仅限教学使用 · 真实史料请注明来源与许可</div>
+</body>
+</html>

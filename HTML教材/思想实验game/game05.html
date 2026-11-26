@@ -1,0 +1,297 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏 05｜薛定谔的猫 · 数据科学与数字人文</title>
+<style>
+:root{
+  --blue:#1f4e79; --blue2:#2b6cb0; --blue3:#3b82c4;
+  --soft:#eaf2fa; --soft2:#f5f9fd;
+  --green:#2f855a; --gsoft:#e9f6ef;
+  --ink:#1a202c; --muted:#4a5568; --faint:#718096;
+  --line:#d9e2ec; --line2:#edf1f6;
+  --bg:#f4f7fb; --card:#ffffff;
+  --red:#c53030; --rsoft:#fff5f5; --rline:#feb2b2;
+  --amber:#b7791f; --asoft:#fffaf0;
+  --shadow:0 2px 12px rgba(31,78,121,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  line-height:1.78;font-size:15px}
+a{color:var(--blue2);text-decoration:none}
+a:hover{text-decoration:underline}
+code{background:var(--soft);padding:1px 5px;border-radius:4px;font-family:Consolas,"Courier New",monospace;font-size:.9em;color:var(--blue)}
+
+/* ---------- top bar ---------- */
+.topbar{background:var(--blue);color:#fff;padding:11px 0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.topbar .wrap{max-width:1240px;margin:0 auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{font-size:15.5px;font-weight:700}
+.brand small{display:block;font-size:11px;font-weight:400;opacity:.8;letter-spacing:.3px}
+.topbar nav{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.topbar nav a,.topbar nav button{color:#fff;border:1px solid rgba(255,255,255,.42);background:transparent;
+  padding:5px 11px;border-radius:6px;font-size:12.5px;cursor:pointer;font-family:inherit;line-height:1.4}
+.topbar nav a:hover,.topbar nav button:hover{background:rgba(255,255,255,.16);text-decoration:none}
+.topbar nav .current{background:rgba(255,255,255,.2);border-color:#fff}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(120deg,#1f4e79 0%,#2b6cb0 52%,#2f855a 140%);color:#fff;padding:34px 22px 30px}
+.hero .wrap{max-width:1240px;margin:0 auto}
+.hero .kicker{font-size:11.5px;letter-spacing:2px;opacity:.85;margin:0 0 8px}
+.hero .tag{border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 10px;display:inline-block;font-size:11px;margin-bottom:10px}
+.hero h1{margin:0 0 6px;font-size:29px;line-height:1.3}
+.hero .en{font-size:13px;font-weight:400;opacity:.8;margin-left:8px}
+.hero .game-name{font-size:16px;font-weight:600;opacity:.96;margin:0 0 10px}
+.hero .lead{max-width:930px;margin:0;opacity:.93;font-size:13.8px}
+.stats{display:flex;gap:0;flex-wrap:wrap;margin-top:22px;border-top:1px solid rgba(255,255,255,.28);padding-top:16px}
+.stats .st{padding:0 20px;border-left:2px solid rgba(255,255,255,.4);min-width:120px}
+.stats .st:first-child{padding-left:0;border-left:none}
+.stats .st b{display:block;font-size:17px;line-height:1.3}
+.stats .st span{font-size:11px;opacity:.82}
+
+/* ---------- layout ---------- */
+.doc{max-width:1240px;margin:0 auto;padding:24px 22px 56px;display:grid;grid-template-columns:248px 1fr;gap:26px;align-items:start}
+.side{position:sticky;top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:15px;box-shadow:var(--shadow);max-height:calc(100vh - 28px);overflow:auto}
+.side h4{margin:2px 0 10px;font-size:12.5px;color:var(--blue);letter-spacing:.5px}
+.side a{display:block;padding:5px 8px;border-radius:6px;font-size:12.4px;color:var(--muted);line-height:1.45}
+.side a:hover{background:var(--soft);color:var(--blue);text-decoration:none}
+.side .jp{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.side .jp a{font-size:11.8px}
+.content{min-width:0}
+.content section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px 26px;margin-bottom:18px;box-shadow:var(--shadow)}
+.content section>h2{margin:0 0 14px;font-size:19px;color:var(--blue);padding-bottom:10px;border-bottom:2px solid var(--gsoft)}
+.content section>h2 .no{color:var(--green);font-size:13px;margin-right:8px}
+h3.sub{font-size:14.5px;color:var(--blue);margin:18px 0 8px;padding-left:9px;border-left:3px solid var(--green)}
+h3.sub:first-of-type{margin-top:4px}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:5px 0}
+b,strong{color:var(--blue)}
+.small{font-size:12.8px;color:var(--muted)}
+
+/* ---------- blocks ---------- */
+.quote{background:var(--soft2);border-left:4px solid var(--blue3);border-radius:0 8px 8px 0;padding:12px 16px;margin:10px 0;font-size:13.6px}
+.quote .src{display:block;font-size:11.8px;color:var(--faint);margin-top:6px}
+.think{border:1px solid var(--line);border-radius:10px;padding:13px 16px;background:#fbfdff;margin:12px 0}
+.think .q{font-weight:700;color:var(--green);font-size:14px;margin-bottom:5px}
+.level{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:6px;vertical-align:1px}
+.lv1{background:var(--soft);color:var(--blue)}
+.lv2{background:var(--gsoft);color:var(--green)}
+.lv3{background:var(--asoft);color:var(--amber)}
+.callout{border-left:4px solid var(--blue2);background:var(--soft);border-radius:0 8px 8px 0;padding:11px 15px;margin:12px 0;font-size:13.4px}
+.callout.green{border-left-color:var(--green);background:var(--gsoft)}
+.callout.risk{border-left-color:var(--red);background:var(--rsoft);border:1px solid var(--rline);border-left-width:4px;color:#7b2020}
+.callout.amber{border-left-color:var(--amber);background:var(--asoft)}
+
+/* ---------- setup cards ---------- */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:12px 0}
+.infocard{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--soft2)}
+.infocard h4{margin:0 0 6px;font-size:12.6px;color:var(--blue);letter-spacing:.3px}
+.infocard .big{font-size:19px;font-weight:700;color:var(--green);line-height:1.3}
+.infocard p,.infocard ul{font-size:12.9px;margin:4px 0}
+.infocard ul{padding-left:18px}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;margin:12px 0}
+table.tb{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+table.tb th{background:var(--blue);color:#fff;text-align:left;padding:8px 10px;font-weight:600;font-size:12.5px}
+table.tb td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+table.tb tbody tr:nth-child(even){background:#f8fafc}
+table.tb.compact{font-size:12.5px}
+table.tb.compact th,table.tb.compact td{padding:6px 8px}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill.b{background:var(--soft);color:var(--blue)}
+.pill.g{background:var(--gsoft);color:var(--green)}
+.pill.r{background:var(--rsoft);color:var(--red)}
+
+/* ---------- flow ---------- */
+ol.flow{margin:10px 0;padding:0;list-style:none;counter-reset:flow}
+ol.flow>li{position:relative;padding:12px 14px 12px 52px;margin:10px 0;border:1px solid var(--line);border-radius:9px;background:#fbfdff;counter-increment:flow}
+ol.flow>li:before{content:counter(flow);position:absolute;left:13px;top:12px;width:27px;height:27px;border-radius:8px;
+  background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+ol.flow>li .ft{font-weight:700;color:var(--blue);font-size:14px}
+ol.flow>li .tm{float:right;background:var(--gsoft);color:var(--green);font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px}
+ol.flow>li .say{background:var(--asoft);border-left:3px solid var(--amber);padding:7px 11px;margin-top:8px;font-size:12.8px;color:#6b4f1d;border-radius:0 6px 6px 0}
+ol.flow>li p{font-size:13.2px;margin:5px 0}
+
+/* ---------- printable materials ---------- */
+.pm{border:2px dashed #b9c9da;border-radius:11px;padding:15px 17px;margin:16px 0;background:#fff;page-break-inside:avoid}
+.pm-h{margin:0 0 3px;font-size:14.5px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.pm-h .tagp{background:var(--green);color:#fff;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.pm-note{font-size:12.3px;color:var(--muted);margin:0 0 12px;background:var(--soft2);padding:6px 10px;border-radius:6px}
+.pgrid{display:grid;gap:12px}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+.pcard{border:1.5px solid #94a9be;border-radius:8px;padding:11px 12px;min-height:118px;background:#fcfdff;display:flex;flex-direction:column}
+.pcard .plab{font-size:10.8px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--blue);border-radius:4px;padding:2px 7px;display:inline-block;align-self:flex-start;margin-bottom:7px}
+.pcard.g .plab{background:var(--green)}
+.pcard.r .plab{background:var(--red)}
+.pcard.a .plab{background:var(--amber)}
+.pcard .pbody{font-size:12.6px;line-height:1.62;flex:1}
+.pcard .pbody p{margin:3px 0}
+.pcard .pcut{margin-top:9px;border-top:1px dashed #b9c9da;padding-top:5px;font-size:9.5px;color:var(--faint);text-align:center}
+.wsheet{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fcfdff;font-size:12.8px}
+.wsheet .wh{font-weight:700;color:var(--blue);margin:10px 0 5px;font-size:13px}
+.wsheet .wh:first-child{margin-top:0}
+.pline{border-bottom:1px solid #c3cfdb;height:26px;margin:5px 0}
+.pline.short{width:55%}
+.wsheet table.mm{width:100%;border-collapse:collapse;font-size:12px}
+.wsheet table.mm th,.wsheet table.mm td{border:1px solid #c3cfdb;padding:6px 7px;text-align:left;vertical-align:top}
+.wsheet table.mm th{background:var(--soft);color:var(--blue);font-size:11.5px}
+.wsheet table.mm td.empty{height:34px}
+.scorebox{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
+.scorebox table{width:100%;border-collapse:collapse;font-size:12.5px}
+.scorebox th{background:var(--green);color:#fff;padding:7px 9px;text-align:left}
+.scorebox td{border-bottom:1px solid var(--line);padding:6px 9px}
+.scorebox td.b{background:#fbfdff}
+
+/* ---------- debrief / tips ---------- */
+ol.debrief{margin:10px 0;padding-left:0;list-style:none;counter-reset:db}
+ol.debrief li{position:relative;padding:9px 12px 9px 42px;margin:7px 0;border-left:3px solid var(--gsoft);background:#fbfdff;border-radius:0 8px 8px 0;font-size:13.3px;counter-increment:db}
+ol.debrief li:before{content:counter(db);position:absolute;left:11px;top:9px;color:var(--green);font-weight:800;font-size:13px}
+details{margin:12px 0;border:1px solid var(--line);border-radius:9px;background:var(--soft2);padding:10px 14px}
+details summary{cursor:pointer;color:var(--blue);font-size:13.2px;font-weight:700}
+details[open] summary{margin-bottom:8px}
+details ul,details p{font-size:13px}
+
+/* ---------- bottom nav ---------- */
+.bottom-nav{max-width:1240px;margin:0 auto 40px;padding:0 22px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bottom-nav a{flex:1;min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow);font-size:13px}
+.bottom-nav a:hover{border-color:var(--blue2);text-decoration:none}
+.bottom-nav a small{display:block;color:var(--faint);font-size:11px}
+.bottom-nav a.next{text-align:right}
+.footer{text-align:center;color:var(--faint);font-size:11.8px;padding:0 20px 34px}
+
+/* ---------- responsive ---------- */
+@media(max-width:920px){
+  .doc{grid-template-columns:1fr;padding:18px 14px}
+  .side{position:static;max-height:none}
+  .content section{padding:19px 17px}
+  .hero h1{font-size:24px}
+  .cols-3,.cols-4{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+
+/* ---------- print ---------- */
+@media print{
+  body{background:#fff;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .topbar,.side,.bottom-nav,.footer{display:none!important}
+  .doc{display:block;padding:0;max-width:none}
+  .content section{border:none;box-shadow:none;padding:0 0 14px;margin:0 0 14px;page-break-inside:auto;border-bottom:1px solid #ddd;border-radius:0}
+  .hero{background:#1f4e79!important;padding:14px 0;color:#fff}
+  .hero h1{font-size:20pt}
+  .hero .lead,.stats .st span{font-size:9pt}
+  .pm{page-break-before:auto;page-break-inside:avoid;border:2px dashed #777}
+  .pcard{min-height:105px}
+  details{display:block;border:none;background:none;padding:0}
+  details>summary{display:none}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap"><div class="brand">《数据科学与数字人文》· 思想实验课堂游戏<small>第 05 / 13 场 · 40–45 人班级版</small></div><nav><a href="thought-experiment-games.html">返回总览</a><a href="game04.html">← 上一场</a><a href="game06.html">下一场 →</a><button onclick="window.print()">打印素材</button></nav></div></header>
+<div class="hero"><div class="wrap"><p class="kicker">THOUGHT EXPERIMENT → CLASSROOM GAME · 05 / 13</p><span class="tag">对接 第5章 数据可视化与视觉修辞</span><h1>薛定谔的猫<span class="en">Schrödinger's Cat · Schrödinger</span></h1><p class="game-name">课堂游戏：一图两态——同一数据的两种叙事</p><p class="lead">猫在盒子打开前既死又活；一份数据在画出来之前，也可以既是「增长」又是「衰退」。学生用完全相同的数据画出两张方向相反的图，再互猜对方用了哪些修辞手法。玩完之后，「图从来不是中立的」不再是一句口号，而是手上的经验。</p><div class="stats"><div class="st"><b>45 分钟</b><span>建议时长</span></div><div class="st"><b>40–45 人</b><span>适用班级</span></div><div class="st"><b>10 组 × 4–5 人</b><span>分组方式</span></div><div class="st"><b>★★☆☆☆</b><span>难度</span></div></div></div></div>
+<div class="doc"><aside class="side"><h4>本场目录</h4><a href="#origin">一、思想实验原典与展开</a><a href="#mapping">二、与教材的对接</a><a href="#setup">三、班级组织（40–45 人）</a><a href="#objectives">四、学习目标</a><a href="#materials">五、材料清单与准备</a><a href="#flow">六、游戏流程</a><a href="#assets">七、游戏素材（可打印）</a><a href="#debrief">八、讨论引导（分层）</a><a href="#assessment">九、评价与计分</a><a href="#redline">十、伦理与安全红线</a><a href="#tips">十一、教师提示与变体</a><div class="jp"><a href="game04.html">← 04 中文房间</a><a href="game06.html">→ 06 六度分隔</a></div></aside>
+<main class="content">
+<section id="origin"><h2><span class="no">01</span>一、思想实验原典与展开</h2>
+<h3 class="sub">原典原文（节译）</h3>
+<div class="quote">还可以构造完全荒谬的情形。把一只活猫关在钢制箱子里，箱内装有：一小块放射性物质、盖革计数器、一个继电器、一把锤子和一瓶氰化氢。若放射性物质衰变，计数器放电，继电器释放锤子打碎毒瓶，猫即死亡。若未衰变，猫活着。<br>如果整个系统不被观察，猫就处于活与死的叠加态。
+<span class="src">——薛定谔《量子力学的现状》（Die gegenwärtige Situation in der Quantenmechanik），1935</span></div>
+
+<h3 class="sub">提出者与写作动机</h3>
+<p>埃尔温·薛定谔（1887—1961），奥地利物理学家，波动力学创始人。这篇论文本意是<b>讽刺</b>哥本哈根诠释：如果量子叠加可以无条件外推到宏观物体，那么" + "「猫既死又活」这种荒谬结论就必须被接受。他写道：人们不会因此就相信猫真的处于半死不活状态。</p>
+
+<h3 class="sub">思想实验的展开</h3>
+<ol>
+<li><b>叠加态：</b>放射性原子在观测前处于" + "「衰变 / 未衰变」的线性叠加，按量子力学，整个系统也处于叠加。</li>
+<li><b>测量问题：</b>何时" + "「坍缩」？观测者是谁？仪器算不算观测者？——这叫<b>测量问题</b>，至今未有公认解。</li>
+<li><b>维格纳的朋友（1961）：</b>让一位朋友在盒内观察，盒外的维格纳仍可把" + "「朋友 + 猫」视作叠加——观察者也可以被叠加，问题递归。</li>
+</ol>
+
+<h3 class="sub">后续变体</h3>
+<ul>
+<li><b>量子自杀 / 量子永生（多世界诠释）：</b>把实验者放进盒子，从第一人称视角只会看到自己存活的分支。</li>
+<li><b>可视化版本（本游戏）：</b>数据是那只猫，" + "「画法」是开盒的动作。同一份数据在两种视觉框架下呈现相反状态——不是物理叠加，而是<b>表征叠加</b>。</li>
+</ul>
+
+<h3 class="sub">常见误解</h3>
+<div class="callout amber"><b>误解：</b>" + "「薛定谔真的认为猫既死又活。」<br><b>正解：</b>恰恰相反，这是一个<b>归谬法</b>思想实验。把它借用可视化课堂时，我们保留的是" + "「观测/呈现方式决定状态」这一结构，而不是量子力学主张。</div>
+</section>
+<section id="mapping"><h2><span class="no">02</span>二、与教材的对接</h2>
+<div class="tbl-wrap"><table class="tb"><thead><tr><th>教材节点</th><th>游戏对应机制</th><th>习得的判断</th></tr></thead><tbody><tr><td>5.1 图从来不是中立的</td><td>同一数据画出相反结论</td><td>中立性是一种需要证明的宣称</td></tr><tr><td>5.3 叙事可视化与 framing</td><td>「增长版 / 停滞版」两种框定</td><td>framing 是选择，不是错误</td></tr><tr><td>5.4 视觉修辞三要素</td><td>手法互猜按路径/视角/色彩归类</td><td>给操控手法命名</td></tr><tr><td>5.6 误导与操控的红线</td><td>红线裁决环节</td><td>区分合法手法与欺骗</td></tr><tr><td>5.7 任务二：同一数据两种叙事</td><td>本游戏即该任务的课堂化</td><td>直接对接教材实践</td></tr></tbody></table></div>
+<div class="callout green"><b>一句话锚点：</b>不是观测决定了数据，而是<b>呈现决定了公众看到的数据</b>。数据没变，责任在呈现者。</div>
+</section>
+<section id="setup"><h2><span class="no">03</span>三、班级组织（40–45 人）</h2>
+<div class="grid3">
+<div class="infocard"><h4>班级规模</h4><div class="big">40–45 人</div><p>10 组 × 4–5 人；若用机房，可改为 20 组 × 2 人，每人一机。</p></div>
+<div class="infocard"><h4>组内角色</h4><div class="big">4–5 人 / 组</div><ul><li>增长版主笔 ×2</li><li>停滞版主笔 ×2</li><li>评审员 ×1（第 3 环节主答）</li></ul></div>
+<div class="infocard"><h4>全班角色</h4><div class="big">画廊评审 45 人</div><p>张贴后每人持 3 枚贴纸，投给自己认为" + "「手法最隐蔽」的三张图。</p></div>
+</div>
+<div class="callout">大班关键：<b>画廊式互评</b>——把所有图贴墙，全班走动投票，比逐个上台讲快得多，也更接近真实展览现场。</div>
+</section>
+<section id="objectives"><h2><span class="no">04</span>四、学习目标</h2>完成本场游戏后，学生应能：<ul><li><b>识别</b>截断纵轴、起点选择、色彩暗示、标注措辞四种常见 framing 手法（识记层）。</li><li><b>绘制</b>同一数据集的两种相反叙事图，并说明每种手法的作用（应用层）。</li><li><b>拆解</b>他人图表中的修辞手段，按教材三要素归类（分析层）。</li><li><b>判定</b>手法与欺骗的边界，并说明责任归属（反思层）。</li></ul></section>
+<section id="materials"><h2><span class="no">05</span>五、材料清单与准备</h2><div class="tbl-wrap"><table class="tb"><thead><tr><th>品名</th><th>数量（45 人上限）</th><th>说明</th></tr></thead><tbody><tr><td>原始数据表 D</td><td>10 套（每组 1 套）</td><td>某学科 20 年论文量，含起伏；素材页提供</td></tr><tr><td>空白坐标图模板</td><td>20 份（每组 2 份）</td><td>A4 横向，含可截断纵轴</td></tr><tr><td>彩笔 / 马克笔</td><td>10 套</td><td>每组一套，至少 4 色</td></tr><tr><td>视觉修辞三要素卡</td><td>10 套 × 3 张</td><td>路径 / 视角 / 色彩</td></tr><tr><td>红线判定卡</td><td>10 张</td><td>列出 5 种争议手法供裁决</td></tr><tr><td>画廊投票贴纸</td><td>45 枚</td><td>每人 3 枚</td></tr></tbody></table></div>
+<div class="callout amber"><b>课前准备：</b>数据表 D 建议打印在 A4 上，每组一套；坐标图模板 prepare 20 份。若用电脑，可直接给 Excel 文件，但仍要求" + "「手绘版」一张，因为手绘更能暴露选择。</div>
+</section>
+<section id="flow"><h2><span class="no">06</span>六、游戏流程</h2><ol class="flow"><li><div class="ft">领数据、宣布任务</div><span class="tm">4′</span><p>发数据表 D 与两张空白图。任务：「同一份数据，一张让人相信蒸蒸日上，一张让人相信停滞衰退。所有数值不得篡改。」</p><div class="say"><b>教师引导语：</b>「你只能动四样东西：起点、纵轴、颜色、标注。数值一个字都不许改。」</div></li><li><div class="ft">画增长态</div><span class="tm">10′</span><p>增长版主笔绘制。常见手法：纵轴从 60 起、起点选低谷年、暖色、加趋势箭头与「稳步攀升」标注。</p></li><li><div class="ft">画停滞态</div><span class="tm">10′</span><p>停滞版主笔绘制。常见手法：纵轴从 0 起、起点选高峰年、冷色、标注「增长乏力」「进入平台期」。</p></li><li><div class="ft">画廊互猜</div><span class="tm">12′</span><p>两图贴墙，各组轮流走动。在便签上写出「我认为对方用了哪三种手法」，并按三要素卡归类。</p></li><li><div class="ft">红线裁决</div><span class="tm">6′</span><p>教师展示两张图，全班用红线判定卡表决：「哪张说谎了？如果都没改数值，责任在谁？」</p></li><li><div class="ft">收束：给手法命名</div><span class="tm">3′</span><p>教师点出：操控往往不来自造假，而来自一连串「都合法」的小选择叠加。要求每组写一条「制图自律条款」。</p></li></ol></section>
+<section id="assets"><h2><span class="no">07</span>七、游戏素材（可打印）</h2>
+<h3 class="sub">素材 A · 原始数据表 D（每组一套）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>某学科 20 年论文发表量（教学样例）</h4><p class="pm-note">这张表是全组唯一数据源。数值不得改动，只能改画法。</p><div class="wsheet">
+<table class="mm"><tr><th>年份</th><th>篇数</th><th>年份</th><th>篇数</th><th>年份</th><th>篇数</th><th>年份</th><th>篇数</th></tr>
+<tr><td>2001</td><td>62</td><td>2006</td><td>71</td><td>2011</td><td>83</td><td>2016</td><td>79</td></tr>
+<tr><td>2002</td><td>65</td><td>2007</td><td>68</td><td>2012</td><td>88</td><td>2017</td><td>82</td></tr>
+<tr><td>2003</td><td>60</td><td>2008</td><td>74</td><td>2013</td><td>91</td><td>2018</td><td>78</td></tr>
+<tr><td>2004</td><td>64</td><td>2009</td><td>77</td><td>2014</td><td>86</td><td>2019</td><td>80</td></tr>
+<tr><td>2005</td><td>69</td><td>2010</td><td>73</td><td>2015</td><td>89</td><td>2020</td><td>77</td></tr>
+</table>
+<p style="margin-top:8px"><b>设计提示：</b>2003 年是低谷（60），2013 年是高峰（91），2014 年后回落到 77–82。起点选 2003 还是 2013，会完全改变叙事。</p>
+</div></div>
+<h3 class="sub">素材 B · 空白坐标图模板（每组 2 份）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>图 A / 图 B · 同一数据的两种画法</h4><p class="pm-note">纵轴起点由你决定；请在图侧写明你选了什么起点、什么配色、什么标题。</p><div class="wsheet">
+<div class="wh">图 ____ ：【　增长版　／　停滞版　】（请圈选）</div>
+<div style="border:1px solid #94a9be;height:210px;position:relative;margin:8px 0 4px 34px">
+ <div style="position:absolute;left:-30px;top:0;bottom:0;display:flex;align-items:center;writing-mode:vertical-rl;font-size:11px;color:#4a5568">纵轴（起点：____）</div>
+ <div style="position:absolute;left:0;bottom:24px;right:0;border-top:1.5px solid #1a202c"></div>
+ <div style="position:absolute;left:0;bottom:24px;top:0;border-left:1.5px solid #1a202c"></div>
+ <div style="position:absolute;left:8px;bottom:6px;font-size:10px;color:#718096">年份 →</div>
+</div>
+<div class="wh">标题（你选择的措辞）</div><div class="pline"></div>
+<div class="wh">我使用的三种手法</div><p>① 起点：＿＿＿＿　② 配色：＿＿＿＿　③ 标注：＿＿＿＿</p>
+</div></div>
+<h3 class="sub">素材 C · 三要素卡与红线判定卡</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>视觉修辞三要素卡（每组 3 张）</h4><p class="pm-note">互猜环节用来给对方的手法归类。</p><div class="pgrid cols-3"><div class="pcard g"><span class="plab">路径</span><div class="pbody"><p>读者的视线被引导去哪？先看峰值还是先看起点？是否用箭头、趋势线、排序规定阅读顺序？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">视角</span><div class="pbody"><p>纵轴从哪起？比例尺多大？时间窗口截取哪一段？坐标轴是否被截断？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">色彩</span><div class="pbody"><p>暖色/冷色、饱和度高低、是否用红色强调局部？色彩在暗示什么情绪？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>红线判定卡（每组 1 张）</h4><p class="pm-note">裁决环节逐项打勾。注意：前三项通常算「手法」，后两项才算「欺骗」。</p><div class="pgrid cols-1"><div class="pcard r"><span class="plab">红线清单</span><div class="pbody"><p>□ 截断纵轴　□ 选择有利起点　□ 色彩情绪引导<br>□ 隐藏不利数据　□ 篡改数值或伪造数据来源</p><p><b>讨论：</b>前三项是否应被禁止？如果禁止，谁来定「合理起点」？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>画廊互评便签（每人 3 张）</h4><p class="pm-note">走动观展时填写，贴在图旁。</p><div class="wsheet">
+<p>我认为第 ____ 组的【　增长版 / 停滞版　】使用了：</p>
+<p>手法 1：＿＿＿＿＿＿　手法 2：＿＿＿＿＿＿　手法 3：＿＿＿＿＿＿</p>
+<p>归类：□路径　□视角　□色彩（可多选）</p>
+<p>我的判断：□ 合法叙事　□ 越界误导</p>
+</div></div></section>
+<section id="debrief"><h2><span class="no">08</span>八、讨论引导（分层）</h2><ol class="debrief"><li><span class="level lv1">识记</span>说出教材 5.4 的视觉修辞三要素，并各举本场一张图里的例子。</li><li><span class="level lv2">分析</span>两图都没改数值，为什么结论相反？把「起点 → 纵轴 → 配色 → 标注」的决策链写出来。</li><li><span class="level lv2">分析</span>互猜环节中，哪一种手法最容易被识破？哪一种最隐蔽？为什么？</li><li><span class="level lv3">反思</span>如果两图都没造假，「说谎」的责任在谁？数据、工具，还是制图者？</li><li><span class="level lv3">反思</span>5.6 的红线应该画在「截断纵轴」这里吗？如果禁止截断，谁来定义「合理起点」？</li><li><span class="level lv3">反思</span>为你的专业领域写一条「制图自律条款」，并说明它如何可核查。</li></ol></section>
+<section id="assessment"><h2><span class="no">09</span>九、评价与计分</h2>
+<div class="scorebox"><table><thead><tr><th>维度</th><th>分值</th><th>达标描述</th><th>扣分点</th></tr></thead><tbody><tr><td class="b">双图差异度</td><td>25</td><td>两图结论明确相反，且数值未改</td><td>结论不够相反扣 10 分</td></tr><tr><td class="b">手法运用</td><td>25</td><td>每张图至少用 3 种手法且能说出作用</td><td>少 1 种扣 8 分</td></tr><tr><td class="b">互猜准确度</td><td>25</td><td>准确指出对方手法并按三要素归类</td><td>归类错误每处扣 5 分</td></tr><tr><td class="b">红线判断</td><td>25</td><td>能区分合法手法与欺骗并给出理由</td><td>只给结论无论证扣 10 分</td></tr></tbody></table></div>
+<div class="callout green"><b>个人加分（+5）：</b>找出一张自己曾经相信过的新闻图表，指出它的 framing。</div>
+</section>
+<section id="redline"><h2><span class="no">10</span>十、伦理与安全红线</h2>
+<div class="callout risk"><b>教学红线：</b>①数据表 D 为教学合成样例，须标注，不得冒充真实学科统计；②不得使用真实新闻图表做" + "「找出误导」的公开批评而不给上下文，避免误伤；③裁决环节要强调：很多手法是合理叙事工具，" + "「越界」需结合语境判断，不是列黑名单。</div>
+</section>
+<section id="tips"><h2><span class="no">11</span>十一、教师提示与变体</h2>
+<details><summary>提示 1 · 手绘 vs 电脑</summary><ul>
+<li><b>推荐手绘：</b>手绘时每一个选择都是显性的；Excel 自动生成的默认坐标轴反而会掩盖选择。</li>
+<li><b>有电脑版：</b>先手绘一张，再用 Excel 复现，对比" + "「软件默认给了你什么」。这是极好的反思点。</li>
+<li><b>时间紧：</b>可把" + "「画两图」压缩为「给同一张图改标题与配色」，15 分钟可完成。</li>
+</ul></details>
+<details><summary>提示 2 · 变体与联动</summary><ul>
+<li><b>新闻版：</b>用同一组真实数据，找两张立场相反媒体的图，做" + "「找手法」竞赛。</li>
+<li><b>反向变体：</b>教师先给两张结论相反的图，让学生反推" + "「原始数据大概长什么样」。</li>
+<li><b>联动：</b>与游戏 03 对照——清洗决定" + "「哪些状态被记录」，可视化决定「哪些状态被看见」。</li>
+</ul></details>
+</section>
+</main></div>
+<div class="bottom-nav"><a href="game04.html"><small>← 上一场 · 04</small>中文房间</a><a class="next" href="game06.html"><small>下一场 · 06 →</small>六度分隔</a></div><div class="footer">《数据科学与数字人文》教学配套资源 · 思想实验课堂游戏 · 素材仅限教学使用 · 真实史料请注明来源与许可</div>
+</body>
+</html>

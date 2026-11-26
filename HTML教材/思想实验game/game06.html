@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏 06｜六度分隔 · 数据科学与数字人文</title>
+<style>
+:root{
+  --blue:#1f4e79; --blue2:#2b6cb0; --blue3:#3b82c4;
+  --soft:#eaf2fa; --soft2:#f5f9fd;
+  --green:#2f855a; --gsoft:#e9f6ef;
+  --ink:#1a202c; --muted:#4a5568; --faint:#718096;
+  --line:#d9e2ec; --line2:#edf1f6;
+  --bg:#f4f7fb; --card:#ffffff;
+  --red:#c53030; --rsoft:#fff5f5; --rline:#feb2b2;
+  --amber:#b7791f; --asoft:#fffaf0;
+  --shadow:0 2px 12px rgba(31,78,121,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  line-height:1.78;font-size:15px}
+a{color:var(--blue2);text-decoration:none}
+a:hover{text-decoration:underline}
+code{background:var(--soft);padding:1px 5px;border-radius:4px;font-family:Consolas,"Courier New",monospace;font-size:.9em;color:var(--blue)}
+
+/* ---------- top bar ---------- */
+.topbar{background:var(--blue);color:#fff;padding:11px 0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.topbar .wrap{max-width:1240px;margin:0 auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{font-size:15.5px;font-weight:700}
+.brand small{display:block;font-size:11px;font-weight:400;opacity:.8;letter-spacing:.3px}
+.topbar nav{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.topbar nav a,.topbar nav button{color:#fff;border:1px solid rgba(255,255,255,.42);background:transparent;
+  padding:5px 11px;border-radius:6px;font-size:12.5px;cursor:pointer;font-family:inherit;line-height:1.4}
+.topbar nav a:hover,.topbar nav button:hover{background:rgba(255,255,255,.16);text-decoration:none}
+.topbar nav .current{background:rgba(255,255,255,.2);border-color:#fff}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(120deg,#1f4e79 0%,#2b6cb0 52%,#2f855a 140%);color:#fff;padding:34px 22px 30px}
+.hero .wrap{max-width:1240px;margin:0 auto}
+.hero .kicker{font-size:11.5px;letter-spacing:2px;opacity:.85;margin:0 0 8px}
+.hero .tag{border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 10px;display:inline-block;font-size:11px;margin-bottom:10px}
+.hero h1{margin:0 0 6px;font-size:29px;line-height:1.3}
+.hero .en{font-size:13px;font-weight:400;opacity:.8;margin-left:8px}
+.hero .game-name{font-size:16px;font-weight:600;opacity:.96;margin:0 0 10px}
+.hero .lead{max-width:930px;margin:0;opacity:.93;font-size:13.8px}
+.stats{display:flex;gap:0;flex-wrap:wrap;margin-top:22px;border-top:1px solid rgba(255,255,255,.28);padding-top:16px}
+.stats .st{padding:0 20px;border-left:2px solid rgba(255,255,255,.4);min-width:120px}
+.stats .st:first-child{padding-left:0;border-left:none}
+.stats .st b{display:block;font-size:17px;line-height:1.3}
+.stats .st span{font-size:11px;opacity:.82}
+
+/* ---------- layout ---------- */
+.doc{max-width:1240px;margin:0 auto;padding:24px 22px 56px;display:grid;grid-template-columns:248px 1fr;gap:26px;align-items:start}
+.side{position:sticky;top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:15px;box-shadow:var(--shadow);max-height:calc(100vh - 28px);overflow:auto}
+.side h4{margin:2px 0 10px;font-size:12.5px;color:var(--blue);letter-spacing:.5px}
+.side a{display:block;padding:5px 8px;border-radius:6px;font-size:12.4px;color:var(--muted);line-height:1.45}
+.side a:hover{background:var(--soft);color:var(--blue);text-decoration:none}
+.side .jp{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.side .jp a{font-size:11.8px}
+.content{min-width:0}
+.content section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px 26px;margin-bottom:18px;box-shadow:var(--shadow)}
+.content section>h2{margin:0 0 14px;font-size:19px;color:var(--blue);padding-bottom:10px;border-bottom:2px solid var(--gsoft)}
+.content section>h2 .no{color:var(--green);font-size:13px;margin-right:8px}
+h3.sub{font-size:14.5px;color:var(--blue);margin:18px 0 8px;padding-left:9px;border-left:3px solid var(--green)}
+h3.sub:first-of-type{margin-top:4px}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:5px 0}
+b,strong{color:var(--blue)}
+.small{font-size:12.8px;color:var(--muted)}
+
+/* ---------- blocks ---------- */
+.quote{background:var(--soft2);border-left:4px solid var(--blue3);border-radius:0 8px 8px 0;padding:12px 16px;margin:10px 0;font-size:13.6px}
+.quote .src{display:block;font-size:11.8px;color:var(--faint);margin-top:6px}
+.think{border:1px solid var(--line);border-radius:10px;padding:13px 16px;background:#fbfdff;margin:12px 0}
+.think .q{font-weight:700;color:var(--green);font-size:14px;margin-bottom:5px}
+.level{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:6px;vertical-align:1px}
+.lv1{background:var(--soft);color:var(--blue)}
+.lv2{background:var(--gsoft);color:var(--green)}
+.lv3{background:var(--asoft);color:var(--amber)}
+.callout{border-left:4px solid var(--blue2);background:var(--soft);border-radius:0 8px 8px 0;padding:11px 15px;margin:12px 0;font-size:13.4px}
+.callout.green{border-left-color:var(--green);background:var(--gsoft)}
+.callout.risk{border-left-color:var(--red);background:var(--rsoft);border:1px solid var(--rline);border-left-width:4px;color:#7b2020}
+.callout.amber{border-left-color:var(--amber);background:var(--asoft)}
+
+/* ---------- setup cards ---------- */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:12px 0}
+.infocard{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--soft2)}
+.infocard h4{margin:0 0 6px;font-size:12.6px;color:var(--blue);letter-spacing:.3px}
+.infocard .big{font-size:19px;font-weight:700;color:var(--green);line-height:1.3}
+.infocard p,.infocard ul{font-size:12.9px;margin:4px 0}
+.infocard ul{padding-left:18px}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;margin:12px 0}
+table.tb{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+table.tb th{background:var(--blue);color:#fff;text-align:left;padding:8px 10px;font-weight:600;font-size:12.5px}
+table.tb td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+table.tb tbody tr:nth-child(even){background:#f8fafc}
+table.tb.compact{font-size:12.5px}
+table.tb.compact th,table.tb.compact td{padding:6px 8px}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill.b{background:var(--soft);color:var(--blue)}
+.pill.g{background:var(--gsoft);color:var(--green)}
+.pill.r{background:var(--rsoft);color:var(--red)}
+
+/* ---------- flow ---------- */
+ol.flow{margin:10px 0;padding:0;list-style:none;counter-reset:flow}
+ol.flow>li{position:relative;padding:12px 14px 12px 52px;margin:10px 0;border:1px solid var(--line);border-radius:9px;background:#fbfdff;counter-increment:flow}
+ol.flow>li:before{content:counter(flow);position:absolute;left:13px;top:12px;width:27px;height:27px;border-radius:8px;
+  background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+ol.flow>li .ft{font-weight:700;color:var(--blue);font-size:14px}
+ol.flow>li .tm{float:right;background:var(--gsoft);color:var(--green);font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px}
+ol.flow>li .say{background:var(--asoft);border-left:3px solid var(--amber);padding:7px 11px;margin-top:8px;font-size:12.8px;color:#6b4f1d;border-radius:0 6px 6px 0}
+ol.flow>li p{font-size:13.2px;margin:5px 0}
+
+/* ---------- printable materials ---------- */
+.pm{border:2px dashed #b9c9da;border-radius:11px;padding:15px 17px;margin:16px 0;background:#fff;page-break-inside:avoid}
+.pm-h{margin:0 0 3px;font-size:14.5px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.pm-h .tagp{background:var(--green);color:#fff;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.pm-note{font-size:12.3px;color:var(--muted);margin:0 0 12px;background:var(--soft2);padding:6px 10px;border-radius:6px}
+.pgrid{display:grid;gap:12px}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+.pcard{border:1.5px solid #94a9be;border-radius:8px;padding:11px 12px;min-height:118px;background:#fcfdff;display:flex;flex-direction:column}
+.pcard .plab{font-size:10.8px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--blue);border-radius:4px;padding:2px 7px;display:inline-block;align-self:flex-start;margin-bottom:7px}
+.pcard.g .plab{background:var(--green)}
+.pcard.r .plab{background:var(--red)}
+.pcard.a .plab{background:var(--amber)}
+.pcard .pbody{font-size:12.6px;line-height:1.62;flex:1}
+.pcard .pbody p{margin:3px 0}
+.pcard .pcut{margin-top:9px;border-top:1px dashed #b9c9da;padding-top:5px;font-size:9.5px;color:var(--faint);text-align:center}
+.wsheet{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fcfdff;font-size:12.8px}
+.wsheet .wh{font-weight:700;color:var(--blue);margin:10px 0 5px;font-size:13px}
+.wsheet .wh:first-child{margin-top:0}
+.pline{border-bottom:1px solid #c3cfdb;height:26px;margin:5px 0}
+.pline.short{width:55%}
+.wsheet table.mm{width:100%;border-collapse:collapse;font-size:12px}
+.wsheet table.mm th,.wsheet table.mm td{border:1px solid #c3cfdb;padding:6px 7px;text-align:left;vertical-align:top}
+.wsheet table.mm th{background:var(--soft);color:var(--blue);font-size:11.5px}
+.wsheet table.mm td.empty{height:34px}
+.scorebox{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
+.scorebox table{width:100%;border-collapse:collapse;font-size:12.5px}
+.scorebox th{background:var(--green);color:#fff;padding:7px 9px;text-align:left}
+.scorebox td{border-bottom:1px solid var(--line);padding:6px 9px}
+.scorebox td.b{background:#fbfdff}
+
+/* ---------- debrief / tips ---------- */
+ol.debrief{margin:10px 0;padding-left:0;list-style:none;counter-reset:db}
+ol.debrief li{position:relative;padding:9px 12px 9px 42px;margin:7px 0;border-left:3px solid var(--gsoft);background:#fbfdff;border-radius:0 8px 8px 0;font-size:13.3px;counter-increment:db}
+ol.debrief li:before{content:counter(db);position:absolute;left:11px;top:9px;color:var(--green);font-weight:800;font-size:13px}
+details{margin:12px 0;border:1px solid var(--line);border-radius:9px;background:var(--soft2);padding:10px 14px}
+details summary{cursor:pointer;color:var(--blue);font-size:13.2px;font-weight:700}
+details[open] summary{margin-bottom:8px}
+details ul,details p{font-size:13px}
+
+/* ---------- bottom nav ---------- */
+.bottom-nav{max-width:1240px;margin:0 auto 40px;padding:0 22px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bottom-nav a{flex:1;min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow);font-size:13px}
+.bottom-nav a:hover{border-color:var(--blue2);text-decoration:none}
+.bottom-nav a small{display:block;color:var(--faint);font-size:11px}
+.bottom-nav a.next{text-align:right}
+.footer{text-align:center;color:var(--faint);font-size:11.8px;padding:0 20px 34px}
+
+/* ---------- responsive ---------- */
+@media(max-width:920px){
+  .doc{grid-template-columns:1fr;padding:18px 14px}
+  .side{position:static;max-height:none}
+  .content section{padding:19px 17px}
+  .hero h1{font-size:24px}
+  .cols-3,.cols-4{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+
+/* ---------- print ---------- */
+@media print{
+  body{background:#fff;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .topbar,.side,.bottom-nav,.footer{display:none!important}
+  .doc{display:block;padding:0;max-width:none}
+  .content section{border:none;box-shadow:none;padding:0 0 14px;margin:0 0 14px;page-break-inside:auto;border-bottom:1px solid #ddd;border-radius:0}
+  .hero{background:#1f4e79!important;padding:14px 0;color:#fff}
+  .hero h1{font-size:20pt}
+  .hero .lead,.stats .st span{font-size:9pt}
+  .pm{page-break-before:auto;page-break-inside:avoid;border:2px dashed #777}
+  .pcard{min-height:105px}
+  details{display:block;border:none;background:none;padding:0}
+  details>summary{display:none}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap"><div class="brand">《数据科学与数字人文》· 思想实验课堂游戏<small>第 06 / 13 场 · 40–45 人班级版</small></div><nav><a href="thought-experiment-games.html">返回总览</a><a href="game05.html">← 上一场</a><a href="game07.html">下一场 →</a><button onclick="window.print()">打印素材</button></nav></div></header>
+<div class="hero"><div class="wrap"><p class="kicker">THOUGHT EXPERIMENT → CLASSROOM GAME · 06 / 13</p><span class="tag">对接 第6章 社会网络分析</span><h1>六度分隔<span class="en">Six Degrees of Separation · Karinthy / Milgram</span></h1><p class="game-name">课堂游戏：六度人脉挑战——从档案里找出关键先生</p><p class="lead">全班 45 人，每人领一张明末文人圈的人物卡。只靠口头询问「谁与谁同乡、同社、同科」，找出从张溥到张煌言的最短链条。然后投影完整关系网，比较直觉与中心性指标。学生会发现：「关键人物」不是被感觉出来的，是被结构决定的。</p><div class="stats"><div class="st"><b>45 分钟</b><span>建议时长</span></div><div class="st"><b>40–45 人</b><span>适用班级</span></div><div class="st"><b>全班即网络</b><span>分组方式</span></div><div class="st"><b>★★★☆☆</b><span>难度</span></div></div></div></div>
+<div class="doc"><aside class="side"><h4>本场目录</h4><a href="#origin">一、思想实验原典与展开</a><a href="#mapping">二、与教材的对接</a><a href="#setup">三、班级组织（40–45 人）</a><a href="#objectives">四、学习目标</a><a href="#materials">五、材料清单与准备</a><a href="#flow">六、游戏流程</a><a href="#assets">七、游戏素材（可打印）</a><a href="#debrief">八、讨论引导（分层）</a><a href="#assessment">九、评价与计分</a><a href="#redline">十、伦理与安全红线</a><a href="#tips">十一、教师提示与变体</a><div class="jp"><a href="game05.html">← 05 薛定谔的猫</a><a href="game07.html">→ 07 平面国</a></div></aside>
+<main class="content">
+<section id="origin"><h2><span class="no">01</span>一、思想实验原典与展开</h2>
+<h3 class="sub">原典与实验</h3>
+<div class="quote">地球上的任意两个人，最多通过五个中间人就能互相认识。
+<span class="src">——弗里杰什·卡林西《链条》（Láncok），1929</span></div>
+<div class="quote">如果你要联系世界上任意一个陌生人，只需在朋友的朋友中不断传递一封信，平均六个环节即可到达。
+<span class="src">——米尔格拉姆" + "「小世界实验」报告，1967</span></div>
+
+<h3 class="sub">提出者与后续</h3>
+<p>卡林西（Frigyes Karinthy，1887—1938），匈牙利作家，在短篇小说中首次提出" + "「链条」设想。斯坦利·米尔格拉姆（Stanley Milgram，1933—1984）于 1967 年用真实信件做了实验，虽然完成率很低，但" + "「六度」从此进入流行语言。1998 年 Watts 与 Strogatz 提出<b>小世界网络模型</b>，解释了为什么" + "「高聚集 + 少量捷径」能让网络同时兼具局部紧密与全局短路径。</p>
+
+<h3 class="sub">思想实验的展开</h3>
+<ol>
+<li><b>路径长度：</b>任意两点间的平均最短路径，在随机图中随规模对数增长——所以网络再大，" + "「度数」也不会暴涨。</li>
+<li><b>枢纽与桥：</b>少数拥有极高度数或处于社群之间的节点，会显著缩短路径。这就是中心性。</li>
+<li><b>完全图反例：</b>如果人人互相认识，任意两点距离为 1，" + "「六度」失去信息——<b>结构上无差别时，结构性指标无意义</b>。</li>
+</ol>
+
+<h3 class="sub">常见误解</h3>
+<div class="callout amber"><b>误解：</b>" + "「六度是一个精确常数，每个人都能在六步内联系到任何人。」<br><b>正解：</b>它是特定网络的<b>平均</b>路径长度，依赖网络的连接密度与社群结构；孤立社群中根本不成立。教材 6.7 任务三用完全图检验" + "「普遍联系」，正是要拆掉这个迷思。</div>
+</section>
+<section id="mapping"><h2><span class="no">02</span>二、与教材的对接</h2>
+<div class="tbl-wrap"><table class="tb"><thead><tr><th>教材节点</th><th>游戏对应机制</th><th>习得的判断</th></tr></thead><tbody><tr><td>6.1 关系即数据</td><td>人物卡上的关系线索</td><td>把「交游」翻译成边</td></tr><tr><td>6.2 节点 / 边 / 度 / 路径</td><td>口头传递链条</td><td>路径是可测量的</td></tr><tr><td>6.3 中心性</td><td>直觉投票 vs 度数/中介比较</td><td>关键人物的结构性定义</td></tr><tr><td>6.4 社群发现</td><td>复社 / 几社 / 浙东 / 藏书圈</td><td>社群是结构，不是标签</td></tr><tr><td>6.6 网络也会偏见</td><td>史料只记录谁的交游？</td><td>网络的 bias 来自记录</td></tr><tr><td>6.7 任务三：完全图</td><td>反证环节</td><td>普遍联系无信息量</td></tr></tbody></table></div>
+<div class="callout green"><b>一句话锚点：</b>当" + "「人人都有联系」时，联系就不再是信息。这是全册最锋利的结构性反思之一。</div>
+</section>
+<section id="setup"><h2><span class="no">03</span>三、班级组织（40–45 人）</h2>
+<div class="grid3">
+<div class="infocard"><h4>班级规模</h4><div class="big">40–45 人</div><p>每人 1 张人物卡，共 45 张（素材页已备齐）；余数学生兼任" + "「网络观察员」。</p></div>
+<div class="infocard"><h4>分组</h4><div class="big">全班 = 1 张网</div><p>不分组，全班共同构成网络；另设 4 人核对组负责画图与计数。</p></div>
+<div class="infocard"><h4>角色</h4><div class="big">节点 45 人</div><ul><li>每人 = 一个节点</li><li>关系线索 = 边</li><li>核对组 = 分析员</li></ul></div>
+</div>
+<div class="callout">大班关键：<b>口头传递容易失控</b>。规定只许喊" + "「我是 09 陈子龙，我与 01 张溥、05 吴伟业相连」这种格式，每次喊话 5 秒，主持人计时。</div>
+</section>
+<section id="objectives"><h2><span class="no">04</span>四、学习目标</h2>完成本场游戏后，学生应能：<ul><li><b>构建</b>一张从人物卡出发的关系网络，识别节点、边与路径（应用层）。</li><li><b>计算</b>度中心性与中介中心性的近似值，并解释其含义（应用层）。</li><li><b>比较</b>直觉判断与结构指标的差异，说明「关键人物」如何被建构（分析层）。</li><li><b>反思</b>完全图为何无信息量，以及史料记录偏差如何塑造网络（反思层）。</li></ul></section>
+<section id="materials"><h2><span class="no">05</span>五、材料清单与准备</h2><div class="tbl-wrap"><table class="tb"><thead><tr><th>品名</th><th>数量（45 人上限）</th><th>说明</th></tr></thead><tbody><tr><td>人物卡 F01–F45</td><td>45 张</td><td>素材页提供完整数据，打印裁切即可</td></tr><tr><td>关系线索汇总表</td><td>4 份</td><td>核对组使用，含全部 45 人的边</td></tr><tr><td>空白网络图模板</td><td>4 份 + 投影 1 份</td><td>核对组手绘，教师投影完整网络</td></tr><tr><td>完全图对照图</td><td>投影 1 份</td><td>45 节点全连接示意</td></tr><tr><td>中心性计算表</td><td>45 份</td><td>每人 1 份，填自己节点的度与中介估计</td></tr><tr><td>路径记录卡</td><td>10 份</td><td>找到最短链的组填写</td></tr></tbody></table></div>
+<div class="callout amber"><b>课前准备：</b>人物卡按编号打印裁切，洗牌后发放。核对组提前拿到" + "「关系线索汇总表」，负责在黑板上逐步画出网络。教师需提前投影完整网络图（可用 Gephi / 在线白板生成，或手工绘制）。</div>
+</section>
+<section id="flow"><h2><span class="no">06</span>六、游戏流程</h2><ol class="flow"><li><div class="ft">发卡、宣读规则</div><span class="tm">4′</span><p>每人一张人物卡，保密。规则：只能用卡上的「关联人物编号」喊话，格式为「我是 ××，我与 ×× 相连」。禁止展示卡片。</p><div class="say"><b>教师引导语：</b>「你现在不是学生，你是这张卡上的人。你的世界只有卡上那两三条关系。」</div></li><li><div class="ft">六度竞速：找最短链</div><span class="tm">12′</span><p>教师指定起点 F01 张溥、终点 F30 张煌言。全班通过喊话接力，记录从起点到终点的最短链条，看能否在 6 步内到达。核对组同步在黑板画边。</p></li><li><div class="ft">网络揭晓</div><span class="tm">6′</span><p>投影完整关系网。各组核对刚才的口头链条是否真的最短。核对组标出社群：复社 / 几社 / 浙东 / 藏书圈。</p></li><li><div class="ft">找关键先生：直觉 vs 指标</div><span class="tm">10′</span><p>先无记名投票「谁最重要」；再算度数（连了几条边）与中介位置（是否连接不同社群）。对比二者。</p><div class="say"><b>教师引导语：</b>「你选的那个人，是「名气大」还是「位置关键」？这两件事常常不是一回事。」</div></li><li><div class="ft">完全图反证</div><span class="tm">8′</span><p>教师投影「45 人互相全连接」的完全图：每人度数都是 44，每人都是「中心」。讨论：这样的网络里，中心性还有信息量吗？</p></li><li><div class="ft">收束：网络的偏见</div><span class="tm">5′</span><p>追问：这张网里为什么几乎没有女性？是她们没有交游，还是史料没有记录？回到 6.6。</p></li></ol></section>
+<section id="assets"><h2><span class="no">07</span>七、游戏素材（可打印）</h2>
+<h3 class="sub">素材 A · 人物卡 F01–F45（每人 1 张）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>人物卡：明末文人交游圈（教学化简版）</h4><p class="pm-note">共 45 张。数据据明末复社及相关文人圈史料改编，关系线索为教学简化，非严格考据。打印后裁切成卡。</p><div class="pgrid cols-4"><div class="pcard "><span class="plab">01 · 张溥</span><div class="pbody"><p><b>字：</b>天如　<b>籍贯：</b>太仓</p><p><b>身份 / 社群：</b>复社领袖</p><p><b>关联人物编号：</b>02,05,09,12</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">02 · 张采</span><div class="pbody"><p><b>字：</b>受先　<b>籍贯：</b>太仓</p><p><b>身份 / 社群：</b>复社领袖</p><p><b>关联人物编号：</b>01,04,21</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">03 · 周钟</span><div class="pbody"><p><b>字：</b>介生　<b>籍贯：</b>金坛</p><p><b>身份 / 社群：</b>复社</p><p><b>关联人物编号：</b>04,08,09</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">04 · 郑敷教</span><div class="pbody"><p><b>字：</b>桐庵　<b>籍贯：</b>吴县</p><p><b>身份 / 社群：</b>复社</p><p><b>关联人物编号：</b>02,03,22</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">05 · 吴伟业</span><div class="pbody"><p><b>字：</b>骏公　<b>籍贯：</b>太仓</p><p><b>身份 / 社群：</b>复社／科第</p><p><b>关联人物编号：</b>01,09,23</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">06 · 钱谦益</span><div class="pbody"><p><b>字：</b>牧斋　<b>籍贯：</b>常熟</p><p><b>身份 / 社群：</b>文坛宗主／藏书</p><p><b>关联人物编号：</b>07,24,37</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">07 · 龚鼎孳</span><div class="pbody"><p><b>字：</b>孝升　<b>籍贯：</b>合肥</p><p><b>身份 / 社群：</b>复社／科第</p><p><b>关联人物编号：</b>06,08,10</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">08 · 吴昌时</span><div class="pbody"><p><b>字：</b>执之　<b>籍贯：</b>嘉兴</p><p><b>身份 / 社群：</b>复社</p><p><b>关联人物编号：</b>03,07,18</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">09 · 陈子龙</span><div class="pbody"><p><b>字：</b>卧子　<b>籍贯：</b>松江</p><p><b>身份 / 社群：</b>复社／几社</p><p><b>关联人物编号：</b>01,05,10,32</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">10 · 李雯</span><div class="pbody"><p><b>字：</b>舒章　<b>籍贯：</b>松江</p><p><b>身份 / 社群：</b>几社</p><p><b>关联人物编号：</b>07,09,11</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">11 · 宋徵舆</span><div class="pbody"><p><b>字：</b>辕文　<b>籍贯：</b>松江</p><p><b>身份 / 社群：</b>几社</p><p><b>关联人物编号：</b>10,31,32</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">12 · 黄宗羲</span><div class="pbody"><p><b>字：</b>太冲　<b>籍贯：</b>余姚</p><p><b>身份 / 社群：</b>复社／浙东</p><p><b>关联人物编号：</b>01,25,30</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>人物卡 F13–F28（续）</h4><p class="pm-note">继续裁切发放。</p><div class="pgrid cols-4"><div class="pcard "><span class="plab">13 · 顾炎武</span><div class="pbody"><p><b>字：</b>宁人　<b>籍贯：</b>昆山</p><p><b>身份 / 社群：</b>复社／遗民</p><p><b>关联人物编号：</b>14,29,36</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">14 · 归庄</span><div class="pbody"><p><b>字：</b>玄恭　<b>籍贯：</b>昆山</p><p><b>身份 / 社群：</b>复社／遗民</p><p><b>关联人物编号：</b>13,21</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">15 · 傅山</span><div class="pbody"><p><b>字：</b>青主　<b>籍贯：</b>阳曲</p><p><b>身份 / 社群：</b>遗民</p><p><b>关联人物编号：</b>16,34</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">16 · 方以智</span><div class="pbody"><p><b>字：</b>密之　<b>籍贯：</b>桐城</p><p><b>身份 / 社群：</b>复社／遗民</p><p><b>关联人物编号：</b>15,17,19</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">17 · 侯方域</span><div class="pbody"><p><b>字：</b>朝宗　<b>籍贯：</b>商丘</p><p><b>身份 / 社群：</b>复社</p><p><b>关联人物编号：</b>16,18,19</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">18 · 冒襄</span><div class="pbody"><p><b>字：</b>辟疆　<b>籍贯：</b>如皋</p><p><b>身份 / 社群：</b>复社</p><p><b>关联人物编号：</b>08,17,19</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">19 · 陈贞慧</span><div class="pbody"><p><b>字：</b>定生　<b>籍贯：</b>宜兴</p><p><b>身份 / 社群：</b>复社</p><p><b>关联人物编号：</b>16,17,18</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">20 · 吴应箕</span><div class="pbody"><p><b>字：</b>次尾　<b>籍贯：</b>贵池</p><p><b>身份 / 社群：</b>复社</p><p><b>关联人物编号：</b>03,21</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">21 · 杨廷枢</span><div class="pbody"><p><b>字：</b>维斗　<b>籍贯：</b>吴县</p><p><b>身份 / 社群：</b>复社</p><p><b>关联人物编号：</b>02,14,20</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">22 · 徐汧</span><div class="pbody"><p><b>字：</b>九一　<b>籍贯：</b>吴县</p><p><b>身份 / 社群：</b>复社／科第</p><p><b>关联人物编号：</b>04,23</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">23 · 文震孟</span><div class="pbody"><p><b>字：</b>文起　<b>籍贯：</b>吴县</p><p><b>身份 / 社群：</b>科第／东林</p><p><b>关联人物编号：</b>05,22</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">24 · 姚希孟</span><div class="pbody"><p><b>字：</b>孟长　<b>籍贯：</b>吴县</p><p><b>身份 / 社群：</b>科第／东林</p><p><b>关联人物编号：</b>06,23</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">25 · 刘宗周</span><div class="pbody"><p><b>字：</b>起东　<b>籍贯：</b>山阴</p><p><b>身份 / 社群：</b>理学／浙东</p><p><b>关联人物编号：</b>12,26</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">26 · 黄道周</span><div class="pbody"><p><b>字：</b>幼玄　<b>籍贯：</b>漳浦</p><p><b>身份 / 社群：</b>理学／科第</p><p><b>关联人物编号：</b>25,27</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">27 · 倪元璐</span><div class="pbody"><p><b>字：</b>玉汝　<b>籍贯：</b>上虞</p><p><b>身份 / 社群：</b>科第／浙东</p><p><b>关联人物编号：</b>26,28</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">28 · 李清</span><div class="pbody"><p><b>字：</b>映碧　<b>籍贯：</b>兴化</p><p><b>身份 / 社群：</b>科第</p><p><b>关联人物编号：</b>27,29</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>人物卡 F29–F45（续）</h4><p class="pm-note">继续裁切发放。注意 F45 徐孚远是几社通往遗民圈的桥。</p><div class="pgrid cols-4"><div class="pcard "><span class="plab">29 · 钱肃乐</span><div class="pbody"><p><b>字：</b>希声　<b>籍贯：</b>鄞县</p><p><b>身份 / 社群：</b>浙东抗清</p><p><b>关联人物编号：</b>13,28,30</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">30 · 张煌言</span><div class="pbody"><p><b>字：</b>玄著　<b>籍贯：</b>鄞县</p><p><b>身份 / 社群：</b>浙东抗清</p><p><b>关联人物编号：</b>12,29</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">31 · 夏允彝</span><div class="pbody"><p><b>字：</b>彝仲　<b>籍贯：</b>松江</p><p><b>身份 / 社群：</b>几社</p><p><b>关联人物编号：</b>11,32</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">32 · 夏完淳</span><div class="pbody"><p><b>字：</b>存古　<b>籍贯：</b>松江</p><p><b>身份 / 社群：</b>几社</p><p><b>关联人物编号：</b>09,31</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">33 · 王夫之</span><div class="pbody"><p><b>字：</b>而农　<b>籍贯：</b>衡阳</p><p><b>身份 / 社群：</b>遗民／理学</p><p><b>关联人物编号：</b>34,36</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">34 · 顾祖禹</span><div class="pbody"><p><b>字：</b>景范　<b>籍贯：</b>无锡</p><p><b>身份 / 社群：</b>遗民／地理</p><p><b>关联人物编号：</b>15,33</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">35 · 阎若璩</span><div class="pbody"><p><b>字：</b>百诗　<b>籍贯：</b>太原</p><p><b>身份 / 社群：</b>考据</p><p><b>关联人物编号：</b>36,40</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">36 · 毛晋</span><div class="pbody"><p><b>字：</b>子晋　<b>籍贯：</b>常熟</p><p><b>身份 / 社群：</b>藏书／出版</p><p><b>关联人物编号：</b>13,35,37</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">37 · 钱曾</span><div class="pbody"><p><b>字：</b>遵王　<b>籍贯：</b>常熟</p><p><b>身份 / 社群：</b>藏书／出版</p><p><b>关联人物编号：</b>06,36</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">38 · 黄虞稷</span><div class="pbody"><p><b>字：</b>俞邰　<b>籍贯：</b>江宁</p><p><b>身份 / 社群：</b>藏书／目录</p><p><b>关联人物编号：</b>37,40</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">39 · 祁彪佳</span><div class="pbody"><p><b>字：</b>虎子　<b>籍贯：</b>山阴</p><p><b>身份 / 社群：</b>藏书／浙东</p><p><b>关联人物编号：</b>25,38</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">40 · 周亮工</span><div class="pbody"><p><b>字：</b>元亮　<b>籍贯：</b>祥符</p><p><b>身份 / 社群：</b>出版／交游</p><p><b>关联人物编号：</b>35,38</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">41 · 张岱</span><div class="pbody"><p><b>字：</b>宗子　<b>籍贯：</b>山阴</p><p><b>身份 / 社群：</b>遗民／小品</p><p><b>关联人物编号：</b>39,42</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">42 · 冯梦龙</span><div class="pbody"><p><b>字：</b>犹龙　<b>籍贯：</b>吴县</p><p><b>身份 / 社群：</b>通俗文学</p><p><b>关联人物编号：</b>41,43</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">43 · 凌濛初</span><div class="pbody"><p><b>字：</b>玄房　<b>籍贯：</b>乌程</p><p><b>身份 / 社群：</b>通俗文学</p><p><b>关联人物编号：</b>42,44</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">44 · 金堡</span><div class="pbody"><p><b>字：</b>道隐　<b>籍贯：</b>仁和</p><p><b>身份 / 社群：</b>遗民／僧</p><p><b>关联人物编号：</b>30,45</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">45 · 徐孚远</span><div class="pbody"><p><b>字：</b>闇公　<b>籍贯：</b>松江</p><p><b>身份 / 社群：</b>几社／遗民</p><p><b>关联人物编号：</b>11,32</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">素材 B · 关系线索汇总表（核对组 4 份）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>关系线索汇总表</h4><p class="pm-note">核对组专用。用于黑板上逐步画出网络，并计算度数与中介位置。</p><div class="wsheet">
+<table class="mm"><tr><th style="width:12%">编号</th><th style="width:22%">姓名</th><th style="width:20%">社群</th><th style="width:20%">关联编号</th><th style="width:12%">度数</th><th style="width:14%">是否桥接</th></tr>
+<tr><td>01</td><td>张溥</td><td>复社领袖</td><td>02,05,09,12</td><td></td><td></td></tr><tr><td>02</td><td>张采</td><td>复社领袖</td><td>01,04,21</td><td></td><td></td></tr><tr><td>03</td><td>周钟</td><td>复社</td><td>04,08,09</td><td></td><td></td></tr><tr><td>04</td><td>郑敷教</td><td>复社</td><td>02,03,22</td><td></td><td></td></tr><tr><td>05</td><td>吴伟业</td><td>复社</td><td>01,09,23</td><td></td><td></td></tr><tr><td>06</td><td>钱谦益</td><td>文坛宗主</td><td>07,24,37</td><td></td><td></td></tr><tr><td>07</td><td>龚鼎孳</td><td>复社</td><td>06,08,10</td><td></td><td></td></tr><tr><td>08</td><td>吴昌时</td><td>复社</td><td>03,07,18</td><td></td><td></td></tr><tr><td>09</td><td>陈子龙</td><td>复社</td><td>01,05,10,32</td><td></td><td></td></tr><tr><td>10</td><td>李雯</td><td>几社</td><td>07,09,11</td><td></td><td></td></tr><tr><td>11</td><td>宋徵舆</td><td>几社</td><td>10,31,32</td><td></td><td></td></tr><tr><td>12</td><td>黄宗羲</td><td>复社</td><td>01,25,30</td><td></td><td></td></tr><tr><td>13</td><td>顾炎武</td><td>复社</td><td>14,29,36</td><td></td><td></td></tr><tr><td>14</td><td>归庄</td><td>复社</td><td>13,21</td><td></td><td></td></tr><tr><td>15</td><td>傅山</td><td>遗民</td><td>16,34</td><td></td><td></td></tr><tr><td>16</td><td>方以智</td><td>复社</td><td>15,17,19</td><td></td><td></td></tr><tr><td>17</td><td>侯方域</td><td>复社</td><td>16,18,19</td><td></td><td></td></tr><tr><td>18</td><td>冒襄</td><td>复社</td><td>08,17,19</td><td></td><td></td></tr><tr><td>19</td><td>陈贞慧</td><td>复社</td><td>16,17,18</td><td></td><td></td></tr><tr><td>20</td><td>吴应箕</td><td>复社</td><td>03,21</td><td></td><td></td></tr><tr><td>21</td><td>杨廷枢</td><td>复社</td><td>02,14,20</td><td></td><td></td></tr><tr><td>22</td><td>徐汧</td><td>复社</td><td>04,23</td><td></td><td></td></tr><tr><td>23</td><td>文震孟</td><td>科第</td><td>05,22</td><td></td><td></td></tr><tr><td>24</td><td>姚希孟</td><td>科第</td><td>06,23</td><td></td><td></td></tr><tr><td>25</td><td>刘宗周</td><td>理学</td><td>12,26</td><td></td><td></td></tr><tr><td>26</td><td>黄道周</td><td>理学</td><td>25,27</td><td></td><td></td></tr><tr><td>27</td><td>倪元璐</td><td>科第</td><td>26,28</td><td></td><td></td></tr><tr><td>28</td><td>李清</td><td>科第</td><td>27,29</td><td></td><td></td></tr><tr><td>29</td><td>钱肃乐</td><td>浙东抗清</td><td>13,28,30</td><td></td><td></td></tr><tr><td>30</td><td>张煌言</td><td>浙东抗清</td><td>12,29</td><td></td><td></td></tr><tr><td>31</td><td>夏允彝</td><td>几社</td><td>11,32</td><td></td><td></td></tr><tr><td>32</td><td>夏完淳</td><td>几社</td><td>09,31</td><td></td><td></td></tr><tr><td>33</td><td>王夫之</td><td>遗民</td><td>34,36</td><td></td><td></td></tr><tr><td>34</td><td>顾祖禹</td><td>遗民</td><td>15,33</td><td></td><td></td></tr><tr><td>35</td><td>阎若璩</td><td>考据</td><td>36,40</td><td></td><td></td></tr><tr><td>36</td><td>毛晋</td><td>藏书</td><td>13,35,37</td><td></td><td></td></tr><tr><td>37</td><td>钱曾</td><td>藏书</td><td>06,36</td><td></td><td></td></tr><tr><td>38</td><td>黄虞稷</td><td>藏书</td><td>37,40</td><td></td><td></td></tr><tr><td>39</td><td>祁彪佳</td><td>藏书</td><td>25,38</td><td></td><td></td></tr><tr><td>40</td><td>周亮工</td><td>出版</td><td>35,38</td><td></td><td></td></tr><tr><td>41</td><td>张岱</td><td>遗民</td><td>39,42</td><td></td><td></td></tr><tr><td>42</td><td>冯梦龙</td><td>通俗文学</td><td>41,43</td><td></td><td></td></tr><tr><td>43</td><td>凌濛初</td><td>通俗文学</td><td>42,44</td><td></td><td></td></tr><tr><td>44</td><td>金堡</td><td>遗民</td><td>30,45</td><td></td><td></td></tr><tr><td>45</td><td>徐孚远</td><td>几社</td><td>11,32</td><td></td><td></td></tr>
+</table>
+</div></div>
+<h3 class="sub">素材 C · 中心性与路径记录表</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>中心性计算表（每人 1 份）</h4><p class="pm-note">先填直觉，再填指标，最后比较。</p><div class="wsheet">
+<div class="wh">我的节点</div><p>编号 ____　姓名 ____________　社群 ____________</p>
+<div class="wh">直觉判断</div><p>我认为最关键的人物是：编号 ____ 姓名 ____________</p>
+<div class="wh">结构指标</div><p>我的度数（直接关联人数）= ____；我是否连接了两个以上社群？□是 □否</p>
+<div class="wh">比较</div><p>直觉选的人 vs 指标最高的人：□一致 □不一致　原因：＿＿＿＿＿＿＿＿</p>
+</div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>最短路径记录卡（找到即填）</h4><p class="pm-note">记录每一步的编号，形成可核查的链条。</p><div class="wsheet">
+<p><b>起点</b> F01 张溥　→　<b>终点</b> F30 张煌言</p>
+<p>路径：F01 → ____ → ____ → ____ → ____ → ____ → F30　共 ____ 步</p>
+<div class="wh">这条链跨越了哪些社群？</div><div class="pline"></div>
+<div class="wh">若把 F01 的所有边删掉，路径会变长吗？</div><div class="pline"></div>
+</div></div></section>
+<section id="debrief"><h2><span class="no">08</span>八、讨论引导（分层）</h2><ol class="debrief"><li><span class="level lv1">识记</span>说出节点、边、度、路径四个概念，并各举本游戏中的一个例子。</li><li><span class="level lv2">分析</span>你们找到的最短链是几步？它跨越了哪几个社群？哪一条边是「桥」？</li><li><span class="level lv2">分析</span>直觉选的「关键人物」与度数/中介最高的人一致吗？差异说明什么？</li><li><span class="level lv3">反思</span>完全图里每个人的度数都是 44，「人人都是中心」为什么反而没有信息量？</li><li><span class="level lv3">反思</span>这张网里几乎没有女性节点。是她们没有交游，还是史料没有记录？6.6 如何解释？</li><li><span class="level lv3">反思</span>如果这是你自己的微信好友网络，「六度」还成立吗？哪些人会是最关键的桥？</li></ol></section>
+<section id="assessment"><h2><span class="no">09</span>九、评价与计分</h2>
+<div class="scorebox"><table><thead><tr><th>维度</th><th>分值</th><th>达标描述</th><th>扣分点</th></tr></thead><tbody><tr><td class="b">路径寻找</td><td>25</td><td>找出可核查的最短链，步数 ≤6</td><td>链条不连续扣 10 分</td></tr><tr><td class="b">网络绘制</td><td>25</td><td>核对组画出完整网络并标出社群</td><td>漏边 3 条以上扣 10 分</td></tr><tr><td class="b">中心性分析</td><td>25</td><td>度数与中介计算正确，比较有据</td><td>只给结论扣 8 分</td></tr><tr><td class="b">完全图反思</td><td>25</td><td>能说明结构性无信息的含义</td><td>停留在「大家都一样」扣 10 分</td></tr></tbody></table></div>
+<div class="callout green"><b>个人加分（+5）：</b>指出一个" + "「史料未记录其交游」而被网络遗漏的人物类型。</div>
+</section>
+<section id="redline"><h2><span class="no">10</span>十、伦理与安全红线</h2>
+<div class="callout risk"><b>教学红线：</b>①人物关系为教学化简版，不得当作史实引用；②讨论" + "「女性缺席」时，须说明这是史料记录偏差而非历史事实判断；③不得把历史人物的社群身份用于现实人物的类比或评价。</div>
+</section>
+<section id="tips"><h2><span class="no">11</span>十一、教师提示与变体</h2>
+<details><summary>提示 1 · 大班控场</summary><ul>
+<li><b>喊话格式：</b>严格规定" + "「我是 ××，我与 ×× 相连」，每次 5 秒。混乱时主持人喊「停」重置。</li>
+<li><b>人数不足 45：</b>余数学生任" + "「网络观察员」，负责记录谁被喊到最多——正好充当度数的直觉版。</li>
+<li><b>时间紧：</b>把" + "「找最短链」改为「从 F01 出发，两跳内能到达谁」，10 分钟即可。</li>
+</ul></details>
+<details><summary>提示 2 · 可视化与技术版</summary><ul>
+<li><b>有电脑：</b>把 FIGURES 数据做成 CSV，用 Gephi / NetworkX 现场生成网络图，让学生比较" + "「手绘」与「算法布局」的中心节点是否一致。</li>
+<li><b>进阶：</b>计算真实的 betweenness centrality，验证" + "「桥接人物」的直觉。</li>
+<li><b>联动：</b>与游戏 13（谷堆悖论）呼应——" + "「几步算短」同样是阈值问题。</li>
+</ul></details>
+</section>
+</main></div>
+<div class="bottom-nav"><a href="game05.html"><small>← 上一场 · 05</small>薛定谔的猫</a><a class="next" href="game07.html"><small>下一场 · 07 →</small>平面国</a></div><div class="footer">《数据科学与数字人文》教学配套资源 · 思想实验课堂游戏 · 素材仅限教学使用 · 真实史料请注明来源与许可</div>
+</body>
+</html>

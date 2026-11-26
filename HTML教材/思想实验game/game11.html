@@ -1,0 +1,295 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>游戏 11｜图灵测试 · 数据科学与数字人文</title>
+<style>
+:root{
+  --blue:#1f4e79; --blue2:#2b6cb0; --blue3:#3b82c4;
+  --soft:#eaf2fa; --soft2:#f5f9fd;
+  --green:#2f855a; --gsoft:#e9f6ef;
+  --ink:#1a202c; --muted:#4a5568; --faint:#718096;
+  --line:#d9e2ec; --line2:#edf1f6;
+  --bg:#f4f7fb; --card:#ffffff;
+  --red:#c53030; --rsoft:#fff5f5; --rline:#feb2b2;
+  --amber:#b7791f; --asoft:#fffaf0;
+  --shadow:0 2px 12px rgba(31,78,121,.07);
+}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:var(--bg);color:var(--ink);
+  font-family:"PingFang SC","Microsoft YaHei","Hiragino Sans GB","Source Han Sans SC",sans-serif;
+  line-height:1.78;font-size:15px}
+a{color:var(--blue2);text-decoration:none}
+a:hover{text-decoration:underline}
+code{background:var(--soft);padding:1px 5px;border-radius:4px;font-family:Consolas,"Courier New",monospace;font-size:.9em;color:var(--blue)}
+
+/* ---------- top bar ---------- */
+.topbar{background:var(--blue);color:#fff;padding:11px 0;box-shadow:0 2px 8px rgba(0,0,0,.12)}
+.topbar .wrap{max-width:1240px;margin:0 auto;padding:0 22px;display:flex;align-items:center;justify-content:space-between;gap:14px;flex-wrap:wrap}
+.brand{font-size:15.5px;font-weight:700}
+.brand small{display:block;font-size:11px;font-weight:400;opacity:.8;letter-spacing:.3px}
+.topbar nav{display:flex;gap:7px;flex-wrap:wrap;align-items:center}
+.topbar nav a,.topbar nav button{color:#fff;border:1px solid rgba(255,255,255,.42);background:transparent;
+  padding:5px 11px;border-radius:6px;font-size:12.5px;cursor:pointer;font-family:inherit;line-height:1.4}
+.topbar nav a:hover,.topbar nav button:hover{background:rgba(255,255,255,.16);text-decoration:none}
+.topbar nav .current{background:rgba(255,255,255,.2);border-color:#fff}
+
+/* ---------- hero ---------- */
+.hero{background:linear-gradient(120deg,#1f4e79 0%,#2b6cb0 52%,#2f855a 140%);color:#fff;padding:34px 22px 30px}
+.hero .wrap{max-width:1240px;margin:0 auto}
+.hero .kicker{font-size:11.5px;letter-spacing:2px;opacity:.85;margin:0 0 8px}
+.hero .tag{border:1px solid rgba(255,255,255,.5);border-radius:20px;padding:2px 10px;display:inline-block;font-size:11px;margin-bottom:10px}
+.hero h1{margin:0 0 6px;font-size:29px;line-height:1.3}
+.hero .en{font-size:13px;font-weight:400;opacity:.8;margin-left:8px}
+.hero .game-name{font-size:16px;font-weight:600;opacity:.96;margin:0 0 10px}
+.hero .lead{max-width:930px;margin:0;opacity:.93;font-size:13.8px}
+.stats{display:flex;gap:0;flex-wrap:wrap;margin-top:22px;border-top:1px solid rgba(255,255,255,.28);padding-top:16px}
+.stats .st{padding:0 20px;border-left:2px solid rgba(255,255,255,.4);min-width:120px}
+.stats .st:first-child{padding-left:0;border-left:none}
+.stats .st b{display:block;font-size:17px;line-height:1.3}
+.stats .st span{font-size:11px;opacity:.82}
+
+/* ---------- layout ---------- */
+.doc{max-width:1240px;margin:0 auto;padding:24px 22px 56px;display:grid;grid-template-columns:248px 1fr;gap:26px;align-items:start}
+.side{position:sticky;top:14px;background:var(--card);border:1px solid var(--line);border-radius:12px;
+  padding:15px;box-shadow:var(--shadow);max-height:calc(100vh - 28px);overflow:auto}
+.side h4{margin:2px 0 10px;font-size:12.5px;color:var(--blue);letter-spacing:.5px}
+.side a{display:block;padding:5px 8px;border-radius:6px;font-size:12.4px;color:var(--muted);line-height:1.45}
+.side a:hover{background:var(--soft);color:var(--blue);text-decoration:none}
+.side .jp{border-top:1px solid var(--line);margin-top:10px;padding-top:10px}
+.side .jp a{font-size:11.8px}
+.content{min-width:0}
+.content section{background:var(--card);border:1px solid var(--line);border-radius:12px;padding:24px 26px;margin-bottom:18px;box-shadow:var(--shadow)}
+.content section>h2{margin:0 0 14px;font-size:19px;color:var(--blue);padding-bottom:10px;border-bottom:2px solid var(--gsoft)}
+.content section>h2 .no{color:var(--green);font-size:13px;margin-right:8px}
+h3.sub{font-size:14.5px;color:var(--blue);margin:18px 0 8px;padding-left:9px;border-left:3px solid var(--green)}
+h3.sub:first-of-type{margin-top:4px}
+p{margin:8px 0}
+ul,ol{margin:8px 0;padding-left:22px}
+li{margin:5px 0}
+b,strong{color:var(--blue)}
+.small{font-size:12.8px;color:var(--muted)}
+
+/* ---------- blocks ---------- */
+.quote{background:var(--soft2);border-left:4px solid var(--blue3);border-radius:0 8px 8px 0;padding:12px 16px;margin:10px 0;font-size:13.6px}
+.quote .src{display:block;font-size:11.8px;color:var(--faint);margin-top:6px}
+.think{border:1px solid var(--line);border-radius:10px;padding:13px 16px;background:#fbfdff;margin:12px 0}
+.think .q{font-weight:700;color:var(--green);font-size:14px;margin-bottom:5px}
+.level{display:inline-block;font-size:11px;font-weight:700;padding:1px 7px;border-radius:20px;margin-right:6px;vertical-align:1px}
+.lv1{background:var(--soft);color:var(--blue)}
+.lv2{background:var(--gsoft);color:var(--green)}
+.lv3{background:var(--asoft);color:var(--amber)}
+.callout{border-left:4px solid var(--blue2);background:var(--soft);border-radius:0 8px 8px 0;padding:11px 15px;margin:12px 0;font-size:13.4px}
+.callout.green{border-left-color:var(--green);background:var(--gsoft)}
+.callout.risk{border-left-color:var(--red);background:var(--rsoft);border:1px solid var(--rline);border-left-width:4px;color:#7b2020}
+.callout.amber{border-left-color:var(--amber);background:var(--asoft)}
+
+/* ---------- setup cards ---------- */
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(250px,1fr));gap:12px;margin:12px 0}
+.grid3{display:grid;grid-template-columns:repeat(auto-fit,minmax(190px,1fr));gap:12px;margin:12px 0}
+.infocard{border:1px solid var(--line);border-radius:9px;padding:12px 14px;background:var(--soft2)}
+.infocard h4{margin:0 0 6px;font-size:12.6px;color:var(--blue);letter-spacing:.3px}
+.infocard .big{font-size:19px;font-weight:700;color:var(--green);line-height:1.3}
+.infocard p,.infocard ul{font-size:12.9px;margin:4px 0}
+.infocard ul{padding-left:18px}
+
+/* ---------- tables ---------- */
+.tbl-wrap{overflow-x:auto;margin:12px 0}
+table.tb{width:100%;border-collapse:collapse;font-size:13px;min-width:520px}
+table.tb th{background:var(--blue);color:#fff;text-align:left;padding:8px 10px;font-weight:600;font-size:12.5px}
+table.tb td{border-bottom:1px solid var(--line);padding:8px 10px;vertical-align:top}
+table.tb tbody tr:nth-child(even){background:#f8fafc}
+table.tb.compact{font-size:12.5px}
+table.tb.compact th,table.tb.compact td{padding:6px 8px}
+.pill{display:inline-block;padding:1px 8px;border-radius:20px;font-size:11px;font-weight:600;white-space:nowrap}
+.pill.b{background:var(--soft);color:var(--blue)}
+.pill.g{background:var(--gsoft);color:var(--green)}
+.pill.r{background:var(--rsoft);color:var(--red)}
+
+/* ---------- flow ---------- */
+ol.flow{margin:10px 0;padding:0;list-style:none;counter-reset:flow}
+ol.flow>li{position:relative;padding:12px 14px 12px 52px;margin:10px 0;border:1px solid var(--line);border-radius:9px;background:#fbfdff;counter-increment:flow}
+ol.flow>li:before{content:counter(flow);position:absolute;left:13px;top:12px;width:27px;height:27px;border-radius:8px;
+  background:var(--blue);color:#fff;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px}
+ol.flow>li .ft{font-weight:700;color:var(--blue);font-size:14px}
+ol.flow>li .tm{float:right;background:var(--gsoft);color:var(--green);font-size:11.5px;font-weight:700;padding:2px 9px;border-radius:20px}
+ol.flow>li .say{background:var(--asoft);border-left:3px solid var(--amber);padding:7px 11px;margin-top:8px;font-size:12.8px;color:#6b4f1d;border-radius:0 6px 6px 0}
+ol.flow>li p{font-size:13.2px;margin:5px 0}
+
+/* ---------- printable materials ---------- */
+.pm{border:2px dashed #b9c9da;border-radius:11px;padding:15px 17px;margin:16px 0;background:#fff;page-break-inside:avoid}
+.pm-h{margin:0 0 3px;font-size:14.5px;color:var(--blue);display:flex;align-items:center;gap:8px}
+.pm-h .tagp{background:var(--green);color:#fff;font-size:10.5px;padding:2px 8px;border-radius:20px;font-weight:600}
+.pm-note{font-size:12.3px;color:var(--muted);margin:0 0 12px;background:var(--soft2);padding:6px 10px;border-radius:6px}
+.pgrid{display:grid;gap:12px}
+.cols-2{grid-template-columns:repeat(2,1fr)}
+.cols-3{grid-template-columns:repeat(3,1fr)}
+.cols-4{grid-template-columns:repeat(4,1fr)}
+.pcard{border:1.5px solid #94a9be;border-radius:8px;padding:11px 12px;min-height:118px;background:#fcfdff;display:flex;flex-direction:column}
+.pcard .plab{font-size:10.8px;font-weight:800;letter-spacing:.5px;color:#fff;background:var(--blue);border-radius:4px;padding:2px 7px;display:inline-block;align-self:flex-start;margin-bottom:7px}
+.pcard.g .plab{background:var(--green)}
+.pcard.r .plab{background:var(--red)}
+.pcard.a .plab{background:var(--amber)}
+.pcard .pbody{font-size:12.6px;line-height:1.62;flex:1}
+.pcard .pbody p{margin:3px 0}
+.pcard .pcut{margin-top:9px;border-top:1px dashed #b9c9da;padding-top:5px;font-size:9.5px;color:var(--faint);text-align:center}
+.wsheet{border:1px solid var(--line);border-radius:8px;padding:14px 16px;background:#fcfdff;font-size:12.8px}
+.wsheet .wh{font-weight:700;color:var(--blue);margin:10px 0 5px;font-size:13px}
+.wsheet .wh:first-child{margin-top:0}
+.pline{border-bottom:1px solid #c3cfdb;height:26px;margin:5px 0}
+.pline.short{width:55%}
+.wsheet table.mm{width:100%;border-collapse:collapse;font-size:12px}
+.wsheet table.mm th,.wsheet table.mm td{border:1px solid #c3cfdb;padding:6px 7px;text-align:left;vertical-align:top}
+.wsheet table.mm th{background:var(--soft);color:var(--blue);font-size:11.5px}
+.wsheet table.mm td.empty{height:34px}
+.scorebox{border:1px solid var(--line);border-radius:8px;overflow:hidden;margin:10px 0}
+.scorebox table{width:100%;border-collapse:collapse;font-size:12.5px}
+.scorebox th{background:var(--green);color:#fff;padding:7px 9px;text-align:left}
+.scorebox td{border-bottom:1px solid var(--line);padding:6px 9px}
+.scorebox td.b{background:#fbfdff}
+
+/* ---------- debrief / tips ---------- */
+ol.debrief{margin:10px 0;padding-left:0;list-style:none;counter-reset:db}
+ol.debrief li{position:relative;padding:9px 12px 9px 42px;margin:7px 0;border-left:3px solid var(--gsoft);background:#fbfdff;border-radius:0 8px 8px 0;font-size:13.3px;counter-increment:db}
+ol.debrief li:before{content:counter(db);position:absolute;left:11px;top:9px;color:var(--green);font-weight:800;font-size:13px}
+details{margin:12px 0;border:1px solid var(--line);border-radius:9px;background:var(--soft2);padding:10px 14px}
+details summary{cursor:pointer;color:var(--blue);font-size:13.2px;font-weight:700}
+details[open] summary{margin-bottom:8px}
+details ul,details p{font-size:13px}
+
+/* ---------- bottom nav ---------- */
+.bottom-nav{max-width:1240px;margin:0 auto 40px;padding:0 22px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.bottom-nav a{flex:1;min-width:190px;background:var(--card);border:1px solid var(--line);border-radius:10px;padding:12px 16px;box-shadow:var(--shadow);font-size:13px}
+.bottom-nav a:hover{border-color:var(--blue2);text-decoration:none}
+.bottom-nav a small{display:block;color:var(--faint);font-size:11px}
+.bottom-nav a.next{text-align:right}
+.footer{text-align:center;color:var(--faint);font-size:11.8px;padding:0 20px 34px}
+
+/* ---------- responsive ---------- */
+@media(max-width:920px){
+  .doc{grid-template-columns:1fr;padding:18px 14px}
+  .side{position:static;max-height:none}
+  .content section{padding:19px 17px}
+  .hero h1{font-size:24px}
+  .cols-3,.cols-4{grid-template-columns:repeat(2,1fr)}
+}
+@media(max-width:560px){.cols-2,.cols-3,.cols-4{grid-template-columns:1fr}}
+
+/* ---------- print ---------- */
+@media print{
+  body{background:#fff;font-size:10.5pt;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+  .topbar,.side,.bottom-nav,.footer{display:none!important}
+  .doc{display:block;padding:0;max-width:none}
+  .content section{border:none;box-shadow:none;padding:0 0 14px;margin:0 0 14px;page-break-inside:auto;border-bottom:1px solid #ddd;border-radius:0}
+  .hero{background:#1f4e79!important;padding:14px 0;color:#fff}
+  .hero h1{font-size:20pt}
+  .hero .lead,.stats .st span{font-size:9pt}
+  .pm{page-break-before:auto;page-break-inside:avoid;border:2px dashed #777}
+  .pcard{min-height:105px}
+  details{display:block;border:none;background:none;padding:0}
+  details>summary{display:none}
+  a{color:inherit;text-decoration:none}
+}
+</style>
+</head>
+<body>
+<header class="topbar"><div class="wrap"><div class="brand">《数据科学与数字人文》· 思想实验课堂游戏<small>第 11 / 13 场 · 40–45 人班级版</small></div><nav><a href="thought-experiment-games.html">返回总览</a><a href="game10.html">← 上一场</a><a href="game12.html">下一场 →</a><button onclick="window.print()">打印素材</button></nav></div></header>
+<div class="hero"><div class="wrap"><p class="kicker">THOUGHT EXPERIMENT → CLASSROOM GAME · 11 / 13</p><span class="tag">对接 第11章 大语言模型与生成式 AI</span><h1>图灵测试<span class="en">Turing Test · Imitation Game</span></h1><p class="game-name">课堂游戏：人文版模仿游戏——盲测裁判</p><p class="lead">九个匿名答案，三个出自人手、三个是 LLM 裸答、三个是 RAG 接上语料后的回答。学生当裁判，投票「哪个是人写的」，并逐条标注有据无据。揭晓后统计幻觉率——他们会发现，最难辨的不是真假，而是「通顺」与「有据」之间的落差。</p><div class="stats"><div class="st"><b>50 分钟</b><span>建议时长</span></div><div class="st"><b>40–45 人</b><span>适用班级</span></div><div class="st"><b>11 组 × 4 人</b><span>分组方式</span></div><div class="st"><b>★★★☆☆</b><span>难度</span></div></div></div></div>
+<div class="doc"><aside class="side"><h4>本场目录</h4><a href="#origin">一、思想实验原典与展开</a><a href="#mapping">二、与教材的对接</a><a href="#setup">三、班级组织（40–45 人）</a><a href="#objectives">四、学习目标</a><a href="#materials">五、材料清单与准备</a><a href="#flow">六、游戏流程</a><a href="#assets">七、游戏素材（可打印）</a><a href="#debrief">八、讨论引导（分层）</a><a href="#assessment">九、评价与计分</a><a href="#redline">十、伦理与安全红线</a><a href="#tips">十一、教师提示与变体</a><div class="jp"><a href="game10.html">← 10 拉普拉斯妖</a><a href="game12.html">→ 12 电车难题</a></div></aside>
+<main class="content">
+<section id="origin"><h2><span class="no">01</span>一、思想实验原典与展开</h2>
+<h3 class="sub">原典原文（节译）</h3>
+<div class="quote">我建议用" + "「模仿游戏」来代替这个问题。游戏中有一个男人 A、一个女人 B 和一个询问者 C。C 待在另一个房间，通过文字与 A、B 交谈。C 的任务是判断哪个是男人、哪个是女人。A 的任务是让 C 判断错误。<br>那么，如果机器取代 A 后，C 判断错误的概率与原来相同，我们是否还说这台机器在思考？
+<span class="src">——图灵《计算机器与智能》（Computing Machinery and Intelligence），Mind，1950</span></div>
+
+<h3 class="sub">提出者与问题转换</h3>
+<p>艾伦·图灵（Alan Turing，1912—1954），英国数学家、逻辑学家，计算机科学的奠基者。他意识到" + "「机器能否思考」无法直接定义，于是把它替换为一个<b>可操作的行为测试</b>：如果对话中无法区分，就应当承认它在思考。这是典型的" + "「操作主义」策略。</p>
+
+<h3 class="sub">思想实验的展开</h3>
+<ol>
+<li><b>原版是性别模仿：</b>图灵最初的游戏是判断男女，机器只是替换其中之一——这个设计本身就在暗示" + "「智能」与「性别」一样，可能是被表演出来的。</li>
+<li><b>判据的软肋：</b>通过测试只说明" + "「像」，不说明" + "「是」。塞尔的中文房间正是对这一软肋的攻击（见游戏 04）。</li>
+<li><b>反向图灵测试：</b>让 AI 出题、人作答，AI 判断谁是人——当 AI 比人更会识别人时，测试的指向就翻转了。</li>
+</ol>
+
+<h3 class="sub">后续变体</h3>
+<ul>
+<li><b>Loebner 奖与 CAPTCHA：</b>前者是年度图灵测试竞赛，后者是" + "「反向图灵测试」——用人类易答、机器难答的问题做验证。</li>
+<li><b>LLM 时代的复活：</b>2023 年后，多项研究显示大模型在短对话中已能让人难以分辨，图灵测试从哲学假设变成日常经验。</li>
+<li><b>人文版（本游戏）：</b>不只问" + "「像不像人」，更问" + "「有没有据」——把教材 11.5 的幻觉核查嵌入测试。</li>
+</ul>
+
+<h3 class="sub">常见误解</h3>
+<div class="callout amber"><b>误解：</b>" + "「图灵测试通过了，就证明机器有意识。」<br><b>正解：</b>图灵本人只主张" + "「如果无法区分，就应当接受它在思考」这一操作性约定，并明确表示不回答" + "「机器是否真的有意识」这个问题。测试测的是<b>行为等价</b>，不是内在体验。</div>
+</section>
+<section id="mapping"><h2><span class="no">02</span>二、与教材的对接</h2>
+<div class="tbl-wrap"><table class="tb"><thead><tr><th>教材节点</th><th>游戏对应机制</th><th>习得的判断</th></tr></thead><tbody><tr><td>11.1 生成式 AI 进了人文书房</td><td>九个古籍问答答案</td><td>AI 已能生成像样的学术回答</td></tr><tr><td>11.2 提示工程</td><td>学生写「必须引用原文」的提示词</td><td>提问方式决定可核查性</td></tr><tr><td>11.3 RAG</td><td>裸答 vs RAG 两组对照</td><td>接上语料能显著降低幻觉</td></tr><tr><td>11.5 幻觉与学术诚信</td><td>逐条标注有据 / 无据</td><td>通顺不等于可靠</td></tr><tr><td>11.6 署名、透明、不替代思考</td><td>署名声明环节</td><td>用了就要说，说了还要负责</td></tr></tbody></table></div>
+<div class="callout green"><b>一句话锚点：</b>盲测能骗过人眼，但骗不过证据核查。<b>通过图灵测试 ≠ 理解，更 ≠ 可引用。</b></div>
+</section>
+<section id="setup"><h2><span class="no">03</span>三、班级组织（40–45 人）</h2>
+<div class="grid3">
+<div class="infocard"><h4>班级规模</h4><div class="big">40–45 人</div><p>11 组 × 4 人 = 44；余 1 人任" + "「揭晓官」，保管九条答案的来源。</p></div>
+<div class="infocard"><h4>组内角色</h4><div class="big">4 人 / 组</div><ul><li>盲测裁判 ×2（判断来源 + 标注证据）</li><li>提示工程师 ×1（第二环节执笔）</li><li>核查员 ×1（回原文验证）</li></ul></div>
+<div class="infocard"><h4>准备方式</h4><div class="big">教师课前</div><p>九条答案由教师按素材页准备好，投影或印成卡片，全程匿名编号 A1–C3。</p></div>
+</div>
+<div class="callout">大班关键：<b>统一投影九条答案</b>，不要每组发纸质版（易泄露来源）。盲测投票用举手或纸质表，30 秒完成。</div>
+</section>
+<section id="objectives"><h2><span class="no">04</span>四、学习目标</h2>完成本场游戏后，学生应能：<ul><li><b>区分</b>人工答案、LLM 裸答与 RAG 答案的输出特征（识记层）。</li><li><b>核查</b>答案中的引文与出处，标注幻觉位置（应用层）。</li><li><b>设计</b>能促进「引用原文、给出处」的提示模板（应用层）。</li><li><b>说明</b>为什么通过图灵测试不等于理解，以及在论文中如何声明 AI 使用（反思层）。</li></ul></section>
+<section id="materials"><h2><span class="no">05</span>五、材料清单与准备</h2><div class="tbl-wrap"><table class="tb"><thead><tr><th>品名</th><th>数量（45 人上限）</th><th>说明</th></tr></thead><tbody><tr><td>九条匿名答案（A1–C3）</td><td>投影 1 套 / 卡片 11 套</td><td>素材页已提供完整文本，教师课前录入</td></tr><tr><td>三道问题</td><td>投影 1 套</td><td>素材页提供</td></tr><tr><td>盲测投票表</td><td>45 份</td><td>每人 1 份，含来源判断 + 有据标注</td></tr><tr><td>幻觉核查表</td><td>11 份</td><td>每组 1 份，记录具体幻觉句</td></tr><tr><td>提示词设计单</td><td>11 份</td><td>每组 1 份</td></tr><tr><td>AI 使用声明表</td><td>11 份</td><td>每组 1 份</td></tr></tbody></table></div>
+<div class="callout amber"><b>课前准备：</b>把九条答案按编号整理成投影页（每题三答案并列），<b>不要暴露 A/B/C 的来源含义</b>。答案中的幻觉（B1 虞姬自刎、B2 重农抑商、B3 出自自序）是刻意设计的，教师须自己先核对。</div>
+</section>
+<section id="flow"><h2><span class="no">06</span>六、游戏流程</h2><ol class="flow"><li><div class="ft">宣布模仿游戏</div><span class="tm">4′</span><p>说明规则：九条答案来自三个来源，编号 A1–C3。你的任务不是猜来源那么简单，还要标出「有据 / 无据」。</p></li><li><div class="ft">盲测投票</div><span class="tm">10′</span><p>投影 Q1 与三个答案。学生独立投票「哪条是人写的」，并逐条标注证据状态。Q2、Q3 同法。</p></li><li><div class="ft">揭晓对账</div><span class="tm">8′</span><p>揭晓官公布：A＝人工、B＝裸答、C＝RAG。统计三组幻觉率与「把 AI 误认为人」的比例。</p><div class="say"><b>教师引导语：</b>「你们最容易把哪一组当成人？——最通顺的那组。这正是危险所在。」</div></li><li><div class="ft">提示工程挑战</div><span class="tm">15′</span><p>各组写提示词，要求模型回答同类问题时「必须引用原文、给出处、不确定则说明」。比谁的提示词带来的幻觉最少。</p></li><li><div class="ft">幻觉自检与署名</div><span class="tm">8′</span><p>对照 11.5/11.6：如果你在论文里用了刚才最优的 AI 答案，应在何处声明、如何署名？「不替代思考」的边界在哪里？</p></li><li><div class="ft">收束：与中文房间对读</div><span class="tm">5′</span><p>教师点题：能通过盲测 ≠ 理解。第 4 章的中文房间早已给出答案——操作符号不等于懂得意义。</p></li></ol></section>
+<section id="assets"><h2><span class="no">07</span>七、游戏素材（可打印）</h2>
+<h3 class="sub">素材 A · 三道问题与九条匿名答案（教师用，含来源标注）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>三道问题（投影用）</h4><p class="pm-note">每题配三条答案，共九条。学生只看到编号，不知道 A/B/C 代表什么。</p><div class="pgrid cols-3"><div class="pcard "><span class="plab">Q1</span><div class="pbody"><p>《史记》中'霸王别姬'的记载出自哪一篇？司马迁本人是怎么写的？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">Q2</span><div class="pbody"><p>《货殖列传》主要写了什么？它体现了司马迁怎样的经济思想？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard "><span class="plab">Q3</span><div class="pbody"><p>'究天人之际，通古今之变'出自哪里？是什么意思？</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">九条答案 · A 组（人工撰写）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>A 组 = 人工</h4><p class="pm-note">这三条由人撰写。风格上有口语痕迹、有个人经验，但未必都给出处。</p><div class="pgrid cols-3"><div class="pcard g"><span class="plab">A1</span><div class="pbody"><p>出自《史记·项羽本纪》。项王被围垓下，夜闻汉军四面楚歌，于是慷慨悲歌，与虞姬泣别——'力拔山兮气盖世'就是这时唱的。后来逃到乌江自刎。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">A2</span><div class="pbody"><p>'货殖列传'是《史记》里专门写商人和经济活动的传，写了范蠡、子贡这些人。司马迁说'天下熙熙，皆为利来'，他不像后来的儒家那样鄙视商人，而是承认人的欲望和商业的合理性。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">A3</span><div class="pbody"><p>这是司马迁《报任安书》里的话。意思是探究天道与人事的关系，通晓从古到今的变化，是《史记》的写作宗旨。我本科读古代文学时背过这句。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">九条答案 · B 组（LLM 裸答，含刻意幻觉）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>B 组 = LLM 裸答</h4><p class="pm-note">幻觉点：B1「虞姬舞剑后自刎」（史记无此记载）、B2「重农抑商」（与司马迁立场相反）、B3「出自太史公自序」（应为报任安书）。</p><div class="pgrid cols-3"><div class="pcard r"><span class="plab">B1</span><div class="pbody"><p>该记载见于《史记·项羽本纪》。项羽在垓下听到四面楚歌，与虞姬在军帐中诀别，虞姬舞剑后自刎，项羽唱《垓下歌》'力拔山兮气盖世'。随后他率八百骑突围，最终在乌江自刎。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard r"><span class="plab">B2</span><div class="pbody"><p>《货殖列传》记载了春秋至汉武帝时期范蠡、子贡、白圭等商人的事迹，体现司马迁'重农抑商'的思想，认为商业是末业，应当加以限制，以保护农业生产。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard r"><span class="plab">B3</span><div class="pbody"><p>'究天人之际，通古今之变'出自《史记·太史公自序》，是司马迁在自序中概括《史记》写作宗旨的名句，意为探究天道与人事之间的关系，通晓古今历史的变化规律。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">九条答案 · C 组（RAG 接语料）</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>C 组 = RAG</h4><p class="pm-note">共同特征：给出原文引文与卷次，并主动指出常见误解。这就是 RAG 降低幻觉的可观察标志。</p><div class="pgrid cols-3"><div class="pcard g"><span class="plab">C1</span><div class="pbody"><p>据《史记·项羽本纪》原文：'项王军壁垓下，兵少食尽，汉军及诸侯兵围之数重。夜闻汉军四面皆楚歌……于是项王乃悲歌慷慨，自为诗曰：力拔山兮气盖世。'[《史记》卷七] 需注意：司马迁并未写虞姬自刎，'霸王别姬'的完整情节是后世演绎。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">C2</span><div class="pbody"><p>据《史记·货殖列传》原文：'天下熙熙，皆为利来；天下攘攘，皆为利往。'该传为范蠡、子贡、白圭等立传，主张'善者因之，其次利道之'。司马迁反对的是官营垄断'与民争利'（参见《史记·平准书》），并非简单的重农抑商。[《史记》卷一二九]</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div><div class="pcard g"><span class="plab">C3</span><div class="pbody"><p>据《文选》卷四一及《汉书·司马迁传》所载《报任安书》：'亦欲以究天人之际，通古今之变，成一家之言。'[《文选》卷四一] 注意此语出自《报任安书》，而非《史记·太史公自序》；后者虽有'绍明世，正《易传》'等语，但无此句。</p></div><div class="pcut">✂ - - - - - - - - - - - - - - - -</div></div></div></div>
+<h3 class="sub">素材 B · 盲测、核查与提示设计表</h3>
+<div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>盲测投票表（每人 1 份）</h4><p class="pm-note">先猜来源，再标证据。注意：两者是独立判断。</p><div class="wsheet">
+<table class="mm"><tr><th style="width:12%">答案编号</th><th style="width:22%">你猜的来源</th><th style="width:22%">证据状态</th><th style="width:44%">具体依据（哪句话让你这样判断）</th></tr>
+<tr><td>A1</td><td>□人 □AI □不确定</td><td>□有据 □无据 □存疑</td><td></td></tr><tr><td>A2</td><td>□人 □AI □不确定</td><td>□有据 □无据 □存疑</td><td></td></tr><tr><td>A3</td><td>□人 □AI □不确定</td><td>□有据 □无据 □存疑</td><td></td></tr><tr><td>B1</td><td>□人 □AI □不确定</td><td>□有据 □无据 □存疑</td><td></td></tr><tr><td>B2</td><td>□人 □AI □不确定</td><td>□有据 □无据 □存疑</td><td></td></tr><tr><td>B3</td><td>□人 □AI □不确定</td><td>□有据 □无据 □存疑</td><td></td></tr><tr><td>C1</td><td>□人 □AI □不确定</td><td>□有据 □无据 □存疑</td><td></td></tr><tr><td>C2</td><td>□人 □AI □不确定</td><td>□有据 □无据 □存疑</td><td></td></tr><tr><td>C3</td><td>□人 □AI □不确定</td><td>□有据 □无据 □存疑</td><td></td></tr>
+</table>
+<div class="wh">你最容易把哪一组当成人？</div><div class="pline"></div>
+</div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>幻觉核查表（每组 1 份）</h4><p class="pm-note">揭晓后填写。幻觉须抄出原句，不能只写「有幻觉」。</p><div class="wsheet">
+<table class="mm"><tr><th style="width:12%">编号</th><th style="width:44%">幻觉原句（抄录）</th><th style="width:44%">应如何核查 / 正确说法</th></tr>
+<tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr><tr><td></td><td></td><td></td></tr></table>
+<div class="wh">裸答组幻觉率 ____ / 3　　RAG 组幻觉率 ____ / 3</div>
+</div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>提示词设计单（每组 1 份）</h4><p class="pm-note">要求：让模型给出可核查的回答。写清角色、任务、约束、输出格式。</p><div class="wsheet">
+<div class="wh">你的提示词全文</div><div class="pline"></div><div class="pline"></div><div class="pline"></div><div class="pline"></div>
+<div class="wh">其中包含的可核查约束（逐条列出）</div><p>① ＿＿＿＿＿　② ＿＿＿＿＿　③ ＿＿＿＿＿</p>
+<div class="wh">你准备如何自检幻觉</div><div class="pline"></div>
+</div></div><div class="pm"><h4 class="pm-h"><span class="tagp">可打印素材</span>AI 使用声明表（每组 1 份）</h4><p class="pm-note">参照 11.6，把「用了什么、怎么用、谁核查」写清楚。</p><div class="wsheet">
+<table class="mm"><tr><th style="width:28%">声明项</th><th>填写</th></tr>
+<tr><td>使用的模型 / 工具</td><td></td></tr><tr><td>使用环节（提示、生成、润色…）</td><td></td></tr><tr><td>人工核查方式</td><td></td></tr><tr><td>责任承担者</td><td></td></tr><tr><td>未使用 AI 的环节</td><td></td></tr></table>
+<div class="wh">一句话说明" + "「不替代思考」的边界"</div><div class="pline"></div>
+</div></div></section>
+<section id="debrief"><h2><span class="no">08</span>八、讨论引导（分层）</h2><ol class="debrief"><li><span class="level lv1">识记</span>说出图灵测试的操作性定义，并解释为何它只测「行为等价」。</li><li><span class="level lv2">分析</span>你最容易把哪一组答案当成人？「通顺」与「有据」为什么容易混淆？</li><li><span class="level lv2">分析</span>B1/B2/B3 的幻觉各是什么？如果学生直接引用，会造成怎样的学术后果？</li><li><span class="level lv2">分析</span>RAG 为什么能降低幻觉？它的局限是什么——检索错了会怎样？</li><li><span class="level lv3">反思</span>通过了图灵测试就等于「理解」吗？第 4 章的中文房间怎么回答？</li><li><span class="level lv3">反思</span>如果 AI 答案比人写得更好，人还要不要署名？署名到底在声明什么？</li></ol></section>
+<section id="assessment"><h2><span class="no">09</span>九、评价与计分</h2>
+<div class="scorebox"><table><thead><tr><th>维度</th><th>分值</th><th>达标描述</th><th>扣分点</th></tr></thead><tbody><tr><td class="b">盲测判断</td><td>20</td><td>来源判断有据，不以「像人」为唯一标准</td><td>纯凭语感扣 10 分</td></tr><tr><td class="b">幻觉识别</td><td>30</td><td>准确抄出三处幻觉并给出正确说法</td><td>每漏 1 处扣 10 分</td></tr><tr><td class="b">提示词质量</td><td>30</td><td>含引用、出处、不确定声明三类约束</td><td>每缺 1 类扣 10 分</td></tr><tr><td class="b">署名声明</td><td>20</td><td>五栏齐全，责任明确</td><td>缺项每处扣 4 分</td></tr></tbody></table></div>
+<div class="callout green"><b>个人加分（+5）：</b>找出一条" + "「自己曾经觉得很有道理、其实没有出处」的 AI 回答。</div>
+</section>
+<section id="redline"><h2><span class="no">10</span>十、伦理与安全红线</h2>
+<div class="callout risk"><b>教学红线：</b>①九条答案中 B 组的幻觉为教学刻意设计，须在揭晓时明确说明；②不得使用学生真实作业作为" + "「人工答案」而不征得同意；③引用《史记》原文须核对权威版本，素材页文本仅供课堂演示；④强调" + "「声明 AI 使用」是学术诚信要求，不是免责声明。</div>
+</section>
+<section id="tips"><h2><span class="no">11</span>十一、教师提示与变体</h2>
+<details><summary>提示 1 · 备课要点</summary><ul>
+<li><b>答案准备：</b>素材页九条答案可直接投影。若想更真实，可课前用大模型现场生成裸答与 RAG 答案，但要自己先核对幻觉位置。</li>
+<li><b>揭晓时机：</b>必须在所有组完成盲测投票后揭晓，否则提示词环节会被污染。</li>
+<li><b>能力差异：</b>基础较弱的学生可只做 Q1 一题，把时间留给提示词设计与讨论。</li>
+</ul></details>
+<details><summary>提示 2 · 变体与联动</summary><ul>
+<li><b>身份反转：</b>把" + "「人写的」换成「学生自己写的」，加入自我识别环节，冲击力更强。</li>
+<li><b>反向图灵测试：</b>让学生出题考 AI，看看什么问题能暴露机器身份（如" + "「描述你昨天晚饭吃了什么」）。</li>
+<li><b>三连问收束：</b>04 中文房间（懂不懂）→ 11 图灵测试（像不像）→ 12 电车难题（该不该），构成期末复盘主线。</li>
+</ul></details>
+</section>
+</main></div>
+<div class="bottom-nav"><a href="game10.html"><small>← 上一场 · 10</small>拉普拉斯妖</a><a class="next" href="game12.html"><small>下一场 · 12 →</small>电车难题</a></div><div class="footer">《数据科学与数字人文》教学配套资源 · 思想实验课堂游戏 · 素材仅限教学使用 · 真实史料请注明来源与许可</div>
+</body>
+</html>
